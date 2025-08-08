@@ -73,7 +73,7 @@ jobs:
           libelf-dev bc gcc make debootstrap live-build squashfs-tools \
           dosfstools xorriso isolinux syslinux-utils genisoimage \
           qemu-system-x86 python3-pip nmap curl wget rsync pv \
-          grub-pc-bin grub-efi-amd64-bin mtools
+          grub-pc-bin grub-efi-amd64-bin mtools vulkan-sdk
           
     - name: Set Build Parameters
       run: |
@@ -84,6 +84,7 @@ jobs:
         
     - name: Build Ainux OS
       run: |
+        chmod +x ainux-builder.sh
         # Run build with timeout (2 hours max)
         timeout 7200 ./ainux-builder.sh || {
           echo "Build timed out or failed"
