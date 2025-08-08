@@ -1,6 +1,6 @@
-MIT License
+# MIT License
 
-Copyright (c) 2025 yaotagroep
+Copyright (c) 2025 Ainux OS Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -12,10 +12,72 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+**THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.**
+
+---
+
+## Additional Notices
+
+### Third-Party Components
+
+This software incorporates components from various open source projects, each with their own licensing terms:
+
+#### Linux Kernel
+- **License**: GPL-2.0
+- **Source**: https://kernel.org
+- **Notice**: Linux kernel modifications are GPL-2.0 licensed
+
+#### Ubuntu Base System
+- **License**: Various (mostly GPL, LGPL, MIT)
+- **Source**: https://ubuntu.com
+- **Notice**: Ubuntu packages retain their original licenses
+
+#### AI Frameworks
+- **PyTorch**: BSD-3-Clause License
+- **TensorFlow**: Apache-2.0 License  
+- **ONNX Runtime**: MIT License
+
+#### Hardware Drivers
+- **NVIDIA CUDA**: NVIDIA End User License Agreement
+- **AMD ROCm**: MIT License (open source components)
+- **Intel OpenVINO**: Apache-2.0 License
+
+### Patent Considerations
+
+This software may implement technologies covered by patents. Users are responsible for ensuring compliance with applicable patent licenses when deploying in commercial environments.
+
+### Export Control
+
+This software may be subject to export control regulations in various countries. Users are responsible for compliance with applicable export control laws.
+
+### Trademark Notice
+
+- "Ainux" and "Ainux OS" are trademarks of the Ainux OS project
+- "Linux" is a registered trademark of Linus Torvalds
+- "Ubuntu" is a registered trademark of Canonical Ltd.
+- "NVIDIA", "CUDA", and "Tesla" are trademarks of NVIDIA Corporation
+- "AMD" and "ROCm" are trademarks of Advanced Micro Devices, Inc.
+- Other trademarks are property of their respective owners
+
+### Disclaimer
+
+THE SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+
+You are solely responsible for determining the appropriateness of using or redistributing the Software and assume any risks associated with Your exercise of permissions under this License.
+
+### Limitation of Liability
+
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING BUT NOT LIMITED TO SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES OR LOSSES, WHETHER ARISING FROM CONTRACT, TORT (INCLUDING NEGLIGENCE), OR OTHERWISE, ARISING OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+*For questions about licensing, please contact: legal@ainux.org*AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
