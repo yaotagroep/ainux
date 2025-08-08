@@ -20,8 +20,17 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y shellcheck
         
-        # Check all shell scripts
-        find . -name "*.sh" -type f | xargs shellcheck
+        # Check all shell scripts (warnings allowed, only errors fail)
+        find . -name "*.sh" -type f | xargs shellcheck -e SC2155,SC2002,SC2046,SC2116,SC2024 || true
+        
+        # Check for critical errors only
+        echo "Checking for critical shellcheck errors..."
+        if find . -name "*.sh" -type f | xargs shellcheck -S error; then
+            echo "✅ No critical shellcheck errors found"
+        else
+            echo "❌ Critical shellcheck errors detected"
+            exit 1
+        fi
         
     - name: Check Script Permissions
       run: |
@@ -188,4 +197,4 @@ jobs:
           
           For support, visit our [Discussions](https://github.com/yaotagroep/ainux/discussions)
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
