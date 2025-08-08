@@ -55,6 +55,8 @@ jobs:
             
     steps:
     - uses: actions/checkout@v4
+      with:
+        lfs: true
     
     - name: Free Disk Space
       run: |
@@ -129,6 +131,8 @@ jobs:
     needs: validate-scripts
     steps:
     - uses: actions/checkout@v4
+      with:
+        lfs: true
     
     - name: Run Security Scan
       run: |
@@ -149,6 +153,8 @@ jobs:
     if: github.event_name == 'release'
     steps:
     - uses: actions/checkout@v4
+      with:
+        lfs: true
     
     - name: Build Release ISOs
       env:
