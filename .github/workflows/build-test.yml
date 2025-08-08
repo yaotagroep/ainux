@@ -86,6 +86,7 @@ jobs:
         echo "ENABLE_GUI=${{ matrix.gui }}" >> $GITHUB_ENV
         echo "SKIP_QEMU_TEST=true" >> $GITHUB_ENV
         echo "BUILD_THREADS=2" >> $GITHUB_ENV  # Limit for CI
+        echo "SKIP_CONNECTIVITY_CHECK=true" >> $GITHUB_ENV  # Skip redundant check in CI
         
     - name: Build Ainux OS
       run: |
@@ -163,6 +164,7 @@ jobs:
       env:
         SKIP_QEMU_TEST: true
         BUILD_THREADS: 4
+        SKIP_CONNECTIVITY_CHECK: true
       run: |
         # Build main node with GUI
         CLUSTER_MODE=main ENABLE_GUI=true ./ainux-builder.sh
