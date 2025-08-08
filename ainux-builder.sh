@@ -32,7 +32,326 @@ log_phase() { echo -e "\n${PURPLE}[PHASE]${NC} $1\n"; }
 
 # Error handling
 error_exit() {
-    log_error "Build failed at line $1"
+    log_success "Build validation completed"
+}
+
+# Main execution with comprehensive error handling
+main() {
+    local start_time=$(date +%s)
+    
+    log_phase "Starting Ainux OS AI Cluster Builder Process"
+    
+    # Check prerequisites
+    check_prerequisites
+    
+    # Execute build phases
+    init_build
+    build_kernel
+    create_rootfs  
+    build_iso
+    validate_build
+    
+    # Calculate build time
+    local end_time=$(date +%s)
+    local build_duration=$((end_time - start_time))
+    local hours=$((build_duration / 3600))
+    local minutes=$(((build_duration % 3600) / 60))
+    
+    log_success "🎉 Ainux OS AI Cluster Build Completed Successfully!"
+    log_info "⏱️  Total build time: ${hours}h ${minutes}m"
+    log_info "📁 Build directory: $BUILD_DIR"
+    log_info "💿 Bootable ISO: $BUILD_DIR/iso/ainux-ai-cluster.iso"
+    log_info "🛠️  Validation script: $BUILD_DIR/validate-build.sh"
+    log_info "📊 Build logs: $BUILD_DIR/logs/"
+    
+    # Display final statistics
+    echo
+    echo "📈 Build Statistics:"
+    echo "==================="
+    if [[ -f "$BUILD_DIR/iso/ainux-ai-cluster.iso" ]]; then
+        local iso_size=$(du -h "$BUILD_DIR/iso/ainux-ai-cluster.iso" | cut -f1)
+        echo "ISO Size: $iso_size"
+    fi
+    
+    if [[ -f "$BUILD_DIR/kernel/vmlinuz-$KERNEL_VERSION-ainux" ]]; then
+        local kernel_size=$(du -h "$BUILD_DIR/kernel/vmlinuz-$KERNEL_VERSION-ainux" | cut -f1)
+        echo "Kernel Size: $kernel_size"
+    fi
+    
+    if [[ -d "$BUILD_DIR/kernel/modules" ]]; then
+        local module_count=$(find "$BUILD_DIR/kernel/modules" -name "*.ko" | wc -l)
+        echo "Kernel Modules: $module_count"
+    fi
+    
+    local total_size=$(du -sh "$BUILD_DIR" | cut -f1)
+    echo "Total Build Size: $total_size"
+    
+    echo
+    echo "🚀 Quick Start Commands:"
+    echo "======================="
+    echo "# Test in QEMU:"
+    echo "cd $BUILD_DIR/iso && qemu-system-x86_64 -m 4096 -cdrom ainux-ai-cluster.iso -enable-kvm"
+    echo
+    echo "# Create bootable USB (replace /dev/sdX with your USB device):"
+    echo "sudo dd if=$BUILD_DIR/iso/ainux-ai-cluster.iso of=/dev/sdX bs=4M status=progress"
+    echo
+    echo "# Validate build:"
+    echo "cd $BUILD_DIR/iso && ./validate-build.sh"
+    echo
+    echo "# After booting Ainux OS:"
+    echo "# Login: aiadmin / ainux2024"
+    echo "sudo cluster-init              # Initialize cluster"
+    echo "sudo validate-hardware         # Check hardware support"
+    echo "/usr/local/bin/ai-monitor      # Monitor AI resources"
+    echo
+}
+
+# Cleanup function for interrupted builds
+cleanup_interrupted_build() {
+    log_warning "Build interrupted. Cleaning up..."
+    cleanup_build
+    log_info "Partial build artifacts preserved in: $BUILD_DIR"
+    log_info "To resume, remove the build directory and restart"
+    exit 130
+}
+
+# Signal handling for graceful shutdown
+trap cleanup_interrupted_build SIGINT SIGTERM
+
+# Help function
+show_help() {
+    cat << 'HELP_EOF'
+Ainux OS AI Cluster Builder v2.1
+================================
+
+USAGE:
+    ./ainux-builder.sh [OPTIONS]
+
+OPTIONS:
+    -h, --help              Show this help message
+    -m, --mode MODE         Set cluster mode: main|sub (default: main)
+    -t, --threads N         Build threads (default: nproc)
+    -g, --gui               Enable GUI components (XFCE)
+    --skip-qemu             Skip QEMU testing phase
+    --custom-packages LIST  Install additional packages (space-separated)
+    --build-dir PATH        Custom build directory (default: ~/ainux-build)
+
+ENVIRONMENT VARIABLES:
+    CLUSTER_MODE           Cluster mode (main/sub)
+    BUILD_THREADS          Number of parallel build jobs
+    ENABLE_GUI             Enable GUI (true/false)
+    SKIP_QEMU_TEST         Skip QEMU testing (true/false)
+    CUSTOM_PACKAGES        Additional packages to install
+
+EXAMPLES:
+    # Build main node with GUI:
+    ./ainux-builder.sh --mode main --gui
+
+    # Build sub node, skip testing:
+    ./ainux-builder.sh --mode sub --skip-qemu
+
+    # Custom build with additional packages:
+    ./ainux-builder.sh --custom-packages "vim htop ncdu"
+
+    # Environment variable usage:
+    CLUSTER_MODE=sub ENABLE_GUI=true ./ainux-builder.sh
+
+REQUIREMENTS:
+    - Ubuntu 22.04 LTS host system
+    - 30GB+ free disk space
+    - Internet connection
+    - sudo privileges
+    - 8GB+ RAM recommended
+
+BUILD OUTPUT:
+    - ainux-ai-cluster.iso      Bootable ISO image
+    - *.sha256, *.md5          Checksums
+    - validate-build.sh        Build validation script
+    - logs/                    Build logs directory
+
+CLUSTER SETUP:
+    1. Boot from ISO on main node
+    2. Login: aiadmin / ainux2024
+    3. Run: sudo cluster-init
+    4. Boot sub-nodes and repeat steps 2-3
+    5. Validate: sudo validate-hardware
+
+For more information, visit: https://github.com/yaotagroep/ainux
+HELP_EOF
+}
+
+# Parse command line arguments
+parse_arguments() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            -m|--mode)
+                CLUSTER_MODE="$2"
+                shift 2
+                ;;
+            -t|--threads)
+                BUILD_THREADS="$2"
+                shift 2
+                ;;
+            -g|--gui)
+                ENABLE_GUI="true"
+                shift
+                ;;
+            --skip-qemu)
+                SKIP_QEMU_TEST="true"
+                shift
+                ;;
+            --custom-packages)
+                CUSTOM_PACKAGES="$2"
+                shift 2
+                ;;
+            --build-dir)
+                BUILD_DIR="$2"
+                shift 2
+                ;;
+            *)
+                log_error "Unknown option: $1"
+                log_info "Use --help for usage information"
+                exit 1
+                ;;
+        esac
+    done
+    
+    # Validate arguments
+    if [[ "$CLUSTER_MODE" != "main" && "$CLUSTER_MODE" != "sub" ]]; then
+        log_error "Invalid cluster mode: $CLUSTER_MODE (must be 'main' or 'sub')"
+        exit 1
+    fi
+    
+    if ! [[ "$BUILD_THREADS" =~ ^[0-9]+$ ]] || [[ "$BUILD_THREADS" -lt 1 ]]; then
+        log_error "Invalid build threads: $BUILD_THREADS (must be positive integer)"
+        exit 1
+    fi
+}
+
+# Check for updates
+check_for_updates() {
+    if command -v curl >/dev/null 2>&1; then
+        local latest_version
+        latest_version=$(curl -s --max-time 5 "https://api.github.com/repos/yaotagroep/ainux/releases/latest" | \
+                        grep '"tag_name"' | cut -d'"' -f4 2>/dev/null || echo "")
+        
+        if [[ -n "$latest_version" && "$latest_version" != "v2.1" ]]; then
+            log_warning "A newer version ($latest_version) may be available"
+            log_info "Visit: https://github.com/yaotagroep/ainux/releases"
+        fi
+    fi
+}
+
+# Pre-flight system check
+preflight_check() {
+    log_info "Performing pre-flight system check..."
+    
+    # Check system resources
+    local available_memory=$(free -g | awk '/^Mem:/{print $2}')
+    if [[ $available_memory -lt 8 ]]; then
+        log_warning "Low system memory ($available_memory GB). Build may be slow or fail."
+        log_info "Recommended: 8GB+ RAM for optimal build performance"
+    fi
+    
+    # Check CPU cores
+    local cpu_cores=$(nproc)
+    if [[ $cpu_cores -lt 4 ]]; then
+        log_warning "Limited CPU cores ($cpu_cores). Consider reducing build threads."
+        BUILD_THREADS=$((cpu_cores))
+    fi
+    
+    # Check for virtualization support (for QEMU testing)
+    if [[ "$SKIP_QEMU_TEST" != "true" ]]; then
+        if ! grep -q "vmx\|svm" /proc/cpuinfo; then
+            log_warning "Hardware virtualization not available. QEMU testing will be slower."
+        fi
+    fi
+    
+    # Check for required commands
+    local missing_commands=()
+    for cmd in git make gcc debootstrap genisoimage; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            missing_commands+=("$cmd")
+        fi
+    done
+    
+    if [[ ${#missing_commands[@]} -gt 0 ]]; then
+        log_error "Missing required commands: ${missing_commands[*]}"
+        log_info "These will be installed during the build process"
+    fi
+    
+    log_success "Pre-flight check completed"
+}
+
+# Create build summary
+create_build_summary() {
+    local summary_file="$BUILD_DIR/build-summary.json"
+    
+    cat > "$summary_file" << EOF
+{
+    "build_info": {
+        "version": "2.1",
+        "timestamp": "$(date -Iseconds)",
+        "build_duration_seconds": $(($(date +%s) - start_time)),
+        "hostname": "$(hostname)",
+        "user": "$(whoami)",
+        "build_directory": "$BUILD_DIR"
+    },
+    "configuration": {
+        "kernel_version": "$KERNEL_VERSION",
+        "cluster_mode": "$CLUSTER_MODE",
+        "build_threads": $BUILD_THREADS,
+        "gui_enabled": $ENABLE_GUI,
+        "custom_packages": "$CUSTOM_PACKAGES"
+    },
+    "artifacts": {
+        "iso_file": "ainux-ai-cluster.iso",
+        "iso_size_bytes": $(stat -f%z "$BUILD_DIR/iso/ainux-ai-cluster.iso" 2>/dev/null || echo 0),
+        "kernel_file": "vmlinuz-$KERNEL_VERSION-ainux",
+        "checksums": {
+            "sha256": "$(cat "$BUILD_DIR/iso/ainux-ai-cluster.iso.sha256" 2>/dev/null | cut -d' ' -f1 || echo 'N/A')",
+            "md5": "$(cat "$BUILD_DIR/iso/ainux-ai-cluster.iso.md5" 2>/dev/null | cut -d' ' -f1 || echo 'N/A')"
+        }
+    },
+    "system_info": {
+        "host_os": "$(lsb_release -d 2>/dev/null | cut -f2 || echo 'Unknown')",
+        "kernel": "$(uname -r)",
+        "architecture": "$(uname -m)",
+        "cpu_cores": $(nproc),
+        "memory_gb": $(free -g | awk '/^Mem:/{print $2}'),
+        "disk_space_gb": $(df "$BUILD_DIR" | tail -1 | awk '{print int($2/1024/1024)}')
+    }
+}
+EOF
+
+    log_info "Build summary saved to: $summary_file"
+}
+
+# Entry point with argument parsing
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    # Initialize variables
+    start_time=$(date +%s)
+    
+    # Parse command line arguments
+    parse_arguments "$@"
+    
+    # Run main build process
+    main
+    
+    # Create build summary
+    create_build_summary
+    
+    log_success "Build process completed successfully!"
+fi
+
+# Export functions for external use
+export -f log_info log_success log_warning log_error log_phase
+export -f cleanup_build check_prerequisites
+export -f init_build build_kernel create_rootfs build_iso validate_builderror "Build failed at line $1"
     log_error "Command: $2"
     cleanup_build
     exit 1
@@ -168,12 +487,11 @@ build_kernel() {
     log_phase "Building Custom Kernel $KERNEL_VERSION with AI Optimizations"
     cd "$BUILD_DIR/kernel"
     
-    # Download kernel with progress
+    # Download kernel with progress - FIXED
     log_info "Downloading Linux kernel $KERNEL_VERSION..."
     if [[ ! -d "linux" ]]; then
         git clone --depth 1 --branch "v$KERNEL_VERSION" \
-            https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git 2>&1 | \
-            pv -l -s $(echo "Cloning kernel source...")
+            https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
     fi
     cd linux
     
@@ -332,15 +650,12 @@ EOF
     log_info "  Container Support: $(grep -q "CONFIG_CGROUPS=y" .config && echo "Enabled" || echo "Disabled")"
     log_info "  Performance Events: $(grep -q "CONFIG_PERF_EVENTS=y" .config && echo "Enabled" || echo "Disabled")"
     
-    # Build kernel with progress indication
+    # Build kernel with progress indication - FIXED
     log_info "Compiling kernel... This will take 30-90 minutes depending on hardware"
     log_info "Using $BUILD_THREADS parallel build jobs"
     
     # Kernel compilation
-    make -j"$BUILD_THREADS" LOCALVERSION=-mupoese 2>&1 | tee "$BUILD_DIR/logs/kernel-build.log" | \
-        grep -E "(CC|LD|AR)" | pv -l -s 5000 > /dev/null &
-    
-    make -j"$BUILD_THREADS" LOCALVERSION=-mupoese
+    make -j"$BUILD_THREADS" LOCALVERSION=-ainux 2>&1 | tee "$BUILD_DIR/logs/kernel-build.log"
     make modules -j"$BUILD_THREADS" 2>&1 | tee "$BUILD_DIR/logs/modules-build.log"
     
     # Install kernel artifacts
@@ -362,10 +677,8 @@ create_rootfs() {
     log_phase "Creating Root Filesystem"
     cd "$BUILD_DIR/rootfs"
     
-    # Bootstrap with progress
+    # Bootstrap with progress - FIXED
     log_info "Bootstrapping Ubuntu 22.04 base system..."
-    sudo debootstrap --arch=amd64 jammy rootfs http://archive.ubuntu.com/ubuntu/ 2>&1 | \
-        pv -l -s 1000 > /dev/null &
     sudo debootstrap --arch=amd64 jammy rootfs http://archive.ubuntu.com/ubuntu/
     
     # Prepare chroot environment
@@ -753,7 +1066,7 @@ cleanup() {
 trap cleanup SIGTERM SIGINT
 
 # Store PID
-echo $$ > "$PID_FILE"
+echo $ > "$PID_FILE"
 
 log_daemon "Starting Ainux OS Cluster Daemon (Mode: $CLUSTER_MODE)"
 
@@ -956,7 +1269,7 @@ cat > /usr/local/bin/validate-hardware << 'VALIDATE_EOF'
 set -euo pipefail
 
 echo "=================================="
-echo "MUPOESE AI Cluster OS Validation"
+echo "Ainux OS AI Cluster Validation"
 echo "=================================="
 echo "Timestamp: $(date)"
 echo "Hostname: $(hostname)"
@@ -1091,15 +1404,13 @@ echo "Root filesystem setup completed successfully"
 exit 0
 EOF
 
-    # Execute chroot setup with progress monitoring
+    # Execute chroot setup with progress monitoring - FIXED
     log_info "Executing system setup in chroot environment..."
     sudo chmod +x rootfs/setup.sh
     
     # Run setup with timeout and progress indication
-    timeout 3600 sudo chroot rootfs /setup.sh 2>&1 | tee "$BUILD_DIR/logs/rootfs-setup.log" | \
-        grep -E "(Installing|Setting up|Processing)" | pv -l -s 500 > /dev/null &
+    timeout 3600 sudo chroot rootfs /setup.sh 2>&1 | tee "$BUILD_DIR/logs/rootfs-setup.log"
     
-    sudo chroot rootfs /setup.sh
     sudo rm rootfs/setup.sh
     
     # Install custom packages if specified
@@ -1284,7 +1595,7 @@ validate_build() {
 set -euo pipefail
 
 echo "=================================="
-echo "MUPOESE AI Cluster OS Build Validation"
+echo "Ainux OS AI Cluster Build Validation"
 echo "=================================="
 echo "Build completed: $(date)"
 echo "Build directory: $PWD"
@@ -1292,12 +1603,12 @@ echo "Build directory: $PWD"
 # Check file integrity
 echo -e "\n📁 Build Artifacts:"
 echo "-------------------"
-if [[ -f "mupoese-ai-cluster.iso" ]]; then
-    echo "✅ ISO file: mupoese-ai-cluster.iso ($(du -h mupoese-ai-cluster.iso | cut -f1))"
+if [[ -f "ainux-ai-cluster.iso" ]]; then
+    echo "✅ ISO file: ainux-ai-cluster.iso ($(du -h ainux-ai-cluster.iso | cut -f1))"
     
     # Verify checksums
-    if [[ -f "mupoese-ai-cluster.iso.sha256" ]]; then
-        if sha256sum -c mupoese-ai-cluster.iso.sha256 >/dev/null 2>&1; then
+    if [[ -f "ainux-ai-cluster.iso.sha256" ]]; then
+        if sha256sum -c ainux-ai-cluster.iso.sha256 >/dev/null 2>&1; then
             echo "✅ SHA256 checksum: Valid"
         else
             echo "❌ SHA256 checksum: Invalid"
@@ -1312,24 +1623,24 @@ fi
 echo -e "\n💿 ISO Structure Validation:"
 echo "----------------------------"
 if command -v isoinfo >/dev/null 2>&1; then
-    echo "Boot catalog: $(isoinfo -d -i mupoese-ai-cluster.iso | grep "El Torito" || echo "Not found")"
-    echo "Volume ID: $(isoinfo -d -i mupoese-ai-cluster.iso | grep "Volume id" | cut -d: -f2 | xargs)"
-    echo "System ID: $(isoinfo -d -i mupoese-ai-cluster.iso | grep "System id" | cut -d: -f2 | xargs)"
+    echo "Boot catalog: $(isoinfo -d -i ainux-ai-cluster.iso | grep "El Torito" || echo "Not found")"
+    echo "Volume ID: $(isoinfo -d -i ainux-ai-cluster.iso | grep "Volume id" | cut -d: -f2 | xargs)"
+    echo "System ID: $(isoinfo -d -i ainux-ai-cluster.iso | grep "System id" | cut -d: -f2 | xargs)"
 fi
 
 # Test kernel artifacts
 echo -e "\n🔧 Kernel Validation:"
 echo "---------------------"
-if [[ -f "../kernel/vmlinuz-$KERNEL_VERSION-mupoese" ]]; then
-    echo "✅ Custom kernel: vmlinuz-$KERNEL_VERSION-mupoese"
-    kernel_size=$(du -h "../kernel/vmlinuz-$KERNEL_VERSION-mupoese" | cut -f1)
+if [[ -f "../kernel/vmlinuz-$KERNEL_VERSION-ainux" ]]; then
+    echo "✅ Custom kernel: vmlinuz-$KERNEL_VERSION-ainux"
+    kernel_size=$(du -h "../kernel/vmlinuz-$KERNEL_VERSION-ainux" | cut -f1)
     echo "   Size: $kernel_size"
 else
     echo "❌ Custom kernel not found"
 fi
 
-if [[ -d "../kernel/modules/lib/modules/$KERNEL_VERSION-mupoese" ]]; then
-    module_count=$(find "../kernel/modules/lib/modules/$KERNEL_VERSION-mupoese" -name "*.ko" | wc -l)
+if [[ -d "../kernel/modules/lib/modules/$KERNEL_VERSION-ainux" ]]; then
+    module_count=$(find "../kernel/modules/lib/modules/$KERNEL_VERSION-ainux" -name "*.ko" | wc -l)
     echo "✅ Kernel modules: $module_count modules built"
 else
     echo "❌ Kernel modules not found"
@@ -1357,10 +1668,10 @@ fi
 echo -e "\n🎯 Recommended Next Steps:"
 echo "--------------------------"
 echo "1. Test ISO in virtual machine:"
-echo "   qemu-system-x86_64 -m 4096 -cdrom mupoese-ai-cluster.iso -enable-kvm"
+echo "   qemu-system-x86_64 -m 4096 -cdrom ainux-ai-cluster.iso -enable-kvm"
 echo ""
 echo "2. Create bootable USB drive:"
-echo "   sudo dd if=mupoese-ai-cluster.iso of=/dev/sdX bs=4M status=progress"
+echo "   sudo dd if=ainux-ai-cluster.iso of=/dev/sdX bs=4M status=progress"
 echo ""
 echo "3. Validate on target hardware:"
 echo "   - Boot from ISO/USB"
@@ -1395,323 +1706,4 @@ VALIDATE_EOF
             -enable-kvm -display gtk || true
     fi
     
-    log_success "Build validation completed"
-}
-
-# Main execution with comprehensive error handling
-main() {
-    local start_time=$(date +%s)
-    
-    log_phase "Starting MUPOESE AI Cluster OS Build Process"
-    
-    # Check prerequisites
-    check_prerequisites
-    
-    # Execute build phases
-    init_build
-    build_kernel
-    create_rootfs  
-    build_iso
-    validate_build
-    
-    # Calculate build time
-    local end_time=$(date +%s)
-    local build_duration=$((end_time - start_time))
-    local hours=$((build_duration / 3600))
-    local minutes=$(((build_duration % 3600) / 60))
-    
-    log_success "🎉 Ainux OS AI Cluster Build Completed Successfully!"
-    log_info "⏱️  Total build time: ${hours}h ${minutes}m"
-    log_info "📁 Build directory: $BUILD_DIR"
-    log_info "💿 Bootable ISO: $BUILD_DIR/iso/ainux-ai-cluster.iso"
-    log_info "🛠️  Validation script: $BUILD_DIR/validate-build.sh"
-    log_info "📊 Build logs: $BUILD_DIR/logs/"
-    
-    # Display final statistics
-    echo
-    echo "📈 Build Statistics:"
-    echo "==================="
-    if [[ -f "$BUILD_DIR/iso/ainux-ai-cluster.iso" ]]; then
-        local iso_size=$(du -h "$BUILD_DIR/iso/ainux-ai-cluster.iso" | cut -f1)
-        echo "ISO Size: $iso_size"
-    fi
-    
-    if [[ -f "$BUILD_DIR/kernel/vmlinuz-$KERNEL_VERSION-ainux" ]]; then
-        local kernel_size=$(du -h "$BUILD_DIR/kernel/vmlinuz-$KERNEL_VERSION-ainux" | cut -f1)
-        echo "Kernel Size: $kernel_size"
-    fi
-    
-    if [[ -d "$BUILD_DIR/kernel/modules" ]]; then
-        local module_count=$(find "$BUILD_DIR/kernel/modules" -name "*.ko" | wc -l)
-        echo "Kernel Modules: $module_count"
-    fi
-    
-    local total_size=$(du -sh "$BUILD_DIR" | cut -f1)
-    echo "Total Build Size: $total_size"
-    
-    echo
-    echo "🚀 Quick Start Commands:"
-    echo "======================="
-    echo "# Test in QEMU:"
-    echo "cd $BUILD_DIR/iso && qemu-system-x86_64 -m 4096 -cdrom ainux-ai-cluster.iso -enable-kvm"
-    echo
-    echo "# Create bootable USB (replace /dev/sdX with your USB device):"
-    echo "sudo dd if=$BUILD_DIR/iso/ainux-ai-cluster.iso of=/dev/sdX bs=4M status=progress"
-    echo
-    echo "# Validate build:"
-    echo "cd $BUILD_DIR/iso && ./validate-build.sh"
-    echo
-    echo "# After booting Ainux OS:"
-    echo "# Login: aiadmin / ainux2024"
-    echo "sudo cluster-init              # Initialize cluster"
-    echo "sudo validate-hardware         # Check hardware support"
-    echo "/usr/local/bin/ai-monitor      # Monitor AI resources"
-    echo
-}
-
-# Cleanup function for interrupted builds
-cleanup_interrupted_build() {
-    log_warning "Build interrupted. Cleaning up..."
-    cleanup_build
-    log_info "Partial build artifacts preserved in: $BUILD_DIR"
-    log_info "To resume, remove the build directory and restart"
-    exit 130
-}
-
-# Signal handling for graceful shutdown
-trap cleanup_interrupted_build SIGINT SIGTERM
-
-# Help function
-show_help() {
-    cat << 'HELP_EOF'
-Ainux OS AI Cluster Builder v2.1
-================================
-
-USAGE:
-    ./ainux-builder.sh [OPTIONS]
-
-OPTIONS:
-    -h, --help              Show this help message
-    -m, --mode MODE         Set cluster mode: main|sub (default: main)
-    -t, --threads N         Build threads (default: nproc)
-    -g, --gui               Enable GUI components (XFCE)
-    --skip-qemu             Skip QEMU testing phase
-    --custom-packages LIST  Install additional packages (space-separated)
-    --build-dir PATH        Custom build directory (default: ~/ainux-build)
-
-ENVIRONMENT VARIABLES:
-    CLUSTER_MODE           Cluster mode (main/sub)
-    BUILD_THREADS          Number of parallel build jobs
-    ENABLE_GUI             Enable GUI (true/false)
-    SKIP_QEMU_TEST         Skip QEMU testing (true/false)
-    CUSTOM_PACKAGES        Additional packages to install
-
-EXAMPLES:
-    # Build main node with GUI:
-    ./ainux-builder.sh --mode main --gui
-
-    # Build sub node, skip testing:
-    ./ainux-builder.sh --mode sub --skip-qemu
-
-    # Custom build with additional packages:
-    ./ainux-builder.sh --custom-packages "vim htop ncdu"
-
-    # Environment variable usage:
-    CLUSTER_MODE=sub ENABLE_GUI=true ./ainux-builder.sh
-
-REQUIREMENTS:
-    - Ubuntu 22.04 LTS host system
-    - 30GB+ free disk space
-    - Internet connection
-    - sudo privileges
-    - 8GB+ RAM recommended
-
-BUILD OUTPUT:
-    - ainux-ai-cluster.iso      Bootable ISO image
-    - *.sha256, *.md5          Checksums
-    - validate-build.sh        Build validation script
-    - logs/                    Build logs directory
-
-CLUSTER SETUP:
-    1. Boot from ISO on main node
-    2. Login: aiadmin / ainux2024
-    3. Run: sudo cluster-init
-    4. Boot sub-nodes and repeat steps 2-3
-    5. Validate: sudo validate-hardware
-
-For more information, visit: https://github.com/yaotagroep/ainux
-HELP_EOF
-}
-
-# Parse command line arguments
-parse_arguments() {
-    while [[ $# -gt 0 ]]; do
-        case $1 in
-            -h|--help)
-                show_help
-                exit 0
-                ;;
-            -m|--mode)
-                CLUSTER_MODE="$2"
-                shift 2
-                ;;
-            -t|--threads)
-                BUILD_THREADS="$2"
-                shift 2
-                ;;
-            -g|--gui)
-                ENABLE_GUI="true"
-                shift
-                ;;
-            --skip-qemu)
-                SKIP_QEMU_TEST="true"
-                shift
-                ;;
-            --custom-packages)
-                CUSTOM_PACKAGES="$2"
-                shift 2
-                ;;
-            --build-dir)
-                BUILD_DIR="$2"
-                shift 2
-                ;;
-            *)
-                log_error "Unknown option: $1"
-                log_info "Use --help for usage information"
-                exit 1
-                ;;
-        esac
-    done
-    
-    # Validate arguments
-    if [[ "$CLUSTER_MODE" != "main" && "$CLUSTER_MODE" != "sub" ]]; then
-        log_error "Invalid cluster mode: $CLUSTER_MODE (must be 'main' or 'sub')"
-        exit 1
-    fi
-    
-    if ! [[ "$BUILD_THREADS" =~ ^[0-9]+$ ]] || [[ "$BUILD_THREADS" -lt 1 ]]; then
-        log_error "Invalid build threads: $BUILD_THREADS (must be positive integer)"
-        exit 1
-    fi
-}
-
-# Check for updates
-check_for_updates() {
-    if command -v curl >/dev/null 2>&1; then
-        local latest_version
-        latest_version=$(curl -s --max-time 5 "https://api.github.com/repos/yaotagroep/ainux/releases/latest" | \
-                        grep '"tag_name"' | cut -d'"' -f4 2>/dev/null || echo "")
-        
-        if [[ -n "$latest_version" && "$latest_version" != "v2.1" ]]; then
-            log_warning "A newer version ($latest_version) may be available"
-            log_info "Visit: https://github.com/yaotagroep/ainux/releases"
-        fi
-    fi
-}
-
-# Pre-flight system check
-preflight_check() {
-    log_info "Performing pre-flight system check..."
-    
-    # Check system resources
-    local available_memory=$(free -g | awk '/^Mem:/{print $2}')
-    if [[ $available_memory -lt 8 ]]; then
-        log_warning "Low system memory ($available_memory GB). Build may be slow or fail."
-        log_info "Recommended: 8GB+ RAM for optimal build performance"
-    fi
-    
-    # Check CPU cores
-    local cpu_cores=$(nproc)
-    if [[ $cpu_cores -lt 4 ]]; then
-        log_warning "Limited CPU cores ($cpu_cores). Consider reducing build threads."
-        BUILD_THREADS=$((cpu_cores))
-    fi
-    
-    # Check for virtualization support (for QEMU testing)
-    if [[ "$SKIP_QEMU_TEST" != "true" ]]; then
-        if ! grep -q "vmx\|svm" /proc/cpuinfo; then
-            log_warning "Hardware virtualization not available. QEMU testing will be slower."
-        fi
-    fi
-    
-    # Check for required commands
-    local missing_commands=()
-    for cmd in git make gcc debootstrap genisoimage; do
-        if ! command -v "$cmd" >/dev/null 2>&1; then
-            missing_commands+=("$cmd")
-        fi
-    done
-    
-    if [[ ${#missing_commands[@]} -gt 0 ]]; then
-        log_error "Missing required commands: ${missing_commands[*]}"
-        log_info "These will be installed during the build process"
-    fi
-    
-    log_success "Pre-flight check completed"
-}
-
-# Create build summary
-create_build_summary() {
-    local summary_file="$BUILD_DIR/build-summary.json"
-    
-    cat > "$summary_file" << EOF
-{
-    "build_info": {
-        "version": "2.1",
-        "timestamp": "$(date -Iseconds)",
-        "build_duration_seconds": $(($(date +%s) - start_time)),
-        "hostname": "$(hostname)",
-        "user": "$(whoami)",
-        "build_directory": "$BUILD_DIR"
-    },
-    "configuration": {
-        "kernel_version": "$KERNEL_VERSION",
-        "cluster_mode": "$CLUSTER_MODE",
-        "build_threads": $BUILD_THREADS,
-        "gui_enabled": $ENABLE_GUI,
-        "custom_packages": "$CUSTOM_PACKAGES"
-    },
-    "artifacts": {
-        "iso_file": "mupoese-ai-cluster.iso",
-        "iso_size_bytes": $(stat -f%z "$BUILD_DIR/iso/ainux-ai-cluster.iso" 2>/dev/null || echo 0),
-        "kernel_file": "vmlinuz-$KERNEL_VERSION-ainux",
-        "checksums": {
-            "sha256": "$(cat "$BUILD_DIR/iso/ainux-ai-cluster.iso.sha256" 2>/dev/null | cut -d' ' -f1 || echo 'N/A')",
-            "md5": "$(cat "$BUILD_DIR/iso/ainux-ai-cluster.iso.md5" 2>/dev/null | cut -d' ' -f1 || echo 'N/A')"
-        }
-    },
-    "system_info": {
-        "host_os": "$(lsb_release -d 2>/dev/null | cut -f2 || echo 'Unknown')",
-        "kernel": "$(uname -r)",
-        "architecture": "$(uname -m)",
-        "cpu_cores": $(nproc),
-        "memory_gb": $(free -g | awk '/^Mem:/{print $2}'),
-        "disk_space_gb": $(df "$BUILD_DIR" | tail -1 | awk '{print int($2/1024/1024)}')
-    }
-}
-EOF
-
-    log_info "Build summary saved to: $summary_file"
-}
-
-# Entry point with argument parsing
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    # Initialize variables
-    start_time=$(date +%s)
-    
-    # Parse command line arguments
-    parse_arguments "$@"
-    
-    # Run main build process
-    main
-    
-    # Create build summary
-    create_build_summary
-    
-    log_success "Build process completed successfully!"
-fi
-
-# Export functions for external use
-export -f log_info log_success log_warning log_error log_phase
-export -f cleanup_build check_prerequisites
-export -f init_build build_kernel create_rootfs build_iso validate_build
+    log_
