@@ -66,10 +66,46 @@ check_prerequisites() {
         exit 1
     fi
     
-    # Check internet connectivity
-    if ! ping -c 1 google.com &>/dev/null; then
-        log_error "Internet connection required for downloading dependencies"
-        exit 1
+    # Check internet connectivity (more robust for CI environments)
+    log_info "Checking internet connectivity..."
+    
+    # Allow skipping connectivity check in CI environments
+    if [[ "${SKIP_CONNECTIVITY_CHECK:-false}" == "true" ]]; then
+        log_warning "Skipping connectivity check (SKIP_CONNECTIVITY_CHECK=true)"
+    else
+        # Try multiple connectivity methods and endpoints
+        connectivity_ok=false
+        
+        # Method 1: Try curl to GitHub (most important for this build)
+        if curl -s --connect-timeout 10 --max-time 30 https://github.com >/dev/null 2>&1; then
+            connectivity_ok=true
+            log_info "✓ GitHub connectivity confirmed"
+        fi
+        
+        # Method 2: Try curl to Ubuntu repos  
+        if [[ "$connectivity_ok" == "false" ]] && curl -s --connect-timeout 10 --max-time 30 http://archive.ubuntu.com >/dev/null 2>&1; then
+            connectivity_ok=true
+            log_info "✓ Ubuntu repository connectivity confirmed"
+        fi
+        
+        # Method 3: Try wget as fallback
+        if [[ "$connectivity_ok" == "false" ]] && wget -q --timeout=10 --tries=1 --spider https://www.google.com >/dev/null 2>&1; then
+            connectivity_ok=true
+            log_info "✓ General internet connectivity confirmed"
+        fi
+        
+        # Method 4: Final fallback - try ping if available
+        if [[ "$connectivity_ok" == "false" ]] && command -v ping >/dev/null && ping -c 1 -W 5 8.8.8.8 >/dev/null 2>&1; then
+            connectivity_ok=true
+            log_info "✓ Network connectivity confirmed via ping"
+        fi
+        
+        if [[ "$connectivity_ok" == "false" ]]; then
+            log_error "Internet connection required for downloading dependencies"
+            log_error "This build requires access to: GitHub, Ubuntu repositories, and other package sources"
+            log_error "Set SKIP_CONNECTIVITY_CHECK=true to bypass this check (not recommended)"
+            exit 1
+        fi
     fi
     
     # Check if running as root (should not)
