@@ -500,10 +500,10 @@ build_kernel() {
     
     # Create fallback patches if download fails
     create_fallback_patches() {
-        log_warning "Using fallback patch configuration..."
-        
-        # NPU Support patch
-        cat > npu-support.patch << 'EOF'
+    log_warning "Using fallback patch configuration..."
+    
+    # NPU Support patch
+    cat > npu-support.patch << 'NPU_EOF'
 --- a/drivers/Kconfig
 +++ b/drivers/Kconfig
 @@ -240,4 +240,6 @@ source "drivers/interconnect/Kconfig"
@@ -535,10 +535,10 @@ build_kernel() {
 +	  Enable support for ARM Ethos NPUs.
 +
 +endif # NPU_FRAMEWORK
-EOF
+NPU_EOF
 
-        # ROCm optimization patch
-        cat > rocm-optimizations.patch << 'EOF'
+    # ROCm optimization patch
+    cat > rocm-optimizations.patch << 'ROCM_EOF'
 --- a/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
 +++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
 @@ -190,6 +190,7 @@ module_param_named(sched_hw_submission, amdgpu_sched_hw_submission, int, 0444);
@@ -548,10 +548,10 @@ EOF
 +/* AI cluster optimizations enabled by default */
  MODULE_PARM_DESC(forcelongtraining, "force long training (default 0)");
  module_param_named(forcelongtraining, amdgpu_force_long_training, bool, 0444);
-EOF
+ROCM_EOF
 
-        # Basic cluster networking patch  
-        cat > cluster-networking.patch << 'EOF'
+    # Basic cluster networking patch  
+    cat > cluster-networking.patch << 'NET_EOF'
 --- a/net/core/dev.c
 +++ b/net/core/dev.c  
 @@ -5520,6 +5520,9 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
@@ -562,10 +562,11 @@ EOF
 +	/* Ainux OS cluster packet optimization */
 +	skb->priority = min(skb->priority + 1, 7);
  
+
  	net_timestamp_check(!netdev_tstamp_prequeue, skb);
-EOF
-    }
-    
+NET_EOF
+   }
+       
     # Try to download patches, fall back to local creation
     if ! wget -q --timeout=10 https://raw.githubusercontent.com/mupoese/npu-patches/main/6.6-npu-support.patch 2>/dev/null; then
         create_fallback_patches
