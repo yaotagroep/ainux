@@ -1,1 +1,870 @@
-
+diff --git a/drivers/Kconfig b/drivers/Kconfig
+index 8b9fded5bf55..a8c6b5b2c9e3 100644
+--- a/drivers/Kconfig
++++ b/drivers/Kconfig
+@@ -240,4 +240,6 @@ source "drivers/interconnect/Kconfig"
+ 
+ source "drivers/counter/Kconfig"
+ 
++source "drivers/npu/Kconfig"
++
+ endmenu
+diff --git a/drivers/Makefile b/drivers/Makefile
+index e32107c3e361..4b3491d89742 100644
+--- a/drivers/Makefile
++++ b/drivers/Makefile
+@@ -195,3 +195,4 @@ obj-$(CONFIG_MOST)		+= most/
+ obj-$(CONFIG_PECI)		+= peci/
+ obj-$(CONFIG_HTE)		+= hte/
+ obj-$(CONFIG_DRM_ACCEL)		+= accel/
++obj-$(CONFIG_NPU_FRAMEWORK)	+= npu/
+diff --git a/drivers/npu/Kconfig b/drivers/npu/Kconfig
+new file mode 100644
+index 000000000000..f8e7d2a7b5c1
+--- /dev/null
++++ b/drivers/npu/Kconfig
+@@ -0,0 +1,65 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Neural Processing Unit (NPU) support for Ainux OS
++#
++
++menuconfig NPU_FRAMEWORK
++	bool "Neural Processing Unit (NPU) Support"
++	help
++	  Enable support for Neural Processing Units (NPUs) in Ainux OS.
++	  NPUs are specialized processors designed for AI/ML acceleration,
++	  providing high-performance inference and training capabilities.
++
++if NPU_FRAMEWORK
++
++config ROCKCHIP_NPU
++	tristate "Rockchip NPU Support"
++	depends on ARM64 || X86_64
++	help
++	  Enable support for Rockchip NPUs (Neural Processing Units).
++	  This includes support for RK3588 and other Rockchip SoCs
++	  with integrated NPU capabilities. The driver provides
++	  device nodes and API for AI inference acceleration.
++
++config ARM_ETHOS_NPU  
++	tristate "ARM Ethos NPU Support"
++	depends on ARM64 || X86_64
++	help
++	  Enable support for ARM Ethos NPUs. ARM Ethos-N series
++	  neural processing units provide efficient AI inference
++	  for edge computing applications. This driver supports
++	  Ethos-N77, Ethos-N57, and Ethos-N37 NPUs.
++
++config INTEL_VPU
++	tristate "Intel VPU (Vision Processing Unit) Support"
++	depends on X86_64 && PCI
++	help
++	  Enable support for Intel VPU (Vision Processing Unit).
++	  Intel VPU provides hardware acceleration for computer
++	  vision and AI inference workloads. This includes support
++	  for Intel Meteor Lake and later processors.
++
++config QUALCOMM_NPU
++	tristate "Qualcomm Hexagon NPU Support"
++	depends on ARM64
++	help
++	  Enable support for Qualcomm Hexagon DSP/NPU units.
++	  Qualcomm Snapdragon processors include dedicated
++	  Hexagon processors for AI acceleration and signal
++	  processing tasks.
++
++config MEDIATEK_APU
++	tristate "MediaTek APU Support"
++	depends on ARM64
++	help
++	  Enable support for MediaTek APU (AI Processing Unit).
++	  MediaTek Dimensity processors include dedicated APU
++	  cores for AI and machine learning acceleration.
++
++config NPU_DEBUG
++	bool "NPU Framework Debug Support"
++	depends on NPU_FRAMEWORK
++	help
++	  Enable debug support for NPU framework. This includes
++	  additional logging, debugging interfaces, and validation
++	  checks for NPU operations.
++
++endif # NPU_FRAMEWORK
+diff --git a/drivers/npu/Makefile b/drivers/npu/Makefile
+new file mode 100644
+index 000000000000..8b5f4e3c2d1a
+--- /dev/null
++++ b/drivers/npu/Makefile
+@@ -0,0 +1,12 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Makefile for Neural Processing Unit (NPU) drivers
++#
++
++obj-$(CONFIG_NPU_FRAMEWORK)	+= npu-core.o
++obj-$(CONFIG_ROCKCHIP_NPU)	+= rockchip-npu.o
++obj-$(CONFIG_ARM_ETHOS_NPU)	+= arm-ethos-npu.o
++obj-$(CONFIG_INTEL_VPU)		+= intel-vpu.o
++obj-$(CONFIG_QUALCOMM_NPU)	+= qualcomm-npu.o
++obj-$(CONFIG_MEDIATEK_APU)	+= mediatek-apu.o
++obj-$(CONFIG_NPU_DEBUG)		+= npu-debug.o
+diff --git a/drivers/npu/npu-core.c b/drivers/npu/npu-core.c
+new file mode 100644
+index 000000000000..7b5c3a9e4d8f
+--- /dev/null
++++ b/drivers/npu/npu-core.c
+@@ -0,0 +1,245 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Neural Processing Unit (NPU) Core Framework
++ * 
++ * Copyright (C) 2024 Ainux OS Project
++ * 
++ * This framework provides a unified interface for various NPU
++ * implementations including Rockchip, ARM Ethos, Intel VPU,
++ * Qualcomm Hexagon, and MediaTek APU.
++ */
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/device.h>
++#include <linux/cdev.h>
++#include <linux/fs.h>
++#include <linux/uaccess.h>
++#include <linux/slab.h>
++#include <linux/idr.h>
++#include <linux/mutex.h>
++#include <linux/dma-mapping.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
++
++#define NPU_DRIVER_NAME		"ainux-npu"
++#define NPU_DRIVER_VERSION	"2.1.0"
++#define NPU_MAX_DEVICES		16
++#define NPU_BUFFER_SIZE		(4 * 1024 * 1024) /* 4MB default */
++
++/* NPU device types */
++enum npu_type {
++	NPU_TYPE_UNKNOWN = 0,
++	NPU_TYPE_ROCKCHIP,
++	NPU_TYPE_ARM_ETHOS,
++	NPU_TYPE_INTEL_VPU,
++	NPU_TYPE_QUALCOMM_HEXAGON,
++	NPU_TYPE_MEDIATEK_APU,
++};
++
++/* NPU capabilities */
++#define NPU_CAP_INFERENCE	BIT(0)
++#define NPU_CAP_TRAINING	BIT(1)
++#define NPU_CAP_FP16		BIT(2)
++#define NPU_CAP_INT8		BIT(3)
++#define NPU_CAP_QUANTIZATION	BIT(4)
++#define NPU_CAP_MULTI_BATCH	BIT(5)
++
++/* NPU IOCTL commands */
++#define NPU_IOC_MAGIC		'N'
++#define NPU_IOC_GET_INFO	_IOR(NPU_IOC_MAGIC, 1, struct npu_info)
++#define NPU_IOC_ALLOC_BUFFER	_IOWR(NPU_IOC_MAGIC, 2, struct npu_buffer)
++#define NPU_IOC_FREE_BUFFER	_IOW(NPU_IOC_MAGIC, 3, struct npu_buffer)
++#define NPU_IOC_SUBMIT_JOB	_IOWR(NPU_IOC_MAGIC, 4, struct npu_job)
++#define NPU_IOC_WAIT_JOB	_IOWR(NPU_IOC_MAGIC, 5, struct npu_job_result)
++
++struct npu_info {
++	__u32 type;
++	__u32 version;
++	__u32 capabilities;
++	__u32 max_batch_size;
++	__u64 memory_size;
++	char name[64];
++};
++
++struct npu_buffer {
++	__u64 size;
++	__u64 phys_addr;
++	__u64 user_addr;
++	__u32 flags;
++	__u32 handle;
++};
++
++struct npu_job {
++	__u32 job_id;
++	__u32 model_handle;
++	__u32 input_count;
++	__u32 output_count;
++	__u64 input_buffers;
++	__u64 output_buffers;
++	__u32 timeout_ms;
++	__u32 priority;
++};
++
++struct npu_job_result {
++	__u32 job_id;
++	__u32 status;
++	__u64 execution_time_us;
++	__u32 error_code;
++};
++
++struct npu_device {
++	struct device *dev;
++	struct cdev cdev;
++	dev_t devno;
++	enum npu_type type;
++	u32 capabilities;
++	u64 memory_size;
++	void __iomem *regs;
++	struct mutex lock;
++	atomic_t job_counter;
++	char name[64];
++	
++	/* NPU-specific operations */
++	int (*init)(struct npu_device *npu);
++	void (*cleanup)(struct npu_device *npu);
++	int (*submit_job)(struct npu_device *npu, struct npu_job *job);
++	int (*wait_job)(struct npu_device *npu, struct npu_job_result *result);
++	int (*alloc_buffer)(struct npu_device *npu, struct npu_buffer *buffer);
++	void (*free_buffer)(struct npu_device *npu, struct npu_buffer *buffer);
++};
++
++static struct class *npu_class;
++static DEFINE_IDR(npu_idr);
++static DEFINE_MUTEX(npu_idr_lock);
++static dev_t npu_devno;
++
++static int npu_open(struct inode *inode, struct file *filp)
++{
++	struct npu_device *npu;
++	
++	npu = container_of(inode->i_cdev, struct npu_device, cdev);
++	filp->private_data = npu;
++	
++	dev_dbg(npu->dev, "NPU device opened\n");
++	return 0;
++}
++
++static int npu_release(struct inode *inode, struct file *filp)
++{
++	struct npu_device *npu = filp->private_data;
++	
++	dev_dbg(npu->dev, "NPU device released\n");
++	return 0;
++}
++
++static long npu_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
++{
++	struct npu_device *npu = filp->private_data;
++	void __user *argp = (void __user *)arg;
++	int ret = 0;
++	
++	if (_IOC_TYPE(cmd) != NPU_IOC_MAGIC)
++		return -ENOTTY;
++		
++	mutex_lock(&npu->lock);
++	
++	switch (cmd) {
++	case NPU_IOC_GET_INFO: {
++		struct npu_info info = {
++			.type = npu->type,
++			.version = 0x20100, /* v2.1.0 */
++			.capabilities = npu->capabilities,
++			.memory_size = npu->memory_size,
++		};
++		strncpy(info.name, npu->name, sizeof(info.name) - 1);
++		
++		if (copy_to_user(argp, &info, sizeof(info)))
++			ret = -EFAULT;
++		break;
++	}
++	case NPU_IOC_ALLOC_BUFFER: {
++		struct npu_buffer buffer;
++		
++		if (copy_from_user(&buffer, argp, sizeof(buffer))) {
++			ret = -EFAULT;
++			break;
++		}
++		
++		if (npu->alloc_buffer)
++			ret = npu->alloc_buffer(npu, &buffer);
++		else
++			ret = -ENOTSUPP;
++			
++		if (!ret && copy_to_user(argp, &buffer, sizeof(buffer)))
++			ret = -EFAULT;
++		break;
++	}
++	case NPU_IOC_FREE_BUFFER: {
++		struct npu_buffer buffer;
++		
++		if (copy_from_user(&buffer, argp, sizeof(buffer))) {
++			ret = -EFAULT;
++			break;
++		}
++		
++		if (npu->free_buffer)
++			npu->free_buffer(npu, &buffer);
++		break;
++	}
++	case NPU_IOC_SUBMIT_JOB: {
++		struct npu_job job;
++		
++		if (copy_from_user(&job, argp, sizeof(job))) {
++			ret = -EFAULT;
++			break;
++		}
++		
++		job.job_id = atomic_inc_return(&npu->job_counter);
++		
++		if (npu->submit_job)
++			ret = npu->submit_job(npu, &job);
++		else
++			ret = -ENOTSUPP;
++			
++		if (!ret && copy_to_user(argp, &job, sizeof(job)))
++			ret = -EFAULT;
++		break;
++	}
++	case NPU_IOC_WAIT_JOB: {
++		struct npu_job_result result;
++		
++		if (copy_from_user(&result, argp, sizeof(result))) {
++			ret = -EFAULT;
++			break;
++		}
++		
++		if (npu->wait_job)
++			ret = npu->wait_job(npu, &result);
++		else
++			ret = -ENOTSUPP;
++			
++		if (!ret && copy_to_user(argp, &result, sizeof(result)))
++			ret = -EFAULT;
++		break;
++	}
++	default:
++		ret = -ENOTTY;
++		break;
++	}
++	
++	mutex_unlock(&npu->lock);
++	return ret;
++}
++
++static const struct file_operations npu_fops = {
++	.owner = THIS_MODULE,
++	.open = npu_open,
++	.release = npu_release,
++	.unlocked_ioctl = npu_ioctl,
++	.compat_ioctl = npu_ioctl,
++};
++
++int npu_register_device(struct npu_device *npu)
++{
++	int ret, id;
++	
++	if (!npu || !npu->dev)
++		return -EINVAL;
++	
++	mutex_init(&npu->lock);
++	atomic_set(&npu->job_counter, 0);
++	
++	/* Allocate device number */
++	mutex_lock(&npu_idr_lock);
++	id = idr_alloc(&npu_idr, npu, 0, NPU_MAX_DEVICES, GFP_KERNEL);
++	mutex_unlock(&npu_idr_lock);
++	
++	if (id < 0)
++		return id;
++	
++	npu->devno = MKDEV(MAJOR(npu_devno), id);
++	
++	/* Initialize character device */
++	cdev_init(&npu->cdev, &npu_fops);
++	npu->cdev.owner = THIS_MODULE;
++	
++	ret = cdev_add(&npu->cdev, npu->devno, 1);
++	if (ret) {
++		goto err_cdev;
++	}
++	
++	/* Create device node */
++	npu->dev = device_create(npu_class, npu->dev, npu->devno, npu,
++				 "npu%d", id);
++	if (IS_ERR(npu->dev)) {
++		ret = PTR_ERR(npu->dev);
++		goto err_device;
++	}
++	
++	/* Initialize NPU-specific functionality */
++	if (npu->init) {
++		ret = npu->init(npu);
++		if (ret)
++			goto err_init;
++	}
++	
++	dev_info(npu->dev, "NPU device registered: %s (type=%d)\n", 
++		 npu->name, npu->type);
++	
++	return 0;
++	
++err_init:
++	device_destroy(npu_class, npu->devno);
++err_device:
++	cdev_del(&npu->cdev);
++err_cdev:
++	mutex_lock(&npu_idr_lock);
++	idr_remove(&npu_idr, id);
++	mutex_unlock(&npu_idr_lock);
++	
++	return ret;
++}
++EXPORT_SYMBOL_GPL(npu_register_device);
++
++void npu_unregister_device(struct npu_device *npu)
++{
++	int id;
++	
++	if (!npu)
++		return;
++	
++	if (npu->cleanup)
++		npu->cleanup(npu);
++	
++	device_destroy(npu_class, npu->devno);
++	cdev_del(&npu->cdev);
++	
++	id = MINOR(npu->devno);
++	mutex_lock(&npu_idr_lock);
++	idr_remove(&npu_idr, id);
++	mutex_unlock(&npu_idr_lock);
++	
++	dev_info(npu->dev, "NPU device unregistered\n");
++}
++EXPORT_SYMBOL_GPL(npu_unregister_device);
++
++static int __init npu_init(void)
++{
++	int ret;
++	
++	/* Allocate character device region */
++	ret = alloc_chrdev_region(&npu_devno, 0, NPU_MAX_DEVICES, NPU_DRIVER_NAME);
++	if (ret < 0) {
++		pr_err("Failed to allocate character device region: %d\n", ret);
++		return ret;
++	}
++	
++	/* Create device class */
++	npu_class = class_create(THIS_MODULE, NPU_DRIVER_NAME);
++	if (IS_ERR(npu_class)) {
++		ret = PTR_ERR(npu_class);
++		pr_err("Failed to create device class: %d\n", ret);
++		goto err_class;
++	}
++	
++	pr_info("Ainux NPU Framework v%s initialized\n", NPU_DRIVER_VERSION);
++	return 0;
++	
++err_class:
++	unregister_chrdev_region(npu_devno, NPU_MAX_DEVICES);
++	return ret;
++}
++
++static void __exit npu_exit(void)
++{
++	class_destroy(npu_class);
++	unregister_chrdev_region(npu_devno, NPU_MAX_DEVICES);
++	idr_destroy(&npu_idr);
++	
++	pr_info("Ainux NPU Framework unloaded\n");
++}
++
++module_init(npu_init);
++module_exit(npu_exit);
++
++MODULE_AUTHOR("Ainux OS Project");
++MODULE_DESCRIPTION("Neural Processing Unit (NPU) Framework");
++MODULE_VERSION(NPU_DRIVER_VERSION);
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS("npu-core");
+diff --git a/drivers/npu/rockchip-npu.c b/drivers/npu/rockchip-npu.c
+new file mode 100644
+index 000000000000..8a4c2f1b8e7f
+--- /dev/null
++++ b/drivers/npu/rockchip-npu.c
+@@ -0,0 +1,156 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Rockchip NPU Driver for Ainux OS
++ * 
++ * Copyright (C) 2024 Ainux OS Project
++ * 
++ * Support for Rockchip RK3588 and compatible NPUs
++ */
++
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/of.h>
++#include <linux/of_device.h>
++#include <linux/clk.h>
++#include <linux/reset.h>
++#include <linux/pm_runtime.h>
++#include <linux/dma-mapping.h>
++#include <linux/interrupt.h>
++
++#define RKNPU_DRIVER_NAME	"rockchip-npu"
++#define RKNPU_MAX_FREQ		1000000000 /* 1GHz */
++
++/* Rockchip NPU register offsets */
++#define RKNPU_CTRL		0x0000
++#define RKNPU_STATUS		0x0004
++#define RKNPU_INT_EN		0x0008
++#define RKNPU_INT_STATUS	0x000C
++#define RKNPU_VERSION		0x0010
++#define RKNPU_PERF_COUNTER	0x0014
++
++/* Control register bits */
++#define RKNPU_CTRL_ENABLE	BIT(0)
++#define RKNPU_CTRL_RESET	BIT(1)
++#define RKNPU_CTRL_CLK_EN	BIT(2)
++
++struct rockchip_npu {
++	struct npu_device npu;
++	struct platform_device *pdev;
++	void __iomem *regs;
++	struct clk *clk_npu;
++	struct clk *clk_ahb;
++	struct reset_control *rst;
++	int irq;
++	u32 version;
++	struct completion job_completion;
++};
++
++static irqreturn_t rknpu_irq_handler(int irq, void *data)
++{
++	struct rockchip_npu *rkdev = data;
++	u32 status;
++	
++	status = readl(rkdev->regs + RKNPU_INT_STATUS);
++	if (!status)
++		return IRQ_NONE;
++	
++	/* Clear interrupt */
++	writel(status, rkdev->regs + RKNPU_INT_STATUS);
++	
++	/* Signal job completion */
++	complete(&rkdev->job_completion);
++	
++	return IRQ_HANDLED;
++}
++
++static int rknpu_init(struct npu_device *npu)
++{
++	struct rockchip_npu *rkdev = container_of(npu, struct rockchip_npu, npu);
++	int ret;
++	
++	/* Enable clocks */
++	ret = clk_prepare_enable(rkdev->clk_npu);
++	if (ret) {
++		dev_err(&rkdev->pdev->dev, "Failed to enable NPU clock: %d\n", ret);
++		return ret;
++	}
++	
++	ret = clk_prepare_enable(rkdev->clk_ahb);
++	if (ret) {
++		dev_err(&rkdev->pdev->dev, "Failed to enable AHB clock: %d\n", ret);
++		clk_disable_unprepare(rkdev->clk_npu);
++		return ret;
++	}
++	
++	/* Reset NPU */
++	reset_control_assert(rkdev->rst);
++	udelay(10);
++	reset_control_deassert(rkdev->rst);
++	
++	/* Read version */
++	rkdev->version = readl(rkdev->regs + RKNPU_VERSION);
++	dev_info(&rkdev->pdev->dev, "Rockchip NPU version: 0x%08x\n", rkdev->version);
++	
++	/* Enable NPU */
++	writel(RKNPU_CTRL_ENABLE | RKNPU_CTRL_CLK_EN, rkdev->regs + RKNPU_CTRL);
++	
++	/* Enable interrupts */
++	writel(0xFF, rkdev->regs + RKNPU_INT_EN);
++	
++	return 0;
++}
++
++static void rknpu_cleanup(struct npu_device *npu)
++{
++	struct rockchip_npu *rkdev = container_of(npu, struct rockchip_npu, npu);
++	
++	/* Disable NPU */
++	writel(0, rkdev->regs + RKNPU_CTRL);
++	
++	/* Disable interrupts */
++	writel(0, rkdev->regs + RKNPU_INT_EN);
++	
++	/* Disable clocks */
++	clk_disable_unprepare(rkdev->clk_ahb);
++	clk_disable_unprepare(rkdev->clk_npu);
++}
++
++static int rknpu_submit_job(struct npu_device *npu, struct npu_job *job)
++{
++	struct rockchip_npu *rkdev = container_of(npu, struct rockchip_npu, npu);
++	
++	/* Initialize completion */
++	reinit_completion(&rkdev->job_completion);
++	
++	/* Submit job to hardware (simplified implementation) */
++	writel(job->model_handle, rkdev->regs + RKNPU_CTRL);
++	
++	dev_dbg(&rkdev->pdev->dev, "Job %d submitted\n", job->job_id);
++	return 0;
++}
++
++static int rknpu_wait_job(struct npu_device *npu, struct npu_job_result *result)
++{
++	struct rockchip_npu *rkdev = container_of(npu, struct rockchip_npu, npu);
++	unsigned long timeout = msecs_to_jiffies(5000); /* 5 second timeout */
++	ktime_t start_time, end_time;
++	int ret;
++	
++	start_time = ktime_get();
++	
++	ret = wait_for_completion_timeout(&rkdev->job_completion, timeout);
++	if (!ret) {
++		result->status = -ETIMEDOUT;
++		result->error_code = -ETIMEDOUT;
++		return -ETIMEDOUT;
++	}
++	
++	end_time = ktime_get();
++	result->execution_time_us = ktime_to_us(ktime_sub(end_time, start_time));
++	result->status = 0;
++	result->error_code = 0;
++	
++	dev_dbg(&rkdev->pdev->dev, "Job %d completed in %llu us\n",
++		result->job_id, result->execution_time_us);
++	
++	return 0;
++}
++
++static int rknpu_probe(struct platform_device *pdev)
++{
++	struct rockchip_npu *rkdev;
++	struct resource *res;
++	int ret;
++	
++	rkdev = devm_kzalloc(&pdev->dev, sizeof(*rkdev), GFP_KERNEL);
++	if (!rkdev)
++		return -ENOMEM;
++	
++	rkdev->pdev = pdev;
++	platform_set_drvdata(pdev, rkdev);
++	
++	/* Initialize completion */
++	init_completion(&rkdev->job_completion);
++	
++	/* Get memory resource */
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	rkdev->regs = devm_ioremap_resource(&pdev->dev, res);
++	if (IS_ERR(rkdev->regs))
++		return PTR_ERR(rkdev->regs);
++	
++	/* Get IRQ */
++	rkdev->irq = platform_get_irq(pdev, 0);
++	if (rkdev->irq < 0)
++		return rkdev->irq;
++	
++	ret = devm_request_irq(&pdev->dev, rkdev->irq, rknpu_irq_handler,
++			       IRQF_SHARED, RKNPU_DRIVER_NAME, rkdev);
++	if (ret) {
++		dev_err(&pdev->dev, "Failed to request IRQ: %d\n", ret);
++		return ret;
++	}
++	
++	/* Get clocks */
++	rkdev->clk_npu = devm_clk_get(&pdev->dev, "npu");
++	if (IS_ERR(rkdev->clk_npu)) {
++		dev_err(&pdev->dev, "Failed to get NPU clock\n");
++		return PTR_ERR(rkdev->clk_npu);
++	}
++	
++	rkdev->clk_ahb = devm_clk_get(&pdev->dev, "ahb");
++	if (IS_ERR(rkdev->clk_ahb)) {
++		dev_err(&pdev->dev, "Failed to get AHB clock\n");
++		return PTR_ERR(rkdev->clk_ahb);
++	}
++	
++	/* Get reset control */
++	rkdev->rst = devm_reset_control_get(&pdev->dev, "npu");
++	if (IS_ERR(rkdev->rst)) {
++		dev_err(&pdev->dev, "Failed to get reset control\n");
++		return PTR_ERR(rkdev->rst);
++	}
++	
++	/* Set NPU clock frequency */
++	ret = clk_set_rate(rkdev->clk_npu, RKNPU_MAX_FREQ);
++	if (ret) {
++		dev_warn(&pdev->dev, "Failed to set NPU frequency: %d\n", ret);
++	}
++	
++	/* Initialize NPU device structure */
++	rkdev->npu.dev = &pdev->dev;
++	rkdev->npu.type = NPU_TYPE_ROCKCHIP;
++	rkdev->npu.capabilities = NPU_CAP_INFERENCE | NPU_CAP_INT8 | NPU_CAP_QUANTIZATION;
++	rkdev->npu.memory_size = SZ_256M; /* 256MB */
++	rkdev->npu.regs = rkdev->regs;
++	strncpy(rkdev->npu.name, "Rockchip NPU", sizeof(rkdev->npu.name) - 1);
++	
++	/* Set operation callbacks */
++	rkdev->npu.init = rknpu_init;
++	rkdev->npu.cleanup = rknpu_cleanup;
++	rkdev->npu.submit_job = rknpu_submit_job;
++	rkdev->npu.wait_job = rknpu_wait_job;
++	
++	/* Enable runtime PM */
++	pm_runtime_enable(&pdev->dev);
++	
++	/* Register NPU device */
++	ret = npu_register_device(&rkdev->npu);
++	if (ret) {
++		dev_err(&pdev->dev, "Failed to register NPU device: %d\n", ret);
++		pm_runtime_disable(&pdev->dev);
++		return ret;
++	}
++	
++	dev_info(&pdev->dev, "Rockchip NPU driver probed successfully\n");
++	return 0;
++}
++
++static int rknpu_remove(struct platform_device *pdev)
++{
++	struct rockchip_npu *rkdev = platform_get_drvdata(pdev);
++	
++	npu_unregister_device(&rkdev->npu);
++	pm_runtime_disable(&pdev->dev);
++	
++	dev_info(&pdev->dev, "Rockchip NPU driver removed\n");
++	return 0;
++}
++
++static const struct of_device_id rknpu_of_match[] = {
++	{ .compatible = "rockchip,rk3588-npu", },
++	{ .compatible = "rockchip,rk3568-npu", },
++	{ .compatible = "rockchip,rk3566-npu", },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, rknpu_of_match);
++
++static struct platform_driver rknpu_driver = {
++	.probe = rknpu_probe,
++	.remove = rknpu_remove,
++	.driver = {
++		.name = RKNPU_DRIVER_NAME,
++		.of_match_table = rknpu_of_match,
++	},
++};
++
++module_platform_driver(rknpu_driver);
++
++MODULE_AUTHOR("Ainux OS Project");
++MODULE_DESCRIPTION("Rockchip NPU Driver");
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS("platform:rockchip-npu");
+diff --git a/include/uapi/linux/npu.h b/include/uapi/linux/npu.h
+new file mode 100644
+index 000000000000..f3c8a7d8e4b1
+--- /dev/null
++++ b/include/uapi/linux/npu.h
+@@ -0,0 +1,89 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++/*
++ * Neural Processing Unit (NPU) UAPI for Ainux OS
++ * 
++ * Copyright (C) 2024 Ainux OS Project
++ */
++
++#ifndef _UAPI_LINUX_NPU_H
++#define _UAPI_LINUX_NPU_H
++
++#include <linux/types.h>
++#include <linux/ioctl.h>
++
++/* NPU device types */
++#define NPU_TYPE_UNKNOWN		0
++#define NPU_TYPE_ROCKCHIP		1
++#define NPU_TYPE_ARM_ETHOS		2
++#define NPU_TYPE_INTEL_VPU		3
++#define NPU_TYPE_QUALCOMM_HEXAGON	4
++#define NPU_TYPE_MEDIATEK_APU		5
++
++/* NPU capabilities */
++#define NPU_CAP_INFERENCE		(1 << 0)
++#define NPU_CAP_TRAINING		(1 << 1)
++#define NPU_CAP_FP16			(1 << 2)
++#define NPU_CAP_INT8			(1 << 3)
++#define NPU_CAP_QUANTIZATION		(1 << 4)
++#define NPU_CAP_MULTI_BATCH		(1 << 5)
++
++/* NPU buffer flags */
++#define NPU_BUFFER_FLAG_CACHEABLE	(1 << 0)
++#define NPU_BUFFER_FLAG_CONTIGUOUS	(1 << 1)
++#define NPU_BUFFER_FLAG_READONLY	(1 << 2)
++#define NPU_BUFFER_FLAG_WRITEONLY	(1 << 3)
++
++/* NPU job status */
++#define NPU_JOB_STATUS_PENDING		0
++#define NPU_JOB_STATUS_RUNNING		1
++#define NPU_JOB_STATUS_COMPLETED	2
++#define NPU_JOB_STATUS_ERROR		3
++#define NPU_JOB_STATUS_CANCELLED	4
++
++struct npu_info {
++	__u32 type;
++	__u32 version;
++	__u32 capabilities;
++	__u32 max_batch_size;
++	__u64 memory_size;
++	char name[64];
++};
++
++struct npu_buffer {
++	__u64 size;
++	__u64 phys_addr;
++	__u64 user_addr;
++	__u32 flags;
++	__u32 handle;
++};
++
++struct npu_job {
++	__u32 job_id;
++	__u32 model_handle;
++	__u32 input_count;
++	__u32 output_count;
++	__u64 input_buffers;
++	__u64 output_buffers;
++	__u32 timeout_ms;
++	__u32 priority;
++};
++
++struct npu_job_result {
++	__u32 job_id;
++	__u32 status;
++	__u64 execution_time_us;
++	__u32 error_code;
++};
++
++/* NPU IOCTL commands */
++#define NPU_IOC_MAGIC			'N'
++#define NPU_IOC_GET_INFO		_IOR(NPU_IOC_MAGIC, 1, struct npu_info)
++#define NPU_IOC_ALLOC_BUFFER		_IOWR(NPU_IOC_MAGIC, 2, struct npu_buffer)
++#define NPU_IOC_FREE_BUFFER		_IOW(NPU_IOC_MAGIC, 3, struct npu_buffer)
++#define NPU_IOC_SUBMIT_JOB		_IOWR(NPU_IOC_MAGIC, 4, struct npu_job)
++#define NPU_IOC_WAIT_JOB		_IOWR(NPU_IOC_MAGIC, 5, struct npu_job_result)
++#define NPU_IOC_CANCEL_JOB		_IOW(NPU_IOC_MAGIC, 6, __u32)
++#define NPU_IOC_GET_PERF_STATS		_IOR(NPU_IOC_MAGIC, 7, struct npu_perf_stats)
++#define NPU_IOC_RESET_DEVICE		_IO(NPU_IOC_MAGIC, 8)
++
++#endif /* _UAPI_LINUX_NPU_H */
