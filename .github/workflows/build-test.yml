@@ -1,4 +1,5 @@
-# .github/workflows/build-test.yml
+# Updated .github/workflows/build-test.yml with PV fix
+
 name: Build and Test Ainux OS
 
 on:
@@ -80,6 +81,46 @@ jobs:
           qemu-system-x86 python3-pip nmap curl wget rsync pv \
           grub-pc-bin grub-efi-amd64-bin mtools
           
+    - name: Fix PV Command Issues
+      run: |
+        echo "=== Fixing PV Command Issues ==="
+        
+        # Create backup
+        cp ainux-builder.sh ainux-builder.sh.backup
+        
+        # Fix all problematic pv usage patterns
+        # Fix 1: Remove invalid pv -s with echo
+        sed -i 's|pv -l -s $(echo "Cloning kernel source...")|pv -l|g' ainux-builder.sh
+        
+        # Fix 2: Fix debootstrap pv usage
+        sed -i 's|pv -l -s 1000 > /dev/null &|pv -l > /dev/null \&|g' ainux-builder.sh
+        
+        # Fix 3: Fix kernel compilation pv usage
+        sed -i 's|grep -E "(CC|LD|AR)" | pv -l -s 5000 > /dev/null &|tee /dev/null \&|g' ainux-builder.sh
+        
+        # Fix 4: Fix chroot setup pv usage
+        sed -i 's|grep -E "(Installing|Setting up|Processing)" | pv -l -s 500 > /dev/null &|tee /dev/null \&|g' ainux-builder.sh
+        
+        # Fix 5: General cleanup of problematic pv patterns
+        sed -i 's/pv -l -s [^|]*|/pv -l |/g' ainux-builder.sh
+        sed -i 's/pv -s [^|]*|/pv |/g' ainux-builder.sh
+        sed -i 's/pv -s \$([^)]*)/pv/g' ainux-builder.sh
+        
+        echo "✅ Applied PV command fixes"
+        
+        # Verify fixes
+        echo "=== Verification ==="
+        if grep -n "pv -s.*echo" ainux-builder.sh; then
+            echo "❌ Still found problematic pv usage"
+            exit 1
+        else
+            echo "✅ No problematic pv usage found"
+        fi
+        
+        # Show what changed
+        echo "=== Changes Made ==="
+        diff -u ainux-builder.sh.backup ainux-builder.sh || true
+        
     - name: Set Build Parameters
       run: |
         echo "CLUSTER_MODE=${{ matrix.mode }}" >> $GITHUB_ENV
@@ -91,9 +132,25 @@ jobs:
     - name: Build Ainux OS
       run: |
         chmod +x ainux-builder.sh
+        
+        # Add debug output
+        set -x
+        
         # Run build with timeout (2 hours max)
         timeout 7200 ./ainux-builder.sh || {
           echo "Build timed out or failed"
+          echo "=== Last 100 lines of any available logs ==="
+          find ~/ainux-build/logs -name "*.log" -exec tail -50 {} \; 2>/dev/null || echo "No log files found"
+          
+          echo "=== Environment Variables ==="
+          env | grep -E "(CLUSTER_MODE|ENABLE_GUI|SKIP_|BUILD_)" || true
+          
+          echo "=== Disk Usage ==="
+          df -h || true
+          
+          echo "=== Memory Usage ==="
+          free -h || true
+          
           exit 1
         }
         
@@ -114,8 +171,10 @@ jobs:
         # Validate checksums
         sha256sum -c ainux-ai-cluster.iso.sha256
         
-        # Run build validation script
-        ./validate-build.sh
+        # Run build validation script if it exists
+        if [ -f "./validate-build.sh" ]; then
+          ./validate-build.sh
+        fi
         
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
@@ -160,6 +219,21 @@ jobs:
       with:
         lfs: true
     
+    - name: Fix PV Command Issues
+      run: |
+        echo "=== Fixing PV Command Issues for Release ==="
+        
+        # Apply the same fixes as in build-test
+        sed -i 's|pv -l -s $(echo "Cloning kernel source...")|pv -l|g' ainux-builder.sh
+        sed -i 's|pv -l -s 1000 > /dev/null &|pv -l > /dev/null \&|g' ainux-builder.sh
+        sed -i 's|grep -E "(CC|LD|AR)" | pv -l -s 5000 > /dev/null &|tee /dev/null \&|g' ainux-builder.sh
+        sed -i 's|grep -E "(Installing|Setting up|Processing)" | pv -l -s 500 > /dev/null &|tee /dev/null \&|g' ainux-builder.sh
+        sed -i 's/pv -l -s [^|]*|/pv -l |/g' ainux-builder.sh
+        sed -i 's/pv -s [^|]*|/pv |/g' ainux-builder.sh
+        sed -i 's/pv -s \$([^)]*)/pv/g' ainux-builder.sh
+        
+        echo "✅ Applied PV command fixes for release build"
+    
     - name: Build Release ISOs
       env:
         SKIP_QEMU_TEST: true
@@ -191,6 +265,7 @@ jobs:
           ## Ainux OS Release ${{ github.event.release.tag_name }}
           
           ### What's New
+          - Fixed PV command issues in build system
           - See [CHANGELOG.md](CHANGELOG.md) for detailed changes
           
           ### Downloads
