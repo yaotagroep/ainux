@@ -34,8 +34,13 @@ jobs:
         
     - name: Check Script Permissions
       run: |
-        # Ensure build script is executable
-        test -x ainux-builder.sh || (echo "ainux-builder.sh not executable" && exit 1)
+        # Make build script executable if it isn't already
+        chmod +x ainux-builder.sh
+        
+        # Verify it's now executable
+        test -x ainux-builder.sh || (echo "Failed to make ainux-builder.sh executable" && exit 1)
+        
+        echo "✅ ainux-builder.sh is now executable"
 
   build-test:
     runs-on: ubuntu-22.04
