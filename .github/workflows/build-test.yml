@@ -1,0 +1,191 @@
+# .github/workflows/build-test.yml
+name: Build and Test Ainux OS
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+jobs:
+  validate-scripts:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Validate Shell Scripts
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y shellcheck
+        
+        # Check all shell scripts
+        find . -name "*.sh" -type f | xargs shellcheck
+        
+    - name: Check Script Permissions
+      run: |
+        # Ensure build script is executable
+        test -x ainux-builder.sh || (echo "ainux-builder.sh not executable" && exit 1)
+
+  build-test:
+    runs-on: ubuntu-22.04
+    needs: validate-scripts
+    strategy:
+      matrix:
+        mode: [main, sub]
+        gui: [true, false]
+        exclude:
+          - mode: sub
+            gui: true  # Sub nodes don't need GUI
+            
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Free Disk Space
+      run: |
+        # Free up space for build
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /usr/local/share/boost
+        sudo apt-get clean
+        df -h
+        
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          git build-essential libncurses-dev bison flex libssl-dev \
+          libelf-dev bc gcc make debootstrap live-build squashfs-tools \
+          dosfstools xorriso isolinux syslinux-utils genisoimage \
+          qemu-system-x86 python3-pip nmap curl wget rsync pv \
+          grub-pc-bin grub-efi-amd64-bin mtools
+          
+    - name: Set Build Parameters
+      run: |
+        echo "CLUSTER_MODE=${{ matrix.mode }}" >> $GITHUB_ENV
+        echo "ENABLE_GUI=${{ matrix.gui }}" >> $GITHUB_ENV
+        echo "SKIP_QEMU_TEST=true" >> $GITHUB_ENV
+        echo "BUILD_THREADS=2" >> $GITHUB_ENV  # Limit for CI
+        
+    - name: Build Ainux OS
+      run: |
+        # Run build with timeout (2 hours max)
+        timeout 7200 ./ainux-builder.sh || {
+          echo "Build timed out or failed"
+          exit 1
+        }
+        
+    - name: Validate Build Artifacts
+      run: |
+        cd ~/ainux-build/iso
+        
+        # Check if ISO was created
+        test -f ainux-ai-cluster.iso || (echo "ISO not found" && exit 1)
+        
+        # Check ISO size (should be > 1GB)
+        size=$(stat -c%s ainux-ai-cluster.iso)
+        if [ $size -lt 1073741824 ]; then
+          echo "ISO too small: $size bytes"
+          exit 1
+        fi
+        
+        # Validate checksums
+        sha256sum -c ainux-ai-cluster.iso.sha256
+        
+        # Run build validation script
+        ./validate-build.sh
+        
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3
+      if: success()
+      with:
+        name: ainux-os-${{ matrix.mode }}-gui-${{ matrix.gui }}
+        path: |
+          ~/ainux-build/iso/ainux-ai-cluster.iso
+          ~/ainux-build/iso/ainux-ai-cluster.iso.sha256
+          ~/ainux-build/iso/ainux-ai-cluster.iso.md5
+          ~/ainux-build/build-info.txt
+          ~/ainux-build/logs/
+        retention-days: 30
+
+  security-scan:
+    runs-on: ubuntu-22.04
+    needs: validate-scripts
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run Security Scan
+      run: |
+        # Install security tools
+        sudo apt-get update
+        sudo apt-get install -y bandit
+        
+        # Scan for security issues
+        find . -name "*.py" -type f | xargs bandit -r || true
+        
+        # Check for hardcoded secrets
+        grep -r -i "password\|secret\|key" --include="*.sh" --include="*.py" . | \
+          grep -v "# " | grep -v "README" || true
+
+  release:
+    runs-on: ubuntu-22.04
+    needs: [build-test, security-scan]
+    if: github.event_name == 'release'
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Release ISOs
+      env:
+        SKIP_QEMU_TEST: true
+        BUILD_THREADS: 4
+      run: |
+        # Build main node with GUI
+        CLUSTER_MODE=main ENABLE_GUI=true ./ainux-builder.sh
+        mv ~/ainux-build/iso/ainux-ai-cluster.iso ~/ainux-main-gui.iso
+        mv ~/ainux-build/iso/ainux-ai-cluster.iso.sha256 ~/ainux-main-gui.iso.sha256
+        
+        # Clean build directory
+        rm -rf ~/ainux-build
+        
+        # Build sub node (headless)
+        CLUSTER_MODE=sub ENABLE_GUI=false ./ainux-builder.sh
+        mv ~/ainux-build/iso/ainux-ai-cluster.iso ~/ainux-sub-headless.iso
+        mv ~/ainux-build/iso/ainux-ai-cluster.iso.sha256 ~/ainux-sub-headless.iso.sha256
+        
+    - name: Upload Release Assets
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          ~/ainux-main-gui.iso
+          ~/ainux-main-gui.iso.sha256
+          ~/ainux-sub-headless.iso
+          ~/ainux-sub-headless.iso.sha256
+        body: |
+          ## Ainux OS Release ${{ github.event.release.tag_name }}
+          
+          ### What's New
+          - See [CHANGELOG.md](CHANGELOG.md) for detailed changes
+          
+          ### Downloads
+          - **ainux-main-gui.iso**: Main node with XFCE desktop environment
+          - **ainux-sub-headless.iso**: Worker/sub nodes (headless)
+          
+          ### Installation
+          ```bash
+          # Verify checksum
+          sha256sum -c ainux-main-gui.iso.sha256
+          
+          # Create bootable USB
+          sudo dd if=ainux-main-gui.iso of=/dev/sdX bs=4M status=progress
+          ```
+          
+          ### Hardware Requirements
+          - CPU: 4+ cores (x86_64)
+          - RAM: 8GB+ recommended
+          - Storage: 64GB+ available space
+          - GPU: NVIDIA RTX/Tesla, AMD RDNA/Vega (optional)
+          
+          For support, visit our [Discussions](https://github.com/yaotagroep/ainux/discussions)
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
