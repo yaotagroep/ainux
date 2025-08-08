@@ -1,0 +1,108 @@
+name: Label Management
+
+on:
+  workflow_dispatch:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+jobs:
+  ensure-labels:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Ensure standard labels exist
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = [
+              // Type labels
+              { name: 'bug', color: 'd73a4a', description: 'Something isn\'t working' },
+              { name: 'enhancement', color: 'a2eeef', description: 'New feature or request' },
+              { name: 'documentation', color: '0075ca', description: 'Improvements or additions to documentation' },
+              { name: 'duplicate', color: 'cfd3d7', description: 'This issue or pull request already exists' },
+              { name: 'good first issue', color: '7057ff', description: 'Good for newcomers' },
+              { name: 'help wanted', color: '008672', description: 'Extra attention is needed' },
+              { name: 'invalid', color: 'e4e669', description: 'This doesn\'t seem right' },
+              { name: 'question', color: 'd876e3', description: 'Further information is requested' },
+              { name: 'wontfix', color: 'ffffff', description: 'This will not be worked on' },
+              
+              // Component labels
+              { name: 'gpu', color: '0e8a16', description: 'GPU-related issues' },
+              { name: 'npu', color: '0e8a16', description: 'NPU-related issues' },
+              { name: 'hardware', color: '1d76db', description: 'Hardware support' },
+              { name: 'build', color: 'fbca04', description: 'Build system related' },
+              { name: 'cluster', color: 'e99695', description: 'Cluster management' },
+              { name: 'installation', color: 'c5def5', description: 'Installation and deployment' },
+              { name: 'performance', color: 'ff6347', description: 'Performance improvements' },
+              { name: 'networking', color: '5319e7', description: 'Network-related issues' },
+              { name: 'kernel', color: '000000', description: 'Linux kernel related' },
+              { name: 'ai-frameworks', color: 'ff9500', description: 'AI/ML framework integration' },
+              
+              // Priority labels
+              { name: 'priority:low', color: 'c2e0c6', description: 'Low priority' },
+              { name: 'priority:medium', color: 'fef2c0', description: 'Medium priority' },
+              { name: 'priority:high', color: 'f9c513', description: 'High priority' },
+              { name: 'priority:critical', color: 'd93f0b', description: 'Critical priority' },
+              
+              // Status labels
+              { name: 'triage', color: 'ffa500', description: 'Needs triage' },
+              { name: 'in-progress', color: '0052cc', description: 'Currently being worked on' },
+              { name: 'blocked', color: 'b60205', description: 'Blocked by external dependency' },
+              { name: 'needs-info', color: 'f9c513', description: 'More information needed' },
+              { name: 'ready-for-review', color: '0e8a16', description: 'Ready for review' },
+              { name: 'stale', color: 'ededed', description: 'No activity for extended period' },
+              { name: 'keep-open', color: '2ea44f', description: 'Do not mark as stale' },
+              { name: 'pinned', color: '8a2be2', description: 'Pinned issue' },
+              { name: 'security', color: 'b60205', description: 'Security-related issue' },
+              
+              // Special labels
+              { name: 'work-in-progress', color: 'fbca04', description: 'Work in progress' },
+              { name: 'breaking-change', color: 'd73a4a', description: 'Breaking change' },
+              { name: 'needs-testing', color: 'ff6347', description: 'Needs testing' },
+              { name: 'tested', color: '0e8a16', description: 'Has been tested' }
+            ];
+
+            // Get existing labels
+            const existingLabels = await github.rest.issues.listLabelsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            
+            const existingLabelNames = existingLabels.data.map(label => label.name);
+
+            // Create missing labels
+            for (const label of labels) {
+              if (!existingLabelNames.includes(label.name)) {
+                try {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: label.name,
+                    color: label.color,
+                    description: label.description
+                  });
+                  console.log(`Created label: ${label.name}`);
+                } catch (error) {
+                  console.log(`Failed to create label ${label.name}: ${error.message}`);
+                }
+              } else {
+                // Update existing label if needed
+                const existingLabel = existingLabels.data.find(l => l.name === label.name);
+                if (existingLabel.color !== label.color || existingLabel.description !== label.description) {
+                  try {
+                    await github.rest.issues.updateLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      name: label.name,
+                      color: label.color,
+                      description: label.description
+                    });
+                    console.log(`Updated label: ${label.name}`);
+                  } catch (error) {
+                    console.log(`Failed to update label ${label.name}: ${error.message}`);
+                  }
+                }
+              }
+            }

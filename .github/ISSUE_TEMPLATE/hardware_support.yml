@@ -1,0 +1,63 @@
+name: Hardware Support Request
+description: Request support for specific hardware
+title: "[HARDWARE] "
+labels: ["hardware", "enhancement"]
+body:
+  - type: dropdown
+    id: hardware_type
+    attributes:
+      label: Hardware Type
+      options:
+        - GPU (NVIDIA)
+        - GPU (AMD)
+        - GPU (Intel)
+        - NPU (Neural Processing Unit)
+        - Network Adapter
+        - Storage Device
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: hardware_model
+    attributes:
+      label: Hardware Model
+      description: Exact model name and number
+      placeholder: "NVIDIA RTX 4090, AMD RX 7900 XTX, etc."
+    validations:
+      required: true
+
+  - type: textarea
+    id: hardware_specs
+    attributes:
+      label: Hardware Specifications
+      description: |
+        Please provide detailed specs:
+        ```bash
+        lspci -v | grep -A 20 "VGA\|3D\|NPU"
+        lsusb
+        ```
+      render: shell
+
+  - type: textarea
+    id: current_status
+    attributes:
+      label: Current Status
+      description: What happens when you try to use this hardware?
+      placeholder: "Not detected, partial functionality, etc."
+
+  - type: input
+    id: driver_version
+    attributes:
+      label: Recommended Driver Version
+      description: If known, what driver version should be used?
+      placeholder: "v560.35, ROCm 6.2, etc."
+
+  - type: checkboxes
+    id: testing
+    attributes:
+      label: Testing Availability
+      options:
+        - label: I have this hardware available for testing
+        - label: I can provide detailed feedback
+        - label: I'm willing to test development builds

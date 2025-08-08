@@ -1,0 +1,82 @@
+name: Documentation Issue
+description: Report missing or incorrect documentation
+title: "[DOCS] "
+labels: ["documentation", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve our documentation! Please provide details below.
+
+  - type: dropdown
+    id: doc_type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation is affected?
+      options:
+        - Installation Guide
+        - Build Instructions
+        - API Documentation
+        - Hardware Compatibility
+        - Troubleshooting
+        - Configuration
+        - Examples/Tutorials
+        - README
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: Issue Type
+      description: What's wrong with the documentation?
+      options:
+        - Missing information
+        - Incorrect information
+        - Outdated information
+        - Unclear instructions
+        - Broken links
+        - Formatting issues
+        - Translation needed
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Location
+      description: Where is this documentation located?
+      placeholder: "README.md, docs/installation.md, wiki page, etc."
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_content
+    attributes:
+      label: Current Content
+      description: What does the current documentation say? (copy the relevant section)
+      render: markdown
+
+  - type: textarea
+    id: expected_content
+    attributes:
+      label: Expected Content
+      description: What should the documentation say instead?
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any additional information that would help us improve the documentation
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to help fix this documentation
+        - label: I can provide additional examples or clarifications

@@ -1,0 +1,74 @@
+name: Stale Issue Management
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight
+  workflow_dispatch:      # Allow manual triggering
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark stale issues and PRs
+        uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Issues
+          stale-issue-message: |
+            This issue has been automatically marked as stale because it has not had activity for 60 days.
+            
+            If this issue is still relevant and you would like to see it addressed:
+            - Add a comment describing the current status
+            - Update the issue with any new information
+            - Add the `keep-open` label to prevent it from being marked as stale
+            
+            This issue will be automatically closed in 14 days if no further activity occurs.
+          close-issue-message: |
+            This issue has been automatically closed due to inactivity. 
+            
+            If you believe this issue is still relevant, please:
+            - Reopen the issue
+            - Provide updated information about the problem
+            - Reference any related issues or PRs
+            
+            Thank you for your contribution to Ainux OS!
+          
+          # Pull Requests  
+          stale-pr-message: |
+            This pull request has been automatically marked as stale because it has not had activity for 30 days.
+            
+            To keep this PR active:
+            - Rebase against the latest main branch
+            - Address any review comments
+            - Add the `keep-open` label
+            
+            This PR will be automatically closed in 7 days if no further activity occurs.
+          close-pr-message: |
+            This pull request has been automatically closed due to inactivity.
+            
+            If you would like to continue working on this PR:
+            - Reopen the pull request
+            - Rebase against the latest main branch
+            - Address any outstanding review comments
+            
+            Thank you for your contribution!
+
+          # Timing
+          days-before-issue-stale: 60
+          days-before-issue-close: 14
+          days-before-pr-stale: 30
+          days-before-pr-close: 7
+          
+          # Labels
+          stale-issue-label: 'stale'
+          stale-pr-label: 'stale'
+          exempt-issue-labels: 'keep-open,pinned,security,critical'
+          exempt-pr-labels: 'keep-open,work-in-progress,security'
+          
+          # Limits
+          operations-per-run: 100
+          remove-stale-when-updated: true
+          
+          # Only close issues/PRs that are marked as stale
+          only-labels: 'stale'
