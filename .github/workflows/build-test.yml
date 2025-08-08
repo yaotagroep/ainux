@@ -111,7 +111,7 @@ jobs:
         ./validate-build.sh
         
     - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: success()
       with:
         name: ainux-os-${{ matrix.mode }}-gui-${{ matrix.gui }}
