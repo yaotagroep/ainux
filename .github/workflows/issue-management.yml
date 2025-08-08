@@ -1,0 +1,154 @@
+name: Issue Management
+
+on:
+  issues:
+    types: [opened, edited]
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues'
+    steps:
+      - name: Auto-label based on issue content
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = issue.body?.toLowerCase() || '';
+            const labels = [];
+
+            // Auto-label based on title prefixes
+            if (title.includes('[bug]')) {
+              labels.push('bug');
+            } else if (title.includes('[feature]')) {
+              labels.push('enhancement');
+            } else if (title.includes('[hardware]')) {
+              labels.push('hardware', 'enhancement');
+            } else if (title.includes('[docs]')) {
+              labels.push('documentation');
+            }
+
+            // Auto-label based on content
+            if (body.includes('gpu') || body.includes('nvidia') || body.includes('amd')) {
+              labels.push('gpu');
+            }
+            if (body.includes('npu') || body.includes('neural processing')) {
+              labels.push('npu');
+            }
+            if (body.includes('build') || body.includes('compilation')) {
+              labels.push('build');
+            }
+            if (body.includes('cluster') || body.includes('node')) {
+              labels.push('cluster');
+            }
+            if (body.includes('install') || body.includes('deployment')) {
+              labels.push('installation');
+            }
+            if (body.includes('performance') || body.includes('slow') || body.includes('optimization')) {
+              labels.push('performance');
+            }
+            if (body.includes('network') || body.includes('connectivity')) {
+              labels.push('networking');
+            }
+
+            // Add priority labels based on keywords
+            if (body.includes('critical') || body.includes('urgent') || body.includes('blocker')) {
+              labels.push('priority:high');
+            } else if (body.includes('important') || body.includes('needed soon')) {
+              labels.push('priority:medium');
+            }
+
+            // Apply labels if any were found
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: [...new Set(labels)] // Remove duplicates
+              });
+            }
+
+  auto-assign:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues'
+    steps:
+      - name: Auto-assign based on component
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body?.toLowerCase() || '';
+            const title = issue.title.toLowerCase();
+            
+            // Skip if already assigned
+            if (issue.assignees.length > 0) {
+              return;
+            }
+
+            // Auto-assign based on component (you can customize these assignments)
+            let assignee = null;
+            
+            if (title.includes('[hardware]') || body.includes('gpu') || body.includes('npu')) {
+              // Hardware-related issues might need specific maintainer
+              console.log('Hardware issue detected - ready for manual assignment');
+            } else if (title.includes('[docs]')) {
+              // Documentation issues might be assigned to doc maintainer
+              console.log('Documentation issue detected - ready for manual assignment');
+            }
+
+            // For now, we'll just add a comment indicating the issue is triaged
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: '👋 Thank you for opening this issue! It has been automatically triaged and labeled. A maintainer will review it shortly.'
+            });
+
+  pr-checks:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: PR validation
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const body = pr.body || '';
+            
+            const checks = {
+              hasDescription: body.length > 50,
+              hasTestingInfo: body.includes('Test Environment') || body.includes('Testing'),
+              hasChangeType: body.includes('- [x]') && (
+                body.includes('Bug fix') || 
+                body.includes('New feature') || 
+                body.includes('Documentation') ||
+                body.includes('Performance') ||
+                body.includes('Breaking change')
+              ),
+              hasRelatedIssue: body.includes('Fixes #') || body.includes('Closes #') || body.includes('Resolves #')
+            };
+            
+            const failedChecks = [];
+            if (!checks.hasDescription) failedChecks.push('- Add a detailed description of your changes');
+            if (!checks.hasTestingInfo) failedChecks.push('- Fill out the testing section');
+            if (!checks.hasChangeType) failedChecks.push('- Select the type of change by checking the appropriate box');
+            if (!checks.hasRelatedIssue) failedChecks.push('- Reference the related issue using "Fixes #issue_number"');
+            
+            if (failedChecks.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: `🔍 **PR Checklist Validation**\n\nThis PR is missing some required information:\n\n${failedChecks.join('\n')}\n\nPlease update the PR description to include this information.`
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: '✅ **PR Checklist Complete**\n\nThank you for providing all the required information! This PR is ready for review.'
+              });
+            }
