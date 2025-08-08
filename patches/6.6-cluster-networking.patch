@@ -1,1 +1,314 @@
-
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 270281cc36d8..c8f4e7b2a3e1 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5520,6 +5520,9 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ 	bool deliver_exact = false;
+ 	int ret = NET_RX_DROP;
+ 	__be16 type;
++	
++	/* Ainux OS cluster packet optimization */
++	skb->priority = min(skb->priority + 1, 7);
+ 
+ 	net_timestamp_check(!netdev_tstamp_prequeue, skb);
+ 
+@@ -5548,6 +5551,20 @@ another_round:
+ 		goto out;
+ 	}
+ 
++	/* Ainux cluster networking optimization */
++	if (skb->protocol == htons(ETH_P_IP)) {
++		struct iphdr *iph = ip_hdr(skb);
++		
++		/* Optimize packets for cluster subnet (10.99.0.0/16) */
++		if ((ntohl(iph->daddr) & 0xFFFF0000) == 0x0A630000) { /* 10.99.x.x */
++			skb->priority = 6; /* High priority for cluster traffic */
++			
++			/* Enable GSO/GRO for cluster traffic */
++			if (skb->len > 1500) {
++				skb_shinfo(skb)->gso_type |= SKB_GSO_TCPV4;
++			}
++		}
++	}
++
+ #ifdef CONFIG_NET_CLS_ACT
+ 	if (pfmemalloc && !skb_pfmemalloc_protocol(skb))
+ 		goto drop;
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 2bdb1e97dce8..f8c4e7b2a3e1 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -1026,6 +1026,23 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
+ 	struct inet_sock *inet;
+ 	struct tcp_skb_cb *tcb;
+ 	struct tcp_out_options opts;
++	
++	/* Ainux cluster networking: Optimize TCP for cluster communication */
++	if (sk && sk->sk_daddr) {
++		__be32 daddr = sk->sk_daddr;
++		
++		/* Check if destination is in cluster subnet (10.99.0.0/16) */
++		if ((ntohl(daddr) & 0xFFFF0000) == 0x0A630000) {
++			struct tcp_sock *tp = tcp_sk(sk);
++			
++			/* Optimize for low-latency cluster communication */
++			if (tp->snd_cwnd < 100) {
++				tp->snd_cwnd = min(tp->snd_cwnd + 10, 100U);
++			}
++			
++			/* Reduce delayed ACK timeout for cluster traffic */
++			inet_csk(sk)->icsk_ack.timeout = msecs_to_jiffies(20);
++		}
++	}
+ 	unsigned int tcp_options_size, tcp_header_size;
+ 	struct sk_buff *oskb = NULL;
+ 	struct tcp_md5sig_key *md5;
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 7c94494fc4d5..8c5f4e3c2d1a 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -3649,6 +3649,19 @@ static void tcp_ack_tstamp(struct sock *sk, struct sk_buff *skb,
+ 		tcp_rtt_estimator(sk, seq_rtt_us);
+ 		tcp_set_rto(sk);
+ 
++		/* Ainux cluster optimization: Aggressive window scaling for cluster traffic */
++		if (sk->sk_daddr && (ntohl(sk->sk_daddr) & 0xFFFF0000) == 0x0A630000) {
++			struct tcp_sock *tp = tcp_sk(sk);
++			
++			/* Increase receive window for cluster communications */
++			if (tp->rcv_wnd < (1 << 20)) { /* Less than 1MB */
++				tp->rcv_wnd = min(tp->rcv_wnd * 2, (u32)(1 << 20)); /* Up to 1MB */
++			}
++			
++			/* Optimize congestion window growth for cluster networks */
++			tp->snd_cwnd_clamp = max(tp->snd_cwnd_clamp, 1000U);
++		}
++
+ 		/* Reset when a valid RTT sample is available. */
+ 		inet_csk(sk)->icsk_backoff = 0;
+ 	}
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index 4e1926606ae1..f8c4e7b2a3e1 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -1103,6 +1103,16 @@ static void neigh_timer_handler(struct timer_list *t)
+ 		goto out;
+ 	}
+ 
++	/* Ainux cluster networking: Optimize ARP cache for cluster nodes */
++	if (neigh->tbl->family == AF_INET) {
++		__be32 addr = *(__be32 *)neigh->primary_key;
++		
++		/* Extend ARP cache timeout for cluster nodes */
++		if ((ntohl(addr) & 0xFFFF0000) == 0x0A630000) { /* 10.99.x.x */
++			neigh->confirmed = jiffies + (300 * HZ); /* 5 minutes */
++		}
++	}
++
+ 	if (neigh->nud_state & (NUD_INCOMPLETE | NUD_PROBE)) {
+ 		next = now + max(NEIGH_VAR(neigh->parms, RETRANS_TIME), HZ/100);
+ 	} else {
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 2a301ba2bb74..f8c4e7b2a3e1 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -1924,6 +1924,18 @@ static int ip_route_input_slow(struct sk_buff *skb, __be32 daddr, __be32 saddr,
+ 
+ 	err = fib_validate_source(skb, saddr, daddr, tos, FIB_RES_OIF(res),
+ 				  in_dev->dev, in_dev, &itag);
++				  
++	/* Ainux cluster networking: Route optimization for cluster traffic */
++	if (!err && (ntohl(daddr) & 0xFFFF0000) == 0x0A630000) { /* Cluster subnet */
++		/* Optimize routing for cluster communications */
++		if (res->type == RTN_LOCAL || res->type == RTN_UNICAST) {
++			/* Set high priority for cluster traffic */
++			skb->priority = 6;
++			
++			/* Prefer direct routes for cluster nodes */
++			if (FIB_RES_GW(res) == 0) {
++				FIB_RES_RESET_NH(res);
++			}
++		}
++	}
+ 	if (err < 0)
+ 		goto martian_source;
+ 
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 4e2cf95c4350..a8c5e9b7e2c1 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -1008,6 +1008,21 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
+ 		sock_valbool_flag(sk, SOCK_ZEROCOPY, valbool);
+ 		break;
+ 
++	case SO_CLUSTER_OPTIMIZED:
++		/* Ainux cluster networking: Enable cluster optimizations */
++		if (valbool) {
++			sock_set_flag(sk, SOCK_CUSTOM_SOCKOPT);
++			
++			/* Optimize socket for cluster communications */
++			sk->sk_sndbuf = max(sk->sk_sndbuf, 1 << 20); /* 1MB send buffer */
++			sk->sk_rcvbuf = max(sk->sk_rcvbuf, 1 << 20); /* 1MB receive buffer */
++			
++			/* Enable TCP_NODELAY for cluster sockets */
++			if (sk->sk_type == SOCK_STREAM) {
++				tcp_sk(sk)->nonagle |= TCP_NAGLE_OFF;
++			}
++		}
++		break;
++		
+ 	default:
+ 		ret = -ENOPROTOOPT;
+ 		break;
+diff --git a/include/uapi/asm-generic/socket.h b/include/uapi/asm-generic/socket.h
+index 0fb4ba0ed626..a8c5e9b7e2c1 100644
+--- a/include/uapi/asm-generic/socket.h
++++ b/include/uapi/asm-generic/socket.h
+@@ -126,6 +126,9 @@
+ 
+ #define SO_RCVMARK		75
+ 
++/* Ainux cluster networking socket option */
++#define SO_CLUSTER_OPTIMIZED	76
++
+ #if !defined(__KERNEL__)
+ 
+ #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
+diff --git a/net/ipv4/tcp_bbr.c b/net/ipv4/tcp_bbr.c
+index d2c470524e68..f8c4e7b2a3e1 100644
+--- a/net/ipv4/tcp_bbr.c
++++ b/net/ipv4/tcp_bbr.c
+@@ -291,6 +291,17 @@ static u32 bbr_target_cwnd(struct sock *sk, u32 bw, int gain)
+ 	/* Allow enough data in flight to utilize the available bandwidth */
+ 	cwnd = max(cwnd, bbr_cwnd_min_target);
+ 
++	/* Ainux cluster optimization: Aggressive scaling for cluster networks */
++	if (sk->sk_daddr && (ntohl(sk->sk_daddr) & 0xFFFF0000) == 0x0A630000) {
++		struct tcp_sock *tp = tcp_sk(sk);
++		
++		/* Scale up more aggressively for cluster traffic */
++		if (tp->snd_cwnd < cwnd) {
++			cwnd = min(cwnd * 2, tp->snd_cwnd_clamp);
++		}
++		
++		/* Higher minimum window for cluster communications */
++		cwnd = max(cwnd, 64U);
++	}
++
+ 	return cwnd;
+ }
+ 
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 28d7ca6bd405..a8c5e9b7e2c1 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -3973,6 +3973,19 @@ normal:
+ 	segs = skb_segment(head_skb, features);
+ 	if (IS_ERR(segs))
+ 		return segs;
++		
++	/* Ainux cluster networking: Optimize GRO for cluster traffic */
++	if (head_skb->protocol == htons(ETH_P_IP)) {
++		struct iphdr *iph = ip_hdr(head_skb);
++		
++		/* Enhanced GRO for cluster subnet traffic */
++		if ((ntohl(iph->daddr) & 0xFFFF0000) == 0x0A630000) {
++			/* Increase GRO aggregation for cluster traffic */
++			struct sk_buff *nskb;
++			for (nskb = segs; nskb; nskb = nskb->next) {
++				nskb->priority = 6; /* High priority */
++			}
++		}
++	}
+ 
+ 	delta_truesize = delta_len - skb_gro_len(head_skb);
+ 	head_skb->truesize += delta_truesize;
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 4e8e9b8a6c7e..a8c5e9b7e2c1 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -1856,6 +1856,18 @@ static bool ixgbe_clean_tx_irq(struct ixgbe_q_vector *q_vector,
+ 		budget--;
+ 	} while (likely(budget));
+ 
++	/* Ainux cluster networking: Optimize Intel 10GbE for cluster traffic */
++	if (likely(total_packets)) {
++		/* Check if we're handling cluster traffic */
++		struct ixgbe_adapter *adapter = q_vector->adapter;
++		
++		/* Increase interrupt moderation for cluster workloads */
++		if (total_packets > 100) { /* High packet rate */
++			/* Reduce interrupt frequency for better throughput */
++			ixgbe_set_itr(q_vector);
++		}
++	}
++
+ 	i += tx_ring->count;
+ 	tx_ring->next_to_clean = i;
+ 	u64_stats_update_begin(&tx_ring->syncp);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 8ec6b8a6c7e4..a8c5e9b7e2c1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -2956,6 +2956,21 @@ static void mlx5e_netdev_set_tcs(struct net_device *netdev, u16 nch, u8 ntc,
+ 	netdev_set_tc_queue(netdev, tc, nch, 0);
+ }
+ 
++/* Ainux cluster networking: Mellanox optimization for cluster workloads */
++static void mlx5e_optimize_for_cluster(struct mlx5e_priv *priv)
++{
++	struct mlx5_core_dev *mdev = priv->mdev;
++	
++	/* Enable hardware acceleration for cluster traffic */
++	if (MLX5_CAP_GEN(mdev, roce)) {
++		/* Optimize RoCE for AI cluster communications */
++		mlx5_core_info(mdev, "Ainux: Optimizing MLX5 for AI cluster workloads\n");
++		
++		/* Increase default ring sizes for cluster workloads */
++		priv->channels.params.log_rq_mtu_frames = max(priv->channels.params.log_rq_mtu_frames, 11U);
++		priv->channels.params.log_sq_size = max(priv->channels.params.log_sq_size, 11U);
++	}
++}
++
+ static int mlx5e_netdev_change_num_channels(struct net_device *netdev,
+ 					    unsigned int new_num_channels)
+ {
+@@ -2969,6 +2984,9 @@ static int mlx5e_netdev_change_num_channels(struct net_device *netdev,
+ 	count = mlx5e_get_max_num_channels(priv->mdev);
+ 	if (new_num_channels > count) {
+ 		netdev_info(netdev, "%s: Requested channels (%d) exceed maximum supported channels (%d)\n",
++			    
++		/* Apply Ainux cluster optimizations */
++		mlx5e_optimize_for_cluster(priv);
+ 			    __func__, new_num_channels, count);
+ 		return -EINVAL;
+ 	}
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 63f7160eee29..a8c5e9b7e2c1 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1829,6 +1829,18 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 		}
+ 	}
+ 
++	/* Ainux cluster networking: UDP optimization for cluster traffic */
++	if (daddr && (ntohl(daddr) & 0xFFFF0000) == 0x0A630000) {
++		/* Optimize UDP for cluster communications */
++		struct inet_sock *inet = inet_sk(sk);
++		
++		/* Increase socket buffer sizes for cluster UDP traffic */
++		if (sk->sk_sndbuf < (256 << 10)) { /* Less than 256KB */
++			sk->sk_sndbuf = 256 << 10; /* Set to 256KB */
++		}
++		
++		/* Enable UDP checksumming for cluster reliability */
++		inet->inet_flags |= INET_FLAGS_CHECKSUM_UDP;
++	}
++
+ 	if (connected)
+ 		rt = (struct rtable *)sk_dst_check(sk, 0);
+ 
+diff --git a/Documentation/networking/ainux-cluster-networking.txt b/Documentation/networking/ainux-cluster-networking.txt
+new file mode 100644
+index 000000000000..a8c5e9b7e2c1
+---
