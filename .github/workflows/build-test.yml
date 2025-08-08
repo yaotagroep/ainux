@@ -58,14 +58,17 @@ jobs:
       with:
         lfs: true
     
-    - name: Free Disk Space
+    - name: Free Up Disk Space (Advanced)
       run: |
-        # Free up space for build
-        sudo rm -rf /usr/share/dotnet
-        sudo rm -rf /opt/ghc
-        sudo rm -rf /usr/local/share/boost
-        sudo apt-get clean
-        df -h
+       echo "⏳ Reclaiming space..."
+       sudo rm -rf /usr/local/lib/android
+       sudo rm -rf /usr/local/share/boost
+       sudo rm -rf /usr/share/dotnet
+       sudo rm -rf /opt/ghc
+       sudo rm -rf /opt/hostedtoolcache
+       sudo apt-get clean
+       sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+       df -h
         
     - name: Install Dependencies
       run: |
