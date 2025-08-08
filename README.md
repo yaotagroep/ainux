@@ -331,12 +331,23 @@ exit
 
 We welcome contributions! Please see our [Contributing Guidelines](https://github.com/yaotagroep/ainux/blob/main/CONTRIBUTING.md) for details.
 
+### 📝 Reporting Issues
+
+We use structured issue templates to help us understand and resolve problems quickly:
+
+- **🐛 [Bug Report](https://github.com/yaotagroep/ainux/issues/new?template=bug_report.yml)**: Report bugs and technical issues
+- **✨ [Feature Request](https://github.com/yaotagroep/ainux/issues/new?template=feature_request.yml)**: Suggest new features or enhancements  
+- **🔧 [Hardware Support](https://github.com/yaotagroep/ainux/issues/new?template=hardware_support.yml)**: Request support for specific hardware
+- **📚 [Documentation](https://github.com/yaotagroep/ainux/issues/new?template=documentation.yml)**: Report documentation issues
+
+For questions and discussions, visit our [Community Discussions](https://github.com/yaotagroep/ainux/discussions).
+
 ### Development Setup
 
 1. Fork the repository on [GitHub](https://github.com/yaotagroep/ainux)
 2. Create a feature branch: `git checkout -b feature/your-feature`
 3. Make your changes and test thoroughly
-4. Submit a pull request with detailed description
+4. Submit a pull request using our [PR template](https://github.com/yaotagroep/ainux/compare)
 
 ### Areas for Contribution
 
