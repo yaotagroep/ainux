@@ -1,0 +1,11 @@
+﻿2025-08-09T10:55:41.5027016Z Cleaning up orphan processes
+2025-08-09T10:55:41.5246289Z Terminate orphan process: pid (3894) (timeout)
+2025-08-09T10:55:41.5262972Z Terminate orphan process: pid (3895) (ainux-builder.sh)
+2025-08-09T10:55:41.5440240Z Terminate orphan process: pid (9577) (make)
+2025-08-09T10:55:41.5665333Z Terminate orphan process: pid (9578) (make)
+2025-08-09T10:55:41.5862606Z Terminate orphan process: pid (9670) (make)
+2025-08-09T10:55:41.6048260Z Terminate orphan process: pid (9739) (conf)
+2025-08-09T10:55:41.6235722Z Terminate orphan process: pid (9789) (sh)
+2025-08-09T10:55:41.6270359Z Terminate orphan process: pid (9790) (rust_is_available.sh)
+2025-08-09T10:55:41.6304977Z Terminate orphan process: pid (9812) (bindgen)
+2025-08-09T10:55:41.6351594Z Terminate orphan process: pid (9816) (clang)
