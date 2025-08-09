@@ -1,0 +1,122 @@
+﻿2025-08-09T15:05:57.1596545Z ##[group]Run sudo apt-get update
+2025-08-09T15:05:57.1598003Z [36;1msudo apt-get update[0m
+2025-08-09T15:05:57.1599311Z [36;1msudo apt-get install -y shellcheck[0m
+2025-08-09T15:05:57.1600765Z [36;1m[0m
+2025-08-09T15:05:57.1602286Z [36;1m# Check all shell scripts (warnings allowed, only errors fail)[0m
+2025-08-09T15:05:57.1604962Z [36;1mfind . -name "*.sh" -type f | xargs shellcheck -e SC2155,SC2002,SC2046,SC2116,SC2024 || true[0m
+2025-08-09T15:05:57.1606990Z [36;1m[0m
+2025-08-09T15:05:57.1607990Z [36;1m# Check for critical errors only[0m
+2025-08-09T15:05:57.1609575Z [36;1mecho "Checking for critical shellcheck errors..."[0m
+2025-08-09T15:05:57.1611623Z [36;1mif find . -name "*.sh" -type f | xargs shellcheck -S error; then[0m
+2025-08-09T15:05:57.1613473Z [36;1m    echo "✅ No critical shellcheck errors found"[0m
+2025-08-09T15:05:57.1614918Z [36;1melse[0m
+2025-08-09T15:05:57.1616071Z [36;1m    echo "❌ Critical shellcheck errors detected"[0m
+2025-08-09T15:05:57.1617522Z [36;1m    exit 1[0m
+2025-08-09T15:05:57.1618581Z [36;1mfi[0m
+2025-08-09T15:05:57.1650219Z shell: /usr/bin/bash -e {0}
+2025-08-09T15:05:57.1651563Z ##[endgroup]
+2025-08-09T15:05:57.7473370Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T15:05:57.7602025Z Get:6 https://packages.microsoft.com/repos/azure-cli jammy InRelease [3596 B]
+2025-08-09T15:05:57.8148100Z Get:7 https://packages.microsoft.com/ubuntu/22.04/prod jammy InRelease [3632 B]
+2025-08-09T15:05:57.8409117Z Hit:2 http://azure.archive.ubuntu.com/ubuntu jammy InRelease
+2025-08-09T15:05:57.8425327Z Get:3 http://azure.archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+2025-08-09T15:05:57.8462223Z Get:4 http://azure.archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+2025-08-09T15:05:57.8483508Z Get:5 http://azure.archive.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+2025-08-09T15:05:58.1328545Z Get:8 https://packages.microsoft.com/repos/azure-cli jammy/main amd64 Packages [2575 B]
+2025-08-09T15:05:58.2198218Z Get:9 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main arm64 Packages [75.0 kB]
+2025-08-09T15:05:58.2310075Z Get:10 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main amd64 Packages [239 kB]
+2025-08-09T15:05:58.6353370Z Get:11 http://azure.archive.ubuntu.com/ubuntu jammy-security/main Translation-en [379 kB]
+2025-08-09T15:06:38.1874624Z Fetched 1087 kB in 1s (1076 kB/s)
+2025-08-09T15:06:39.0418348Z Reading package lists...
+2025-08-09T15:06:39.1006604Z Reading package lists...
+2025-08-09T15:06:39.2846811Z Building dependency tree...
+2025-08-09T15:06:39.2852752Z Reading state information...
+2025-08-09T15:06:39.4830760Z shellcheck is already the newest version (0.8.0-2).
+2025-08-09T15:06:39.4831768Z 0 upgraded, 0 newly installed, 0 to remove and 16 not upgraded.
+2025-08-09T15:06:42.9562847Z 
+2025-08-09T15:06:42.9563597Z In ./build-server.sh line 14:
+2025-08-09T15:06:42.9565076Z PURPLE='\033[0;35m'
+2025-08-09T15:06:42.9565672Z ^----^ SC2034 (warning): PURPLE appears unused. Verify use (or export if used externally).
+2025-08-09T15:06:42.9566312Z 
+2025-08-09T15:06:42.9566328Z 
+2025-08-09T15:06:42.9566506Z In ./ainux-builder.sh line 50:
+2025-08-09T15:06:42.9566934Z         DEFAULT_HOSTNAME="ainux-ai"
+2025-08-09T15:06:42.9567828Z         ^--------------^ SC2034 (warning): DEFAULT_HOSTNAME appears unused. Verify use (or export if used externally).
+2025-08-09T15:06:42.9568581Z 
+2025-08-09T15:06:42.9568600Z 
+2025-08-09T15:06:42.9568776Z In ./ainux-builder.sh line 1334:
+2025-08-09T15:06:42.9569619Z         log_info "Available patches: $(ls -1 "$PATCH_DIR"/*.patch 2>/dev/null | xargs -r basename -s .patch | tr '\n' ' ')"
+2025-08-09T15:06:42.9571277Z                                        ^-- SC2011 (warning): Use 'find .. -print0 | xargs -0 ..' or 'find .. -exec .. +' to allow non-alphanumeric filenames.
+2025-08-09T15:06:42.9572126Z 
+2025-08-09T15:06:42.9572147Z 
+2025-08-09T15:06:42.9572344Z In ./build-desktop.sh line 14:
+2025-08-09T15:06:42.9572833Z PURPLE='\033[0;35m'
+2025-08-09T15:06:42.9573575Z ^----^ SC2034 (warning): PURPLE appears unused. Verify use (or export if used externally).
+2025-08-09T15:06:42.9574802Z 
+2025-08-09T15:06:42.9574816Z 
+2025-08-09T15:06:42.9574979Z In ./build-arm.sh line 14:
+2025-08-09T15:06:42.9575436Z PURPLE='\033[0;35m'
+2025-08-09T15:06:42.9576140Z ^----^ SC2034 (warning): PURPLE appears unused. Verify use (or export if used externally).
+2025-08-09T15:06:42.9577026Z 
+2025-08-09T15:06:42.9577040Z 
+2025-08-09T15:06:42.9577197Z In ./build-arm.sh line 92:
+2025-08-09T15:06:42.9577884Z         sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu || {
+2025-08-09T15:06:42.9578888Z                             ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+2025-08-09T15:06:42.9579470Z 
+2025-08-09T15:06:42.9579486Z 
+2025-08-09T15:06:42.9579727Z In ./scripts/enhanced-issue-monitor.sh line 88:
+2025-08-09T15:06:42.9580485Z         backup=$(ls -t "${file}".*.backup* 2>/dev/null | head -1)
+2025-08-09T15:06:42.9581456Z                  ^-- SC2012 (info): Use find instead of ls to better handle non-alphanumeric filenames.
+2025-08-09T15:06:42.9581982Z 
+2025-08-09T15:06:42.9581996Z 
+2025-08-09T15:06:42.9582189Z In ./scripts/enhanced-issue-monitor.sh line 153:
+2025-08-09T15:06:42.9582632Z     return $issues_found
+2025-08-09T15:06:42.9583168Z            ^-----------^ SC2086 (info): Double quote to prevent globbing and word splitting.
+2025-08-09T15:06:42.9583662Z 
+2025-08-09T15:06:42.9583781Z Did you mean: 
+2025-08-09T15:06:42.9584087Z     return "$issues_found"
+2025-08-09T15:06:42.9584308Z 
+2025-08-09T15:06:42.9584321Z 
+2025-08-09T15:06:42.9584511Z In ./scripts/enhanced-issue-monitor.sh line 227:
+2025-08-09T15:06:42.9584975Z         if [[ -d "~/ainux-build/logs" ]]; then
+2025-08-09T15:06:42.9585536Z                   ^----------------^ SC2088 (warning): Tilde does not expand in quotes. Use $HOME.
+2025-08-09T15:06:42.9586001Z 
+2025-08-09T15:06:42.9586015Z 
+2025-08-09T15:06:42.9586179Z In ./scripts/issue-monitor.sh line 197:
+2025-08-09T15:06:42.9586694Z     local latest_backup=$(ls -t $backup_pattern 2>/dev/null | head -1)
+2025-08-09T15:06:42.9587457Z                           ^-- SC2012 (info): Use find instead of ls to better handle non-alphanumeric filenames.
+2025-08-09T15:06:42.9588277Z                                 ^-------------^ SC2086 (info): Double quote to prevent globbing and word splitting.
+2025-08-09T15:06:42.9588705Z 
+2025-08-09T15:06:42.9588791Z Did you mean: 
+2025-08-09T15:06:42.9589071Z     local latest_backup=$(ls -t "$backup_pattern" 2>/dev/null | head -1)
+2025-08-09T15:06:42.9589513Z 
+2025-08-09T15:06:42.9589528Z 
+2025-08-09T15:06:42.9589733Z In ./scripts/issue-monitor.sh line 345:
+2025-08-09T15:06:42.9590075Z             kill $pid 2>/dev/null || log_message "WARN" "Process $pid not found"
+2025-08-09T15:06:42.9590485Z                  ^--^ SC2086 (info): Double quote to prevent globbing and word splitting.
+2025-08-09T15:06:42.9590737Z 
+2025-08-09T15:06:42.9590815Z Did you mean: 
+2025-08-09T15:06:42.9591293Z             kill "$pid" 2>/dev/null || log_message "WARN" "Process $pid not found"
+2025-08-09T15:06:42.9591539Z 
+2025-08-09T15:06:42.9591547Z 
+2025-08-09T15:06:42.9591643Z In ./scripts/issue-monitor.sh line 353:
+2025-08-09T15:06:42.9591895Z             if kill -0 $pid 2>/dev/null; then
+2025-08-09T15:06:42.9592236Z                        ^--^ SC2086 (info): Double quote to prevent globbing and word splitting.
+2025-08-09T15:06:42.9592672Z 
+2025-08-09T15:06:42.9592797Z Did you mean: 
+2025-08-09T15:06:42.9593102Z             if kill -0 "$pid" 2>/dev/null; then
+2025-08-09T15:06:42.9593396Z 
+2025-08-09T15:06:42.9593407Z 
+2025-08-09T15:06:42.9593604Z In ./scripts/verify-logger-integrity.sh line 101:
+2025-08-09T15:06:42.9594196Z         find "$backup_dir" -name "*.backup" -type f -mtime +$keep_days -delete
+2025-08-09T15:06:42.9594926Z                                                             ^--------^ SC2086 (info): Double quote to prevent globbing and word splitting.
+2025-08-09T15:06:42.9595395Z 
+2025-08-09T15:06:42.9595519Z Did you mean: 
+2025-08-09T15:06:42.9596175Z         find "$backup_dir" -name "*.backup" -type f -mtime +"$keep_days" -delete
+2025-08-09T15:06:42.9596675Z 
+2025-08-09T15:06:42.9596810Z For more information:
+2025-08-09T15:06:42.9597391Z   https://www.shellcheck.net/wiki/SC2011 -- Use 'find .. -print0 | xargs -0 ....
+2025-08-09T15:06:42.9598360Z   https://www.shellcheck.net/wiki/SC2034 -- DEFAULT_HOSTNAME appears unused. ...
+2025-08-09T15:06:42.9599445Z   https://www.shellcheck.net/wiki/SC2088 -- Tilde does not expand in quotes. ...
+2025-08-09T15:06:42.9600152Z Checking for critical shellcheck errors...
+2025-08-09T15:06:43.9685119Z ✅ No critical shellcheck errors found

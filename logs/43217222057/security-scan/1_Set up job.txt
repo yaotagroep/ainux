@@ -1,0 +1,45 @@
+﻿2025-08-09T15:06:50.7259928Z Current runner version: '2.327.1'
+2025-08-09T15:06:50.7283122Z ##[group]Runner Image Provisioner
+2025-08-09T15:06:50.7283896Z Hosted Compute Agent
+2025-08-09T15:06:50.7284536Z Version: 20250711.363
+2025-08-09T15:06:50.7285108Z Commit: 6785254374ce925a23743850c1cb91912ce5c14c
+2025-08-09T15:06:50.7285783Z Build Date: 2025-07-11T20:04:25Z
+2025-08-09T15:06:50.7286372Z ##[endgroup]
+2025-08-09T15:06:50.7286937Z ##[group]Operating System
+2025-08-09T15:06:50.7287462Z Ubuntu
+2025-08-09T15:06:50.7287977Z 22.04.5
+2025-08-09T15:06:50.7288483Z LTS
+2025-08-09T15:06:50.7288902Z ##[endgroup]
+2025-08-09T15:06:50.7289418Z ##[group]Runner Image
+2025-08-09T15:06:50.7289955Z Image: ubuntu-22.04
+2025-08-09T15:06:50.7290462Z Version: 20250804.2.0
+2025-08-09T15:06:50.7291678Z Included Software: https://github.com/actions/runner-images/blob/ubuntu22/20250804.2/images/ubuntu/Ubuntu2204-Readme.md
+2025-08-09T15:06:50.7293191Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu22%2F20250804.2
+2025-08-09T15:06:50.7294500Z ##[endgroup]
+2025-08-09T15:06:50.7296863Z ##[group]GITHUB_TOKEN Permissions
+2025-08-09T15:06:50.7298993Z Actions: write
+2025-08-09T15:06:50.7299733Z Attestations: write
+2025-08-09T15:06:50.7300273Z Checks: write
+2025-08-09T15:06:50.7300815Z Contents: write
+2025-08-09T15:06:50.7301502Z Deployments: write
+2025-08-09T15:06:50.7302033Z Discussions: write
+2025-08-09T15:06:50.7302514Z Issues: write
+2025-08-09T15:06:50.7303056Z Metadata: read
+2025-08-09T15:06:50.7303548Z Models: read
+2025-08-09T15:06:50.7304027Z Packages: write
+2025-08-09T15:06:50.7304572Z Pages: write
+2025-08-09T15:06:50.7305039Z PullRequests: write
+2025-08-09T15:06:50.7305586Z RepositoryProjects: write
+2025-08-09T15:06:50.7306147Z SecurityEvents: write
+2025-08-09T15:06:50.7306776Z Statuses: write
+2025-08-09T15:06:50.7307261Z ##[endgroup]
+2025-08-09T15:06:50.7309270Z Secret source: Actions
+2025-08-09T15:06:50.7310023Z Prepare workflow directory
+2025-08-09T15:06:50.7624084Z Prepare all required actions
+2025-08-09T15:06:50.7660095Z Getting action download info
+2025-08-09T15:06:51.3230904Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-08-09T15:06:51.3232161Z Version: 4.2.2
+2025-08-09T15:06:51.3233670Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-08-09T15:06:51.3234860Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-08-09T15:06:51.3235614Z ##[endgroup]
+2025-08-09T15:06:51.4647776Z Complete job name: security-scan
