@@ -1,6 +1,17 @@
-# 🚀 Ainux OS Build Variants Guide v3.0
+# 🚀 Ainux OS Build Variants Guide v4.0
 
-This document provides comprehensive information about the different Ainux OS build variants, their use cases, hardware support, and build instructions.
+This document provides comprehensive information about the different Ainux OS build variants, their use cases, hardware support, and build instructions with the latest v4.0 enhancements.
+
+## 🎯 Build Variants Overview
+
+Ainux OS offers three specialized variants optimized for different use cases and hardware platforms. Each variant includes comprehensive TPU, NPU, GPU, CPU, and DPU acceleration support with enhanced v4.0 fixes.
+
+### ✅ Recent v4.0 Enhancements
+- **GPU Detection Fixed**: Resolved AMD/NVIDIA support detection issues in CI environments
+- **Permission Handling Enhanced**: Multi-level permission fixing for rootfs/setup.sh
+- **Docker Integration**: Automated GitHub Container Registry publishing
+- **Hardware Monitoring**: Enhanced real-time hardware support verification
+- **Build Optimization**: Improved CI/CD performance and reliability
 
 ## 🎯 Build Variants Overview
 
@@ -398,15 +409,49 @@ export NPU_FRAMEWORK=true          # Enable NPU framework support
 
 ---
 
+## 🛠️ Recent Issue Resolutions (v4.0)
+
+### ✅ GPU/NVIDIA Support Detection Fixed
+**Issue**: GPU support showing as "Disabled" in CI builds despite proper configuration
+**Solution**: Added post-CI GPU configuration re-enabling in ainux-builder.sh
+**Impact**: All GPU support now properly detected across all build variants
+
+### ✅ Enhanced Permission Handling  
+**Issue**: rootfs/setup.sh permission denied errors in CI environments
+**Solution**: Multi-level permission fixing before chroot execution
+**Impact**: Eliminated permission issues across Desktop/Server/ARM builds
+
+### ✅ Docker Registry Integration
+**Feature**: Automated container distribution via GitHub Container Registry
+**Implementation**: Hardware-specific container tags and enterprise compliance scanning
+**Benefit**: Simplified deployment and distribution pipeline
+
+---
+
 ## 🛠️ Troubleshooting
 
 ### Common Issues
 
-#### Permission Denied (rootfs/setup.sh)
-**Fixed in v3.0**: Enhanced permission handling prevents this issue.
+#### Permission Denied (rootfs/setup.sh) - ✅ FIXED in v4.0
+**Status**: Resolved with enhanced permission handling
+**Previous Issue**: CI environments had cross-user permission problems
+**Current Solution**: Multi-level chmod approach automatically applied
 ```bash
-# Manual fix if needed
+# Now automatically handled in build system:
 chmod +x rootfs/setup.sh 2>/dev/null || true
+sudo chmod 755 rootfs/setup.sh
+sudo chroot rootfs chmod 755 /setup.sh
+```
+
+#### GPU Support Detection - ✅ FIXED in v4.0
+**Status**: Resolved with post-CI GPU re-enabling  
+**Previous Issue**: GPU support showing as "Disabled" despite proper config
+**Current Solution**: GPU support automatically re-enabled after CI optimizations
+```bash
+# Automatically applied after CI optimizations:
+scripts/config --enable CONFIG_DRM_AMDGPU
+scripts/config --enable CONFIG_HSA_AMD  
+scripts/config --enable CONFIG_DRM_NOUVEAU
 ```
 
 #### Build Timeout

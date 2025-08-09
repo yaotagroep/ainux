@@ -1508,6 +1508,15 @@ DEBUG_EOF
         scripts/config --set-val CONFIG_NR_CPUS 4
         scripts/config --set-val CONFIG_LOG_BUF_SHIFT 17
         
+        # Ensure GPU support remains enabled after CI optimizations
+        log_info "Re-enabling GPU support after CI optimizations..."
+        scripts/config --enable CONFIG_DRM
+        scripts/config --enable CONFIG_DRM_KMS_HELPER
+        scripts/config --enable CONFIG_DRM_AMDGPU
+        scripts/config --enable CONFIG_HSA_AMD
+        scripts/config --enable CONFIG_DRM_NOUVEAU
+        scripts/config --enable CONFIG_DRM_I915
+        
         # Reduce build threads for CI memory constraints
         if [[ $BUILD_THREADS -gt 2 ]]; then
             BUILD_THREADS=2
@@ -2383,8 +2392,10 @@ EOF
         timeout_duration=3600  # 60 minutes for normal builds
     fi
     
-    # Final permission fix to ensure setup.sh is always executable
+    # Enhanced permission fix to ensure setup.sh is always executable (addressing CI permission issues)
     chmod +x rootfs/setup.sh 2>/dev/null || true
+    sudo chmod 755 rootfs/setup.sh
+    sudo chroot rootfs chmod 755 /setup.sh
     
     # Run setup with timeout and progress indication
     log_info "Running chroot setup (timeout: ${timeout_duration}s)..."
