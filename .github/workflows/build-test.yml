@@ -48,8 +48,15 @@ jobs:
     - name: Make setup.sh executable (Fix Permission Issue)
       run: |
         # This addresses the rootfs/setup.sh permission denied issue
-        # Note: The rootfs/setup.sh is created during build, but we ensure
-        # the build script handles permissions correctly
+        # The build script will handle permissions, but we ensure all scripts are executable
+        chmod +x ainux-builder.sh build-desktop.sh build-server.sh build-arm.sh
+        
+        # Also ensure any existing rootfs/setup.sh is executable (if it exists from previous run)
+        if [ -f rootfs/setup.sh ]; then 
+          chmod +x rootfs/setup.sh
+          echo "✅ Made existing rootfs/setup.sh executable"
+        fi
+        
         echo "🔧 Build script will handle rootfs/setup.sh permissions during execution"
 
   build-test:
