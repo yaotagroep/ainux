@@ -24,6 +24,33 @@ SKIP_QEMU_TEST="${SKIP_QEMU_TEST:-false}"
 ENABLE_GUI="${ENABLE_GUI:-false}"
 CUSTOM_PACKAGES="${CUSTOM_PACKAGES:-}"
 
+# Build variant configuration
+BUILD_VARIANT="${BUILD_VARIANT:-ai}"  # ai/desktop/server/arm
+ARCH="${ARCH:-x86_64}"  # x86_64/arm64
+
+# Select kernel config based on variant
+case "$BUILD_VARIANT" in
+    "desktop")
+        KERNEL_CONFIG="$REPO_ROOT/configs/ainux-6.6-desktop.config"
+        ENABLE_GUI="true"
+        DEFAULT_HOSTNAME="ainux-desktop"
+        ;;
+    "server")
+        KERNEL_CONFIG="$REPO_ROOT/configs/ainux-6.6-server.config"
+        ENABLE_GUI="false"
+        DEFAULT_HOSTNAME="ainux-server"
+        ;;
+    "arm")
+        KERNEL_CONFIG="$REPO_ROOT/configs/ainux-6.6-arm.config"
+        ARCH="arm64"
+        DEFAULT_HOSTNAME="ainux-arm"
+        ;;
+    "ai"|*)
+        KERNEL_CONFIG="$REPO_ROOT/configs/ainux-6.6-ai.config"
+        DEFAULT_HOSTNAME="ainux-ai"
+        ;;
+esac
+
 # Logging functions
 log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
@@ -1372,10 +1399,13 @@ DEBUG_EOF
     fi
     
     # Enhanced kernel configuration
-    log_info "Configuring kernel for AI workloads..."
+    log_info "Configuring kernel for $BUILD_VARIANT workloads..."
     
-    # Create optimized config if download fails
-    if ! wget -q --timeout=10 https://raw.githubusercontent.com/yaotagroep/ainux/main/configs/ainux-6.6-ai.config -O .config; then
+    # Use local kernel config based on build variant
+    if [[ -f "$KERNEL_CONFIG" ]]; then
+        log_info "Using local kernel config: $KERNEL_CONFIG"
+        cp "$KERNEL_CONFIG" .config
+    elif ! wget -q --timeout=10 https://raw.githubusercontent.com/yaotagroep/ainux/main/configs/ainux-6.6-ai.config -O .config; then
         log_warning "Using host kernel config as base..."
         cp "/boot/config-$(uname -r)" .config 2>/dev/null || {
             log_warning "No host config found, using default config..."
@@ -2325,7 +2355,10 @@ EOF
 
     # Execute chroot setup with progress monitoring - OPTIMIZED for CI
     log_info "Executing system setup in chroot environment..."
-    sudo chmod +x rootfs/setup.sh
+    
+    # Ensure setup.sh is executable in the rootfs before chroot
+    sudo chmod 755 rootfs/setup.sh
+    sudo chroot rootfs chmod +x /setup.sh
     
     # Propagate CI environment variables into chroot
     if [[ "${CI:-false}" == "true" ]] || [[ "${GITHUB_ACTIONS:-false}" == "true" ]]; then
