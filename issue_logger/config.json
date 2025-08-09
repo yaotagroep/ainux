@@ -26,11 +26,14 @@
     },
     
     "file_settings": {
-      "max_file_size_mb": 50,
+      "max_file_size_mb": 100,
       "backup_on_size_limit": true,
       "compression": "gzip",
       "encoding": "utf-8",
-      "line_ending": "LF"
+      "line_ending": "LF",
+      "prevent_truncation": true,
+      "auto_rotate": true,
+      "buffer_size_kb": 64
     }
   },
 
@@ -117,11 +120,13 @@
 
   "formatting": {
     "code_snippets": {
-      "max_length": 200,
-      "include_context_lines": 2,
+      "max_length": 500,
+      "include_context_lines": 3,
       "highlight_syntax": true,
       "remove_comments": false,
-      "minify_whitespace": true
+      "minify_whitespace": false,
+      "prevent_truncation": true,
+      "truncation_marker": "... [TRUNCATED - see full context in file]"
     },
     
     "descriptions": {

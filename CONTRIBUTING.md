@@ -115,13 +115,17 @@ qemu-system-x86_64 -m 4096 -cdrom ainux-ai-cluster.iso -enable-kvm
 ## 🏗️ Development Areas
 
 ### High Priority
-- [ ] ARM64 architecture support
+- [ ] ARM64 architecture support  
 - [ ] Additional NPU drivers (Qualcomm, MediaTek)
+- [ ] Enhanced TPU support (Edge TPU optimizations)
+- [ ] DPU/SmartNIC acceleration improvements
 - [ ] Kubernetes integration
 - [ ] Web management interface
 
 ### Medium Priority
 - [ ] Intel Arc GPU optimization
+- [ ] Advanced NPU scheduling and load balancing
+- [ ] CPU-specific AI acceleration (AVX-512, ARM NEON)
 - [ ] Advanced networking (RDMA)
 - [ ] Container orchestration
 - [ ] Monitoring dashboards

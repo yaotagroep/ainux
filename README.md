@@ -26,9 +26,11 @@
 ### ✨ Key Features
 
 - **🧠 AI-First Architecture**: Native support for PyTorch, TensorFlow, ONNX Runtime
+- **🖥️ CPU Optimization**: Full x86_64 support with AI workload optimizations
 - **🚀 Multi-GPU Support**: NVIDIA CUDA, AMD ROCm, Intel Arc out-of-the-box
 - **🔌 NPU Integration**: Rockchip, ARM Ethos, Intel VPU support with enhanced driver framework
-- **🔌 TPU Integration**: Google Coral, PCIe Bifurcation support
+- **🔌 TPU Integration**: Google Coral, PCIe TPU support with Edge TPU compatibility
+- **📡 DPU Support**: SmartNIC integration with DPDK for high-speed networking
 - **💾 Flash Memory Optimization**: NVMe caching, bcache, dm-cache support
 - **🧠 Advanced Memory Management**: ZRAM compression, huge pages, shared memory pools
 - **🌐 Cluster Management**: Automatic node discovery and load balancing
@@ -54,9 +56,10 @@
 │                                     │                     │
 │  Hardware Support Layer                                   │
 │  ┌─────────────┬─────────────┬─────────────┬─────────────┐ │
-│  │ NVIDIA CUDA │ AMD ROCm    │ NPU Support │ Networking  │ │
+│  │ NVIDIA CUDA │ AMD ROCm    │ NPU/TPU     │ Networking  │ │
 │  │ RTX/Tesla   │ RDNA/Vega   │ Rockchip    │ 10GbE/IB    │ │
 │  │ Driver 560+ │ ROCm 6.2+   │ ARM Ethos   │ Thunderbolt │ │
+│  │             │ Intel Arc   │ Google TPU  │ DPU/SmartNIC│ │
 │  └─────────────┴─────────────┴─────────────┴─────────────┘ │
 ├─────────────────────────────────────────────────────────────┤
 │              Linux Kernel 6.6.58 LTS (Custom)             │
@@ -120,9 +123,13 @@ sudo validate-hardware
 
 | Component | Supported Hardware | Driver Version |
 |-----------|-------------------|----------------|
+| **CPUs** | Intel x86_64, AMD x86_64, ARM64 (planned) | Native kernel support |
 | **NVIDIA GPUs** | RTX 20/30/40 Series, Tesla, A100, H100 | Driver 560+ |
 | **AMD GPUs** | RDNA, RDNA2, RDNA3, Vega, MI Series | ROCm 6.2+ |
+| **Intel GPUs** | Arc A-Series, Xe-LP, Xe-HPG | Intel GPU drivers |
 | **NPUs** | Rockchip RK3588, ARM Ethos-N, Intel VPU | Native unified framework |
+| **TPUs** | Google Coral USB/PCIe, Edge TPU | Enhanced TPU driver |
+| **DPUs** | SmartNIC, DPDK-enabled cards | DPDK integration |
 | **Flash Storage** | NVMe, SATA SSD, eMMC, UFS | bcache, dm-cache |
 | **Memory** | DDR4/DDR5, ZRAM, Huge Pages | Optimized pools |
 | **Networking** | 10GbE, InfiniBand, Thunderbolt 3/4 | Kernel native |
