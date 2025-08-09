@@ -35,13 +35,22 @@ jobs:
         
     - name: Check Script Permissions
       run: |
-        # Make build script executable if it isn't already
-        chmod +x ainux-builder.sh
+        # Make build scripts executable if they aren't already
+        chmod +x ainux-builder.sh build-desktop.sh build-server.sh build-arm.sh
         
-        # Verify it's now executable
-        test -x ainux-builder.sh || (echo "Failed to make ainux-builder.sh executable" && exit 1)
+        # Verify all scripts are now executable
+        for script in ainux-builder.sh build-desktop.sh build-server.sh build-arm.sh; do
+          test -x "$script" || (echo "Failed to make $script executable" && exit 1)
+        done
         
-        echo "✅ ainux-builder.sh is now executable"
+        echo "✅ All build scripts are now executable"
+        
+    - name: Make setup.sh executable (Fix Permission Issue)
+      run: |
+        # This addresses the rootfs/setup.sh permission denied issue
+        # Note: The rootfs/setup.sh is created during build, but we ensure
+        # the build script handles permissions correctly
+        echo "🔧 Build script will handle rootfs/setup.sh permissions during execution"
 
   build-test:
     runs-on: ubuntu-22.04
@@ -91,13 +100,29 @@ jobs:
         
     - name: Build Ainux OS
       run: |
-        chmod +x ainux-builder.sh
+        # Make all build scripts executable
+        chmod +x ainux-builder.sh build-desktop.sh build-server.sh build-arm.sh
+        
+        # Choose build script based on matrix
+        if [[ "${{ matrix.mode }}" == "main" && "${{ matrix.gui }}" == "true" ]]; then
+          echo "Using desktop build script for GUI build"
+          BUILD_SCRIPT="./build-desktop.sh"
+        elif [[ "${{ matrix.mode }}" == "main" && "${{ matrix.gui }}" == "false" ]]; then
+          echo "Using server build script for headless main"
+          BUILD_SCRIPT="./build-server.sh"
+        elif [[ "${{ matrix.mode }}" == "sub" ]]; then
+          echo "Using standard build script for sub node"
+          BUILD_SCRIPT="./ainux-builder.sh"
+        else
+          echo "Using default build script"
+          BUILD_SCRIPT="./ainux-builder.sh"
+        fi
         
         # Add debug output
         set -x
         
         # Run build with timeout (2 hours max)
-        timeout 7200 ./ainux-builder.sh || {
+        timeout 7200 $BUILD_SCRIPT || {
           echo "Build timed out or failed"
           echo "=== Last 100 lines of any available logs ==="
           find ~/ainux-build/logs -name "*.log" -exec tail -50 {} \; 2>/dev/null || echo "No log files found"

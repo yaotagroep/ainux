@@ -77,13 +77,25 @@
 - **Network**: Internet connection for downloads
 - **Privileges**: sudo access
 
-### Build Ainux OS
+### Build Ainux OS v2.1
 
+#### 🛠️ Quick Build (Recommended)
 ```bash
-# Clone the repository
-git clone https://github.com/yaotagroep/ainux.git
-cd ainux
+# 🖥️ Desktop Edition - Gaming + AI workstation with full GUI
+./build-desktop.sh
 
+# 🏢 Server Edition - Enterprise with high availability & security  
+./build-server.sh
+
+# 🍓 ARM Edition - Raspberry Pi & edge computing devices
+./build-arm.sh
+
+# 🤖 AI/Cluster Edition - Full AI acceleration (default)
+./ainux-builder.sh
+```
+
+#### 🔧 Traditional Build (Environment Variables)
+```bash
 # Make the builder executable
 chmod +x ainux-builder.sh
 
