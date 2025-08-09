@@ -1,3 +1,7 @@
+<closed>[fe3ef2a]
+2025-08-09T10:38:03.791Z|patches/6.6-npu-support.patch|138|[RESOLVED][SYN]-Fixed npu-core.c diff header line count mismatch|(SUMMARY: Updated line count from 245 to 372)|@@ -0,0 +1,372 @@|2m15s|{"fix_applied":"corrected_diff_header_line_count","verification":"patch_syntax_validation","files_affected":["drivers/npu/npu-core.c"],"error_types_fixed":["expected_declaration_at_end_of_input","control_reaches_end_of_non_void_function","unused_variables"]}
+</closed>
+
 <closed>[0092bbf]
 2025-08-09T10:11:51.754Z|patches/6.6-npu-support.patch|113|[RESOLVED][CFG]-Added NPU Kconfig fix script and build integration|(SUMMARY: Fixed Kconfig truncation during patch application)|endif # NPU_FRAMEWORK|5m40s|{"fix_applied":"npu_kconfig_completion_script","verification":"kernel_defconfig_success","components_verified":["NPU_FRAMEWORK","GOOGLE_TPU","NPU_DEBUG"]}
 </closed>

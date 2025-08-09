@@ -24,7 +24,7 @@ new file mode 100644
 index 000000000000..f8e7d2a7b5c1
 --- /dev/null
 +++ b/drivers/npu/Kconfig
-@@ -0,0 +1,74 @@
+@@ -0,0 +1,87 @@
 +# SPDX-License-Identifier: GPL-2.0-only
 +#
 +# Neural Processing Unit (NPU) support for Ainux OS
@@ -116,7 +116,7 @@ new file mode 100644
 index 000000000000..8b5f4e3c2d1a
 --- /dev/null
 +++ b/drivers/npu/Makefile
-@@ -0,0 +1,12 @@
+@@ -0,0 +1,14 @@
 +# SPDX-License-Identifier: GPL-2.0
 +#
 +# Makefile for Neural Processing Unit (NPU) drivers
@@ -135,7 +135,7 @@ new file mode 100644
 index 000000000000..7b5c3a9e4d8f
 --- /dev/null
 +++ b/drivers/npu/npu-core.c
-@@ -0,0 +1,245 @@
+@@ -0,0 +1,372 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Neural Processing Unit (NPU) Core Framework
@@ -512,7 +512,7 @@ new file mode 100644
 index 000000000000..8a4c2f1b8e7f
 --- /dev/null
 +++ b/drivers/npu/rockchip-npu.c
-@@ -0,0 +1,156 @@
+@@ -0,0 +1,435 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Rockchip NPU Driver for Ainux OS
