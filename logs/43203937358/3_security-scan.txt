@@ -1,0 +1,267 @@
+﻿2025-08-09T03:10:25.6249883Z Current runner version: '2.327.1'
+2025-08-09T03:10:25.6274726Z ##[group]Runner Image Provisioner
+2025-08-09T03:10:25.6275574Z Hosted Compute Agent
+2025-08-09T03:10:25.6276228Z Version: 20250711.363
+2025-08-09T03:10:25.6276828Z Commit: 6785254374ce925a23743850c1cb91912ce5c14c
+2025-08-09T03:10:25.6277529Z Build Date: 2025-07-11T20:04:25Z
+2025-08-09T03:10:25.6278138Z ##[endgroup]
+2025-08-09T03:10:25.6278727Z ##[group]Operating System
+2025-08-09T03:10:25.6279264Z Ubuntu
+2025-08-09T03:10:25.6279783Z 22.04.5
+2025-08-09T03:10:25.6280257Z LTS
+2025-08-09T03:10:25.6280749Z ##[endgroup]
+2025-08-09T03:10:25.6281292Z ##[group]Runner Image
+2025-08-09T03:10:25.6282024Z Image: ubuntu-22.04
+2025-08-09T03:10:25.6282549Z Version: 20250804.2.0
+2025-08-09T03:10:25.6283495Z Included Software: https://github.com/actions/runner-images/blob/ubuntu22/20250804.2/images/ubuntu/Ubuntu2204-Readme.md
+2025-08-09T03:10:25.6285150Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu22%2F20250804.2
+2025-08-09T03:10:25.6286168Z ##[endgroup]
+2025-08-09T03:10:25.6288547Z ##[group]GITHUB_TOKEN Permissions
+2025-08-09T03:10:25.6290688Z Actions: write
+2025-08-09T03:10:25.6291384Z Attestations: write
+2025-08-09T03:10:25.6292183Z Checks: write
+2025-08-09T03:10:25.6292747Z Contents: write
+2025-08-09T03:10:25.6293336Z Deployments: write
+2025-08-09T03:10:25.6293880Z Discussions: write
+2025-08-09T03:10:25.6294380Z Issues: write
+2025-08-09T03:10:25.6294926Z Metadata: read
+2025-08-09T03:10:25.6295389Z Models: read
+2025-08-09T03:10:25.6295923Z Packages: write
+2025-08-09T03:10:25.6296482Z Pages: write
+2025-08-09T03:10:25.6296959Z PullRequests: write
+2025-08-09T03:10:25.6297518Z RepositoryProjects: write
+2025-08-09T03:10:25.6298092Z SecurityEvents: write
+2025-08-09T03:10:25.6298752Z Statuses: write
+2025-08-09T03:10:25.6299257Z ##[endgroup]
+2025-08-09T03:10:25.6301487Z Secret source: Actions
+2025-08-09T03:10:25.6302548Z Prepare workflow directory
+2025-08-09T03:10:25.6631991Z Prepare all required actions
+2025-08-09T03:10:25.6672962Z Getting action download info
+2025-08-09T03:10:26.0768555Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-08-09T03:10:26.0769699Z Version: 4.2.2
+2025-08-09T03:10:26.0770763Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-08-09T03:10:26.0772105Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-08-09T03:10:26.0772942Z ##[endgroup]
+2025-08-09T03:10:26.2714156Z Complete job name: security-scan
+2025-08-09T03:10:26.3515234Z ##[group]Run actions/checkout@v4
+2025-08-09T03:10:26.3516092Z with:
+2025-08-09T03:10:26.3516473Z   lfs: true
+2025-08-09T03:10:26.3516874Z   repository: yaotagroep/ainux
+2025-08-09T03:10:26.3517534Z   token: ***
+2025-08-09T03:10:26.3517923Z   ssh-strict: true
+2025-08-09T03:10:26.3518331Z   ssh-user: git
+2025-08-09T03:10:26.3518743Z   persist-credentials: true
+2025-08-09T03:10:26.3519204Z   clean: true
+2025-08-09T03:10:26.3519612Z   sparse-checkout-cone-mode: true
+2025-08-09T03:10:26.3520100Z   fetch-depth: 1
+2025-08-09T03:10:26.3520524Z   fetch-tags: false
+2025-08-09T03:10:26.3520924Z   show-progress: true
+2025-08-09T03:10:26.3521343Z   submodules: false
+2025-08-09T03:10:26.3522040Z   set-safe-directory: true
+2025-08-09T03:10:26.3522786Z ##[endgroup]
+2025-08-09T03:10:26.4607448Z Syncing repository: yaotagroep/ainux
+2025-08-09T03:10:26.4609967Z ##[group]Getting Git version info
+2025-08-09T03:10:26.4610656Z Working directory is '/home/runner/work/ainux/ainux'
+2025-08-09T03:10:26.4611839Z [command]/usr/bin/git version
+2025-08-09T03:10:26.4725473Z git version 2.50.1
+2025-08-09T03:10:26.4779234Z [command]/usr/bin/git lfs version
+2025-08-09T03:10:28.2759454Z git-lfs/3.7.0 (GitHub; linux amd64; go 1.24.4)
+2025-08-09T03:10:28.2774041Z ##[endgroup]
+2025-08-09T03:10:28.2791899Z Temporarily overriding HOME='/home/runner/work/_temp/c78f7411-8e40-4c8b-8dd2-2d158cbb2402' before making global git config changes
+2025-08-09T03:10:28.2795329Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-09T03:10:28.2797985Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ainux/ainux
+2025-08-09T03:10:28.2834546Z Deleting the contents of '/home/runner/work/ainux/ainux'
+2025-08-09T03:10:28.2837885Z ##[group]Initializing the repository
+2025-08-09T03:10:28.2842300Z [command]/usr/bin/git init /home/runner/work/ainux/ainux
+2025-08-09T03:10:28.2910257Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-09T03:10:28.2912384Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-09T03:10:28.2914342Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-09T03:10:28.2916018Z hint:
+2025-08-09T03:10:28.2916875Z hint: 	git config --global init.defaultBranch <name>
+2025-08-09T03:10:28.2918096Z hint:
+2025-08-09T03:10:28.2919107Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-09T03:10:28.2921250Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-09T03:10:28.2922925Z hint:
+2025-08-09T03:10:28.2923609Z hint: 	git branch -m <name>
+2025-08-09T03:10:28.2924402Z hint:
+2025-08-09T03:10:28.2925715Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-09T03:10:28.2928779Z Initialized empty Git repository in /home/runner/work/ainux/ainux/.git/
+2025-08-09T03:10:28.2934411Z [command]/usr/bin/git remote add origin https://github.com/yaotagroep/ainux
+2025-08-09T03:10:28.2968618Z ##[endgroup]
+2025-08-09T03:10:28.2971413Z ##[group]Disabling automatic garbage collection
+2025-08-09T03:10:28.2974102Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-09T03:10:28.3003149Z ##[endgroup]
+2025-08-09T03:10:28.3005773Z ##[group]Setting up auth
+2025-08-09T03:10:28.3011134Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-09T03:10:28.3045772Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-09T03:10:28.3309463Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-09T03:10:28.3347137Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-09T03:10:28.3588491Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-09T03:10:28.3625802Z ##[endgroup]
+2025-08-09T03:10:28.3629270Z [command]/usr/bin/git lfs install --local
+2025-08-09T03:10:28.4030753Z Updated Git hooks.
+2025-08-09T03:10:28.4032476Z Git LFS initialized.
+2025-08-09T03:10:28.4045951Z ##[group]Fetching the repository
+2025-08-09T03:10:28.4056194Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +19908207d51a9969ef4767d669c1398833b16a31:refs/remotes/origin/main
+2025-08-09T03:10:29.2077078Z From https://github.com/yaotagroep/ainux
+2025-08-09T03:10:29.2078663Z  * [new ref]         19908207d51a9969ef4767d669c1398833b16a31 -> origin/main
+2025-08-09T03:10:29.2105335Z ##[endgroup]
+2025-08-09T03:10:29.2106018Z ##[group]Determining the checkout info
+2025-08-09T03:10:29.2107387Z ##[endgroup]
+2025-08-09T03:10:29.2108040Z ##[group]Fetching LFS objects
+2025-08-09T03:10:29.2113207Z [command]/usr/bin/git lfs fetch origin refs/remotes/origin/main
+2025-08-09T03:10:29.2337195Z Fetching reference refs/remotes/origin/main
+2025-08-09T03:10:29.2686192Z ##[endgroup]
+2025-08-09T03:10:29.2691292Z [command]/usr/bin/git sparse-checkout disable
+2025-08-09T03:10:29.2735061Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-09T03:10:29.2763131Z ##[group]Checking out the ref
+2025-08-09T03:10:29.2767461Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-09T03:10:29.3113115Z Switched to a new branch 'main'
+2025-08-09T03:10:29.3114268Z branch 'main' set up to track 'origin/main'.
+2025-08-09T03:10:29.3362517Z ##[endgroup]
+2025-08-09T03:10:29.3399833Z [command]/usr/bin/git log -1 --format=%H
+2025-08-09T03:10:29.3424516Z 19908207d51a9969ef4767d669c1398833b16a31
+2025-08-09T03:10:29.3608510Z ##[group]Run # Install security tools
+2025-08-09T03:10:29.3609014Z [36;1m# Install security tools[0m
+2025-08-09T03:10:29.3609323Z [36;1msudo apt-get update[0m
+2025-08-09T03:10:29.3609619Z [36;1msudo apt-get install -y bandit[0m
+2025-08-09T03:10:29.3609920Z [36;1m[0m
+2025-08-09T03:10:29.3610247Z [36;1m# Scan for security issues in Python files (if any exist)[0m
+2025-08-09T03:10:29.3610666Z [36;1mif find . -name "*.py" -type f | grep -q .; then[0m
+2025-08-09T03:10:29.3611065Z [36;1m  echo "Found Python files, running bandit scan..."[0m
+2025-08-09T03:10:29.3611468Z [36;1m  find . -name "*.py" -type f | xargs bandit -r || true[0m
+2025-08-09T03:10:29.3611961Z [36;1melse[0m
+2025-08-09T03:10:29.3612253Z [36;1m  echo "No Python files found, skipping bandit scan"[0m
+2025-08-09T03:10:29.3612607Z [36;1mfi[0m
+2025-08-09T03:10:29.3612829Z [36;1m[0m
+2025-08-09T03:10:29.3613108Z [36;1m# Check for hardcoded secrets in shell and Python scripts[0m
+2025-08-09T03:10:29.3613568Z [36;1mecho "Checking for potential hardcoded secrets..."[0m
+2025-08-09T03:10:29.3614026Z [36;1mif grep -r -i "password\|secret\|key" --include="*.sh" --include="*.py" . | \[0m
+2025-08-09T03:10:29.3614495Z [36;1m  grep -v "# " | grep -v "README" | grep -v "GITHUB_TOKEN"; then[0m
+2025-08-09T03:10:29.3614934Z [36;1m  echo "⚠️  Found potential hardcoded secrets above - please review"[0m
+2025-08-09T03:10:29.3615305Z [36;1melse[0m
+2025-08-09T03:10:29.3615559Z [36;1m  echo "✅ No obvious hardcoded secrets found"[0m
+2025-08-09T03:10:29.3615859Z [36;1mfi[0m
+2025-08-09T03:10:29.3647379Z shell: /usr/bin/bash -e {0}
+2025-08-09T03:10:29.3647683Z ##[endgroup]
+2025-08-09T03:10:29.5618485Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T03:10:29.5896137Z Get:6 https://packages.microsoft.com/repos/azure-cli jammy InRelease [3596 B]
+2025-08-09T03:10:29.6133627Z Get:7 https://packages.microsoft.com/ubuntu/22.04/prod jammy InRelease [3632 B]
+2025-08-09T03:10:29.7207686Z Get:8 https://packages.microsoft.com/repos/azure-cli jammy/main amd64 Packages [2575 B]
+2025-08-09T03:10:29.7480058Z Hit:2 http://azure.archive.ubuntu.com/ubuntu jammy InRelease
+2025-08-09T03:10:29.7490979Z Get:3 http://azure.archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+2025-08-09T03:10:29.7524665Z Get:4 http://azure.archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+2025-08-09T03:10:29.7543341Z Get:5 http://azure.archive.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+2025-08-09T03:10:29.7734707Z Get:9 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main amd64 Packages [239 kB]
+2025-08-09T03:10:29.7835682Z Get:10 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main arm64 Packages [75.0 kB]
+2025-08-09T03:10:30.1552633Z Get:11 http://azure.archive.ubuntu.com/ubuntu jammy-security/main Translation-en [379 kB]
+2025-08-09T03:10:38.9340719Z Fetched 1087 kB in 1s (1570 kB/s)
+2025-08-09T03:10:39.8313667Z Reading package lists...
+2025-08-09T03:10:39.8909385Z Reading package lists...
+2025-08-09T03:10:40.1178975Z Building dependency tree...
+2025-08-09T03:10:40.1190943Z Reading state information...
+2025-08-09T03:10:40.3092221Z The following additional packages will be installed:
+2025-08-09T03:10:40.3093213Z   python3-bandit python3-git python3-gitdb python3-pbr python3-smmap
+2025-08-09T03:10:40.3093762Z   python3-stevedore
+2025-08-09T03:10:40.3100394Z Suggested packages:
+2025-08-09T03:10:40.3100772Z   python-git-doc python3-nose
+2025-08-09T03:10:40.3404504Z The following NEW packages will be installed:
+2025-08-09T03:10:40.3414141Z   bandit python3-bandit python3-git python3-gitdb python3-pbr python3-smmap
+2025-08-09T03:10:40.3414794Z   python3-stevedore
+2025-08-09T03:10:40.3587174Z 0 upgraded, 7 newly installed, 0 to remove and 16 not upgraded.
+2025-08-09T03:10:40.3588021Z Need to get 356 kB of archives.
+2025-08-09T03:10:40.3589854Z After this operation, 1915 kB of additional disk space will be used.
+2025-08-09T03:10:40.3590565Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T03:10:40.5392419Z Get:2 http://azure.archive.ubuntu.com/ubuntu jammy/universe amd64 python3-smmap all 5.0.0-1 [21.0 kB]
+2025-08-09T03:10:40.7084829Z Get:3 http://azure.archive.ubuntu.com/ubuntu jammy/universe amd64 python3-gitdb all 4.0.9-1 [46.5 kB]
+2025-08-09T03:10:40.8815855Z Get:4 http://azure.archive.ubuntu.com/ubuntu jammy/universe amd64 python3-git all 3.1.24-1 [130 kB]
+2025-08-09T03:10:41.0888095Z Get:5 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 python3-pbr all 5.8.0-0ubuntu1 [66.5 kB]
+2025-08-09T03:10:41.1898994Z Get:6 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 python3-stevedore all 1:3.5.0-0ubuntu1 [20.9 kB]
+2025-08-09T03:10:41.2785651Z Get:7 http://azure.archive.ubuntu.com/ubuntu jammy/universe amd64 python3-bandit all 1.6.2-1 [66.6 kB]
+2025-08-09T03:10:41.3867765Z Get:8 http://azure.archive.ubuntu.com/ubuntu jammy/universe amd64 bandit all 1.6.2-1 [4384 B]
+2025-08-09T03:10:41.7010950Z Fetched 356 kB in 1s (342 kB/s)
+2025-08-09T03:10:41.7607827Z Selecting previously unselected package python3-smmap.
+2025-08-09T03:10:41.9076718Z (Reading database ... 
+2025-08-09T03:10:41.9077012Z (Reading database ... 5%
+2025-08-09T03:10:41.9077230Z (Reading database ... 10%
+2025-08-09T03:10:41.9077431Z (Reading database ... 15%
+2025-08-09T03:10:41.9077618Z (Reading database ... 20%
+2025-08-09T03:10:41.9077809Z (Reading database ... 25%
+2025-08-09T03:10:41.9077996Z (Reading database ... 30%
+2025-08-09T03:10:41.9078186Z (Reading database ... 35%
+2025-08-09T03:10:41.9078370Z (Reading database ... 40%
+2025-08-09T03:10:41.9078551Z (Reading database ... 45%
+2025-08-09T03:10:41.9078736Z (Reading database ... 50%
+2025-08-09T03:10:42.5589140Z (Reading database ... 55%
+2025-08-09T03:10:42.9410271Z (Reading database ... 60%
+2025-08-09T03:10:43.3922665Z (Reading database ... 65%
+2025-08-09T03:10:44.0620793Z (Reading database ... 70%
+2025-08-09T03:10:44.9425896Z (Reading database ... 75%
+2025-08-09T03:10:45.8221254Z (Reading database ... 80%
+2025-08-09T03:10:47.1515689Z (Reading database ... 85%
+2025-08-09T03:10:48.0154675Z (Reading database ... 90%
+2025-08-09T03:10:48.8877365Z (Reading database ... 95%
+2025-08-09T03:10:48.8877851Z (Reading database ... 100%
+2025-08-09T03:10:48.8878439Z (Reading database ... 267991 files and directories currently installed.)
+2025-08-09T03:10:48.8934344Z Preparing to unpack .../0-python3-smmap_5.0.0-1_all.deb ...
+2025-08-09T03:10:48.8950541Z Unpacking python3-smmap (5.0.0-1) ...
+2025-08-09T03:10:48.9258523Z Selecting previously unselected package python3-gitdb.
+2025-08-09T03:10:48.9424446Z Preparing to unpack .../1-python3-gitdb_4.0.9-1_all.deb ...
+2025-08-09T03:10:48.9439278Z Unpacking python3-gitdb (4.0.9-1) ...
+2025-08-09T03:10:48.9987234Z Selecting previously unselected package python3-git.
+2025-08-09T03:10:49.0156464Z Preparing to unpack .../2-python3-git_3.1.24-1_all.deb ...
+2025-08-09T03:10:49.0168562Z Unpacking python3-git (3.1.24-1) ...
+2025-08-09T03:10:49.0651882Z Selecting previously unselected package python3-pbr.
+2025-08-09T03:10:49.0821106Z Preparing to unpack .../3-python3-pbr_5.8.0-0ubuntu1_all.deb ...
+2025-08-09T03:10:49.0833958Z Unpacking python3-pbr (5.8.0-0ubuntu1) ...
+2025-08-09T03:10:49.1230149Z Selecting previously unselected package python3-stevedore.
+2025-08-09T03:10:49.1398139Z Preparing to unpack .../4-python3-stevedore_1%3a3.5.0-0ubuntu1_all.deb ...
+2025-08-09T03:10:49.1412008Z Unpacking python3-stevedore (1:3.5.0-0ubuntu1) ...
+2025-08-09T03:10:49.1777730Z Selecting previously unselected package python3-bandit.
+2025-08-09T03:10:49.1947159Z Preparing to unpack .../5-python3-bandit_1.6.2-1_all.deb ...
+2025-08-09T03:10:49.1982481Z Unpacking python3-bandit (1.6.2-1) ...
+2025-08-09T03:10:49.2334884Z Selecting previously unselected package bandit.
+2025-08-09T03:10:49.2506491Z Preparing to unpack .../6-bandit_1.6.2-1_all.deb ...
+2025-08-09T03:10:49.2521935Z Unpacking bandit (1.6.2-1) ...
+2025-08-09T03:10:49.3132483Z Setting up python3-pbr (5.8.0-0ubuntu1) ...
+2025-08-09T03:10:49.4635815Z Setting up python3-stevedore (1:3.5.0-0ubuntu1) ...
+2025-08-09T03:10:49.5878458Z Setting up python3-smmap (5.0.0-1) ...
+2025-08-09T03:10:49.6983935Z Setting up python3-gitdb (4.0.9-1) ...
+2025-08-09T03:10:49.8247428Z Setting up python3-git (3.1.24-1) ...
+2025-08-09T03:10:49.9865524Z Setting up python3-bandit (1.6.2-1) ...
+2025-08-09T03:10:50.1254940Z Setting up bandit (1.6.2-1) ...
+2025-08-09T03:10:50.1303076Z Processing triggers for man-db (2.10.2-1) ...
+2025-08-09T03:10:52.0727022Z NEEDRESTART-VER: 3.5
+2025-08-09T03:10:52.6821164Z NEEDRESTART-KCUR: 6.8.0-1031-azure
+2025-08-09T03:10:52.6821829Z NEEDRESTART-KEXP: 6.8.0-1031-azure
+2025-08-09T03:10:52.6822169Z NEEDRESTART-KSTA: 1
+2025-08-09T03:10:52.6822440Z NEEDRESTART-SVC: hosted-compute-agent.service
+2025-08-09T03:10:54.1484364Z No Python files found, skipping bandit scan
+2025-08-09T03:10:54.1514288Z Checking for potential hardcoded secrets...
+2025-08-09T03:10:54.1515102Z ./ainux-builder.sh:    curl -fsSL https://repo.radeon.com/rocm/rocm.gpg.key | apt-key add -
+2025-08-09T03:10:54.1515967Z ./ainux-builder.sh:CLUSTER_SECRET_KEY=/etc/cluster/cluster.key
+2025-08-09T03:10:54.1516631Z ./ainux-builder.sh:    if [[ ! -f /etc/cluster/cluster.key ]]; then
+2025-08-09T03:10:54.1517502Z ./ainux-builder.sh:        ssh-keygen -t ed25519 -f /etc/cluster/cluster.key -N "" -C "ainux-cluster-$(date +%s)"
+2025-08-09T03:10:54.1518543Z ./ainux-builder.sh:        chmod 600 /etc/cluster/cluster.key*
+2025-08-09T03:10:54.1519159Z ./ainux-builder.sh:        log_cluster "Generated new cluster keys"
+2025-08-09T03:10:54.1519828Z ./ainux-builder.sh:    "cluster_key_fingerprint": "$(ssh-keygen -lf /etc/cluster/cluster.key.pub | awk '{print $2}')"
+2025-08-09T03:10:54.1520573Z ./ainux-builder.sh:    log_cluster "Cluster key fingerprint: $(ssh-keygen -lf /etc/cluster/cluster.key.pub | awk '{print $2}')"
+2025-08-09T03:10:54.1521199Z ./ainux-builder.sh:            if ssh-keyscan -t ed25519 "$main_ip" >/dev/null 2>&1; then
+2025-08-09T03:10:54.1521872Z ./ainux-builder.sh:        if [[ ! -f /etc/cluster/node.key ]]; then
+2025-08-09T03:10:54.1522419Z ./ainux-builder.sh:            ssh-keygen -t ed25519 -f /etc/cluster/node.key -N "" -C "ainux-sub-$(hostname)-$(date +%s)"
+2025-08-09T03:10:54.1523056Z ./ainux-builder.sh:    "node_key_fingerprint": "$(ssh-keygen -lf /etc/cluster/node.key.pub | awk '{print $2}')"
+2025-08-09T03:10:54.1523653Z ./ainux-builder.sh:        test keystatus gfxmenu regexp probe efi_gop efi_uga all_video gfxterm font \
+2025-08-09T03:10:54.1524383Z ⚠️  Found potential hardcoded secrets above - please review
+2025-08-09T03:10:54.1605316Z Post job cleanup.
+2025-08-09T03:10:54.2534610Z [command]/usr/bin/git version
+2025-08-09T03:10:54.2568873Z git version 2.50.1
+2025-08-09T03:10:54.2611019Z Temporarily overriding HOME='/home/runner/work/_temp/fcc0ca25-2c00-4552-b08a-624cd2530616' before making global git config changes
+2025-08-09T03:10:54.2612188Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-09T03:10:54.2616356Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ainux/ainux
+2025-08-09T03:10:54.2650193Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-09T03:10:54.2681224Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-09T03:10:54.2901886Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-09T03:10:54.2922071Z http.https://github.com/.extraheader
+2025-08-09T03:10:54.2934565Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-08-09T03:10:54.2965038Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-09T03:10:54.3289994Z Cleaning up orphan processes
