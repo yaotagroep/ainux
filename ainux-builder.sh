@@ -326,23 +326,6 @@ EOF
     log_info "Build summary saved to: $summary_file"
 }
 
-# Entry point with argument parsing
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    # Initialize variables
-    start_time=$(date +%s)
-    
-    # Parse command line arguments
-    parse_arguments "$@"
-    
-    # Run main build process
-    main
-    
-    # Create build summary
-    create_build_summary
-    
-    log_success "Build process completed successfully!"
-fi
-
 # Error handling function
 error_exit() {
     log_error "Build failed at line $1"
@@ -350,11 +333,6 @@ error_exit() {
     cleanup_build
     exit 1
 }
-
-# Export functions for external use
-export -f log_info log_success log_warning log_error log_phase
-export -f cleanup_build check_prerequisites
-export -f init_build build_kernel create_rootfs build_iso validate_build
 
 trap 'error_exit $LINENO "$BASH_COMMAND"' ERR
 
@@ -1708,3 +1686,25 @@ VALIDATE_EOF
     
     log_success "Build validation completed"
 }
+
+# Export functions for external use
+export -f log_info log_success log_warning log_error log_phase
+export -f cleanup_build check_prerequisites
+export -f init_build build_kernel create_rootfs build_iso validate_build
+
+# Entry point with argument parsing
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    # Initialize variables
+    start_time=$(date +%s)
+    
+    # Parse command line arguments
+    parse_arguments "$@"
+    
+    # Run main build process
+    main
+    
+    # Create build summary
+    create_build_summary
+    
+    log_success "Build process completed successfully!"
+fi
