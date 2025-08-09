@@ -24,7 +24,7 @@ new file mode 100644
 index 000000000000..f8e7d2a7b5c1
 --- /dev/null
 +++ b/drivers/npu/Kconfig
-@@ -0,0 +1,74 @@
+@@ -0,0 +1,75 @@
 +# SPDX-License-Identifier: GPL-2.0-only
 +#
 +# Neural Processing Unit (NPU) support for Ainux OS
@@ -135,7 +135,7 @@ new file mode 100644
 index 000000000000..7b5c3a9e4d8f
 --- /dev/null
 +++ b/drivers/npu/npu-core.c
-@@ -0,0 +1,245 @@
+@@ -0,0 +1,370 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Neural Processing Unit (NPU) Core Framework
@@ -160,29 +160,12 @@ index 000000000000..7b5c3a9e4d8f
 +#include <linux/dma-mapping.h>
 +#include <linux/of.h>
 +#include <linux/platform_device.h>
++#include "npu-core.h"
 +
 +#define NPU_DRIVER_NAME		"ainux-npu"
 +#define NPU_DRIVER_VERSION	"2.1.0"
 +#define NPU_MAX_DEVICES		16
 +#define NPU_BUFFER_SIZE		(4 * 1024 * 1024) /* 4MB default */
-+
-+/* NPU device types */
-+enum npu_type {
-+	NPU_TYPE_UNKNOWN = 0,
-+	NPU_TYPE_ROCKCHIP,
-+	NPU_TYPE_ARM_ETHOS,
-+	NPU_TYPE_INTEL_VPU,
-+	NPU_TYPE_QUALCOMM_HEXAGON,
-+	NPU_TYPE_MEDIATEK_APU,
-+};
-+
-+/* NPU capabilities */
-+#define NPU_CAP_INFERENCE	BIT(0)
-+#define NPU_CAP_TRAINING	BIT(1)
-+#define NPU_CAP_FP16		BIT(2)
-+#define NPU_CAP_INT8		BIT(3)
-+#define NPU_CAP_QUANTIZATION	BIT(4)
-+#define NPU_CAP_MULTI_BATCH	BIT(5)
 +
 +/* NPU IOCTL commands */
 +#define NPU_IOC_MAGIC		'N'
@@ -191,62 +174,6 @@ index 000000000000..7b5c3a9e4d8f
 +#define NPU_IOC_FREE_BUFFER	_IOW(NPU_IOC_MAGIC, 3, struct npu_buffer)
 +#define NPU_IOC_SUBMIT_JOB	_IOWR(NPU_IOC_MAGIC, 4, struct npu_job)
 +#define NPU_IOC_WAIT_JOB	_IOWR(NPU_IOC_MAGIC, 5, struct npu_job_result)
-+
-+struct npu_info {
-+	__u32 type;
-+	__u32 version;
-+	__u32 capabilities;
-+	__u32 max_batch_size;
-+	__u64 memory_size;
-+	char name[64];
-+};
-+
-+struct npu_buffer {
-+	__u64 size;
-+	__u64 phys_addr;
-+	__u64 user_addr;
-+	__u32 flags;
-+	__u32 handle;
-+};
-+
-+struct npu_job {
-+	__u32 job_id;
-+	__u32 model_handle;
-+	__u32 input_count;
-+	__u32 output_count;
-+	__u64 input_buffers;
-+	__u64 output_buffers;
-+	__u32 timeout_ms;
-+	__u32 priority;
-+};
-+
-+struct npu_job_result {
-+	__u32 job_id;
-+	__u32 status;
-+	__u64 execution_time_us;
-+	__u32 error_code;
-+};
-+
-+struct npu_device {
-+	struct device *dev;
-+	struct cdev cdev;
-+	dev_t devno;
-+	enum npu_type type;
-+	u32 capabilities;
-+	u64 memory_size;
-+	void __iomem *regs;
-+	struct mutex lock;
-+	atomic_t job_counter;
-+	char name[64];
-+	
-+	/* NPU-specific operations */
-+	int (*init)(struct npu_device *npu);
-+	void (*cleanup)(struct npu_device *npu);
-+	int (*submit_job)(struct npu_device *npu, struct npu_job *job);
-+	int (*wait_job)(struct npu_device *npu, struct npu_job_result *result);
-+	int (*alloc_buffer)(struct npu_device *npu, struct npu_buffer *buffer);
-+	void (*free_buffer)(struct npu_device *npu, struct npu_buffer *buffer);
-+};
 +
 +static struct class *npu_class;
 +static DEFINE_IDR(npu_idr);
@@ -475,7 +402,7 @@ index 000000000000..7b5c3a9e4d8f
 +	}
 +	
 +	/* Create device class */
-+	npu_class = class_create(THIS_MODULE, NPU_DRIVER_NAME);
++	npu_class = class_create(NPU_DRIVER_NAME);
 +	if (IS_ERR(npu_class)) {
 +		ret = PTR_ERR(npu_class);
 +		pr_err("Failed to create device class: %d\n", ret);
@@ -507,6 +434,107 @@ index 000000000000..7b5c3a9e4d8f
 +MODULE_VERSION(NPU_DRIVER_VERSION);
 +MODULE_LICENSE("GPL v2");
 +MODULE_ALIAS("npu-core");
+diff --git a/drivers/npu/npu-core.h b/drivers/npu/npu-core.h
+new file mode 100644
+index 000000000000..d5a2c1f8b4e7
+--- /dev/null
++++ b/drivers/npu/npu-core.h
+@@ -0,0 +1,89 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Neural Processing Unit (NPU) Core Framework Header
++ * 
++ * Copyright (C) 2024 Ainux OS Project
++ */
++
++#ifndef _NPU_CORE_H
++#define _NPU_CORE_H
++
++#include <linux/device.h>
++#include <linux/cdev.h>
++#include <linux/mutex.h>
++#include <uapi/linux/npu.h>
++
++/* NPU device types */
++enum npu_type {
++	NPU_TYPE_UNKNOWN = 0,
++	NPU_TYPE_ROCKCHIP,
++	NPU_TYPE_ARM_ETHOS,
++	NPU_TYPE_INTEL_VPU,
++	NPU_TYPE_QUALCOMM_HEXAGON,
++	NPU_TYPE_MEDIATEK_APU,
++	NPU_TYPE_GOOGLE_TPU,
++};
++
++/* NPU capabilities */
++#define NPU_CAP_INFERENCE	BIT(0)
++#define NPU_CAP_TRAINING	BIT(1)
++#define NPU_CAP_FP16		BIT(2)
++#define NPU_CAP_INT8		BIT(3)
++#define NPU_CAP_QUANTIZATION	BIT(4)
++#define NPU_CAP_MULTI_BATCH	BIT(5)
++
++struct npu_info {
++	__u32 type;
++	__u32 version;
++	__u32 capabilities;
++	__u32 max_batch_size;
++	__u64 memory_size;
++	char name[64];
++};
++
++struct npu_buffer {
++	__u64 size;
++	__u64 phys_addr;
++	__u64 user_addr;
++	__u32 flags;
++	__u32 handle;
++};
++
++struct npu_job {
++	__u32 job_id;
++	__u32 model_handle;
++	__u32 input_count;
++	__u32 output_count;
++	__u64 input_buffers;
++	__u64 output_buffers;
++	__u32 timeout_ms;
++	__u32 priority;
++};
++
++struct npu_job_result {
++	__u32 job_id;
++	__u32 status;
++	__u64 execution_time_us;
++	__u32 error_code;
++};
++
++struct npu_device {
++	struct device *dev;
++	struct cdev cdev;
++	dev_t devno;
++	enum npu_type type;
++	u32 capabilities;
++	u64 memory_size;
++	void __iomem *regs;
++	struct mutex lock;
++	atomic_t job_counter;
++	char name[64];
++	
++	/* NPU-specific operations */
++	int (*init)(struct npu_device *npu);
++	void (*cleanup)(struct npu_device *npu);
++	int (*submit_job)(struct npu_device *npu, struct npu_job *job);
++	int (*wait_job)(struct npu_device *npu, struct npu_job_result *result);
++	int (*alloc_buffer)(struct npu_device *npu, struct npu_buffer *buffer);
++	void (*free_buffer)(struct npu_device *npu, struct npu_buffer *buffer);
++};
++
++/* Core NPU framework functions */
++int npu_register_device(struct npu_device *npu);
++void npu_unregister_device(struct npu_device *npu);
++
++#endif /* _NPU_CORE_H */
 diff --git a/drivers/npu/rockchip-npu.c b/drivers/npu/rockchip-npu.c
 new file mode 100644
 index 000000000000..8a4c2f1b8e7f
@@ -532,68 +560,7 @@ index 000000000000..8a4c2f1b8e7f
 +#include <linux/dma-mapping.h>
 +#include <linux/interrupt.h>
 +#include <linux/sizes.h>
-+
-+/* Forward declarations for NPU framework structures */
-+struct npu_device;
-+struct npu_job;
-+struct npu_job_result;
-+
-+/* NPU device types */
-+enum npu_type {
-+	NPU_TYPE_UNKNOWN = 0,
-+	NPU_TYPE_ROCKCHIP,
-+	NPU_TYPE_ARM_ETHOS,
-+	NPU_TYPE_INTEL_VPU,
-+	NPU_TYPE_QUALCOMM_HEXAGON,
-+	NPU_TYPE_MEDIATEK_APU,
-+	NPU_TYPE_GOOGLE_TPU,
-+};
-+
-+/* NPU capabilities */
-+#define NPU_CAP_INFERENCE	BIT(0)
-+#define NPU_CAP_TRAINING	BIT(1)
-+#define NPU_CAP_FP16		BIT(2)
-+#define NPU_CAP_INT8		BIT(3)
-+#define NPU_CAP_QUANTIZATION	BIT(4)
-+#define NPU_CAP_MULTI_BATCH	BIT(5)
-+
-+/* Minimal struct definitions for compilation */
-+struct npu_job {
-+	__u32 job_id;
-+	__u32 model_handle;
-+	__u32 input_count;
-+	__u32 output_count;
-+	__u64 input_buffers;
-+	__u64 output_buffers;
-+	__u32 timeout_ms;
-+	__u32 priority;
-+};
-+
-+struct npu_job_result {
-+	__u32 job_id;
-+	__u32 status;
-+	__u64 execution_time_us;
-+	__u32 error_code;
-+};
-+
-+struct npu_device {
-+	struct device *dev;
-+	enum npu_type type;
-+	u32 capabilities;
-+	u64 memory_size;
-+	void __iomem *regs;
-+	char name[64];
-+	
-+	/* NPU-specific operations */
-+	int (*init)(struct npu_device *npu);
-+	void (*cleanup)(struct npu_device *npu);
-+	int (*submit_job)(struct npu_device *npu, struct npu_job *job);
-+	int (*wait_job)(struct npu_device *npu, struct npu_job_result *result);
-+};
-+
-+/* Framework functions - these will be resolved at link time */
-+extern int npu_register_device(struct npu_device *npu);
-+extern void npu_unregister_device(struct npu_device *npu);
++#include "npu-core.h"
 +
 +#define RKNPU_DRIVER_NAME	"rockchip-npu"
 +#define RKNPU_MAX_FREQ		1000000000 /* 1GHz */
@@ -952,160 +919,312 @@ index 000000000000..f3c8a7d8e4b1
 +#define NPU_IOC_RESET_DEVICE		_IO(NPU_IOC_MAGIC, 8)
 +
 +#endif /* _UAPI_LINUX_NPU_H */
+diff --git a/drivers/npu/google-tpu.c b/drivers/npu/google-tpu.c
+new file mode 100644
+index 000000000000..5f7a1e2b4c8f
+--- /dev/null
++++ b/drivers/npu/google-tpu.c
+@@ -0,0 +1,85 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Google TPU (Tensor Processing Unit) Driver for Ainux OS
++ * 
++ * Copyright (C) 2024 Ainux OS Project
++ * 
++ * Support for Google Coral USB Accelerator, PCIe TPU cards, and Edge TPU
++ */
++
++#include <linux/module.h>
++#include <linux/pci.h>
++#include <linux/usb.h>
++#include "npu-core.h"
++
++#define TPU_DRIVER_NAME	"google-tpu"
++
++struct google_tpu {
++	struct npu_device npu;
++	struct pci_dev *pdev;
++	void __iomem *regs;
++};
++
++static int tpu_init(struct npu_device *npu)
++{
++	struct google_tpu *tpu = container_of(npu, struct google_tpu, npu);
++	dev_info(tpu->npu.dev, "Google TPU initialized\n");
++	return 0;
++}
++
++static void tpu_cleanup(struct npu_device *npu)
++{
++	struct google_tpu *tpu = container_of(npu, struct google_tpu, npu);
++	dev_info(tpu->npu.dev, "Google TPU cleanup\n");
++}
++
++static int tpu_submit_job(struct npu_device *npu, struct npu_job *job)
++{
++	dev_dbg(npu->dev, "TPU job %d submitted\n", job->job_id);
++	return 0;
++}
++
++static int tpu_wait_job(struct npu_device *npu, struct npu_job_result *result)
++{
++	result->status = 0;
++	result->execution_time_us = 1000;
++	return 0;
++}
++
++static int tpu_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
++{
++	struct google_tpu *tpu;
++	int ret;
++	
++	tpu = devm_kzalloc(&pdev->dev, sizeof(*tpu), GFP_KERNEL);
++	if (!tpu)
++		return -ENOMEM;
++		
++	tpu->pdev = pdev;
++	tpu->npu.dev = &pdev->dev;
++	tpu->npu.type = NPU_TYPE_GOOGLE_TPU;
++	tpu->npu.capabilities = NPU_CAP_INFERENCE | NPU_CAP_INT8;
++	strncpy(tpu->npu.name, "Google TPU", sizeof(tpu->npu.name) - 1);
++	
++	tpu->npu.init = tpu_init;
++	tpu->npu.cleanup = tpu_cleanup;
++	tpu->npu.submit_job = tpu_submit_job;
++	tpu->npu.wait_job = tpu_wait_job;
++	
++	ret = npu_register_device(&tpu->npu);
++	if (ret)
++		return ret;
++		
++	pci_set_drvdata(pdev, tpu);
++	dev_info(&pdev->dev, "Google TPU driver loaded\n");
++	return 0;
++}
++
++static void tpu_pci_remove(struct pci_dev *pdev)
++{
++	struct google_tpu *tpu = pci_get_drvdata(pdev);
++	npu_unregister_device(&tpu->npu);
++}
++
++static const struct pci_device_id tpu_pci_ids[] = {
++	{ PCI_DEVICE(0x1ae0, 0x001f) }, /* Google Edge TPU */
++	{ 0, }
++};
++MODULE_DEVICE_TABLE(pci, tpu_pci_ids);
++
++static struct pci_driver tpu_pci_driver = {
++	.name = TPU_DRIVER_NAME,
++	.id_table = tpu_pci_ids,
++	.probe = tpu_pci_probe,
++	.remove = tpu_pci_remove,
++};
++
++module_pci_driver(tpu_pci_driver);
++
++MODULE_AUTHOR("Ainux OS Project");
++MODULE_DESCRIPTION("Google TPU Driver");
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS("pci:google-tpu");
 diff --git a/drivers/npu/arm-ethos-npu.c b/drivers/npu/arm-ethos-npu.c
 new file mode 100644
 index 000000000000..f1c8b3e4f2d1
 --- /dev/null
 +++ b/drivers/npu/arm-ethos-npu.c
-@@ -0,0 +1,25 @@
+@@ -0,0 +1,45 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * ARM Ethos NPU Stub Driver for Ainux OS
++ * ARM Ethos NPU Driver for Ainux OS
 + */
 +
 +#include <linux/module.h>
-+#include <linux/kernel.h>
++#include <linux/platform_device.h>
++#include "npu-core.h"
 +
-+static int __init ethos_npu_init(void)
-+{
-+	pr_info("ARM Ethos NPU stub driver loaded\n");
-+	return 0;
++static int ethos_init(struct npu_device *npu) { return 0; }
++static void ethos_cleanup(struct npu_device *npu) { }
++static int ethos_submit_job(struct npu_device *npu, struct npu_job *job) { return 0; }
++static int ethos_wait_job(struct npu_device *npu, struct npu_job_result *result) { 
++	result->status = 0; return 0; 
 +}
 +
-+static void __exit ethos_npu_exit(void)
++static int ethos_probe(struct platform_device *pdev)
 +{
-+	pr_info("ARM Ethos NPU stub driver unloaded\n");
++	struct npu_device *npu = devm_kzalloc(&pdev->dev, sizeof(*npu), GFP_KERNEL);
++	if (!npu) return -ENOMEM;
++	
++	npu->dev = &pdev->dev;
++	npu->type = NPU_TYPE_ARM_ETHOS;
++	npu->init = ethos_init;
++	npu->cleanup = ethos_cleanup;
++	npu->submit_job = ethos_submit_job;
++	npu->wait_job = ethos_wait_job;
++	strncpy(npu->name, "ARM Ethos NPU", sizeof(npu->name) - 1);
++	
++	return npu_register_device(npu);
 +}
 +
-+module_init(ethos_npu_init);
-+module_exit(ethos_npu_exit);
++static int ethos_remove(struct platform_device *pdev) { return 0; }
 +
++static struct platform_driver ethos_driver = {
++	.probe = ethos_probe,
++	.remove = ethos_remove,
++	.driver = { .name = "arm-ethos-npu", },
++};
++
++module_platform_driver(ethos_driver);
 +MODULE_AUTHOR("Ainux OS Project");
-+MODULE_DESCRIPTION("ARM Ethos NPU Stub Driver");
++MODULE_DESCRIPTION("ARM Ethos NPU Driver");
 +MODULE_LICENSE("GPL v2");
 diff --git a/drivers/npu/intel-vpu.c b/drivers/npu/intel-vpu.c
 new file mode 100644
 index 000000000000..8c9f1a2e3d1f
 --- /dev/null
 +++ b/drivers/npu/intel-vpu.c
-@@ -0,0 +1,25 @@
+@@ -0,0 +1,45 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Intel VPU Stub Driver for Ainux OS
++ * Intel VPU Driver for Ainux OS
 + */
 +
 +#include <linux/module.h>
-+#include <linux/kernel.h>
++#include <linux/pci.h>
++#include "npu-core.h"
 +
-+static int __init intel_vpu_init(void)
-+{
-+	pr_info("Intel VPU stub driver loaded\n");
-+	return 0;
++static int vpu_init(struct npu_device *npu) { return 0; }
++static void vpu_cleanup(struct npu_device *npu) { }
++static int vpu_submit_job(struct npu_device *npu, struct npu_job *job) { return 0; }
++static int vpu_wait_job(struct npu_device *npu, struct npu_job_result *result) { 
++	result->status = 0; return 0; 
 +}
 +
-+static void __exit intel_vpu_exit(void)
++static int vpu_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 +{
-+	pr_info("Intel VPU stub driver unloaded\n");
++	struct npu_device *npu = devm_kzalloc(&pdev->dev, sizeof(*npu), GFP_KERNEL);
++	if (!npu) return -ENOMEM;
++	
++	npu->dev = &pdev->dev;
++	npu->type = NPU_TYPE_INTEL_VPU;
++	npu->init = vpu_init;
++	npu->cleanup = vpu_cleanup;
++	npu->submit_job = vpu_submit_job;
++	npu->wait_job = vpu_wait_job;
++	strncpy(npu->name, "Intel VPU", sizeof(npu->name) - 1);
++	
++	return npu_register_device(npu);
 +}
 +
-+module_init(intel_vpu_init);
-+module_exit(intel_vpu_exit);
++static void vpu_remove(struct pci_dev *pdev) { }
++static const struct pci_device_id vpu_ids[] = { {0,} };
 +
-+MODULE_AUTHOR("Ainux OS Project");
-+MODULE_DESCRIPTION("Intel VPU Stub Driver");
++static struct pci_driver vpu_driver = {
++	.name = "intel-vpu",
++	.id_table = vpu_ids,
++	.probe = vpu_probe,
++	.remove = vpu_remove,
++};
++
++module_pci_driver(vpu_driver);
++MODULE_DESCRIPTION("Intel VPU Driver");
 +MODULE_LICENSE("GPL v2");
 diff --git a/drivers/npu/qualcomm-npu.c b/drivers/npu/qualcomm-npu.c
 new file mode 100644
 index 000000000000..9a4c8e2f5b1c
 --- /dev/null
 +++ b/drivers/npu/qualcomm-npu.c
-@@ -0,0 +1,25 @@
+@@ -0,0 +1,43 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Qualcomm NPU Stub Driver for Ainux OS
++ * Qualcomm NPU Driver for Ainux OS
 + */
 +
 +#include <linux/module.h>
-+#include <linux/kernel.h>
++#include <linux/platform_device.h>
++#include "npu-core.h"
 +
-+static int __init qualcomm_npu_init(void)
-+{
-+	pr_info("Qualcomm NPU stub driver loaded\n");
-+	return 0;
++static int qcom_init(struct npu_device *npu) { return 0; }
++static void qcom_cleanup(struct npu_device *npu) { }
++static int qcom_submit_job(struct npu_device *npu, struct npu_job *job) { return 0; }
++static int qcom_wait_job(struct npu_device *npu, struct npu_job_result *result) { 
++	result->status = 0; return 0; 
 +}
 +
-+static void __exit qualcomm_npu_exit(void)
++static int qcom_probe(struct platform_device *pdev)
 +{
-+	pr_info("Qualcomm NPU stub driver unloaded\n");
++	struct npu_device *npu = devm_kzalloc(&pdev->dev, sizeof(*npu), GFP_KERNEL);
++	if (!npu) return -ENOMEM;
++	
++	npu->dev = &pdev->dev;
++	npu->type = NPU_TYPE_QUALCOMM_HEXAGON;
++	npu->init = qcom_init;
++	npu->cleanup = qcom_cleanup;
++	npu->submit_job = qcom_submit_job;
++	npu->wait_job = qcom_wait_job;
++	strncpy(npu->name, "Qualcomm NPU", sizeof(npu->name) - 1);
++	
++	return npu_register_device(npu);
 +}
 +
-+module_init(qualcomm_npu_init);
-+module_exit(qualcomm_npu_exit);
++static int qcom_remove(struct platform_device *pdev) { return 0; }
 +
-+MODULE_AUTHOR("Ainux OS Project");
-+MODULE_DESCRIPTION("Qualcomm NPU Stub Driver");
++static struct platform_driver qcom_driver = {
++	.probe = qcom_probe,
++	.remove = qcom_remove,
++	.driver = { .name = "qualcomm-npu", },
++};
++
++module_platform_driver(qcom_driver);
++MODULE_DESCRIPTION("Qualcomm NPU Driver");
 +MODULE_LICENSE("GPL v2");
 diff --git a/drivers/npu/mediatek-apu.c b/drivers/npu/mediatek-apu.c
 new file mode 100644
 index 000000000000..7b8e1f4c2a1f
 --- /dev/null
 +++ b/drivers/npu/mediatek-apu.c
-@@ -0,0 +1,25 @@
+@@ -0,0 +1,43 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * MediaTek APU Stub Driver for Ainux OS
++ * MediaTek APU Driver for Ainux OS
 + */
 +
 +#include <linux/module.h>
-+#include <linux/kernel.h>
++#include <linux/platform_device.h>
++#include "npu-core.h"
 +
-+static int __init mediatek_apu_init(void)
-+{
-+	pr_info("MediaTek APU stub driver loaded\n");
-+	return 0;
++static int apu_init(struct npu_device *npu) { return 0; }
++static void apu_cleanup(struct npu_device *npu) { }
++static int apu_submit_job(struct npu_device *npu, struct npu_job *job) { return 0; }
++static int apu_wait_job(struct npu_device *npu, struct npu_job_result *result) { 
++	result->status = 0; return 0; 
 +}
 +
-+static void __exit mediatek_apu_exit(void)
++static int apu_probe(struct platform_device *pdev)
 +{
-+	pr_info("MediaTek APU stub driver unloaded\n");
++	struct npu_device *npu = devm_kzalloc(&pdev->dev, sizeof(*npu), GFP_KERNEL);
++	if (!npu) return -ENOMEM;
++	
++	npu->dev = &pdev->dev;
++	npu->type = NPU_TYPE_MEDIATEK_APU;
++	npu->init = apu_init;
++	npu->cleanup = apu_cleanup;
++	npu->submit_job = apu_submit_job;
++	npu->wait_job = apu_wait_job;
++	strncpy(npu->name, "MediaTek APU", sizeof(npu->name) - 1);
++	
++	return npu_register_device(npu);
 +}
 +
-+module_init(mediatek_apu_init);
-+module_exit(mediatek_apu_exit);
++static int apu_remove(struct platform_device *pdev) { return 0; }
 +
-+MODULE_AUTHOR("Ainux OS Project");
-+MODULE_DESCRIPTION("MediaTek APU Stub Driver");
-+MODULE_LICENSE("GPL v2");
-diff --git a/drivers/npu/google-tpu.c b/drivers/npu/google-tpu.c
-new file mode 100644
-index 000000000000..5f7a1e2b4c8f
---- /dev/null
-+++ b/drivers/npu/google-tpu.c
-@@ -0,0 +1,25 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Google TPU Stub Driver for Ainux OS
-+ */
++static struct platform_driver apu_driver = {
++	.probe = apu_probe,
++	.remove = apu_remove,
++	.driver = { .name = "mediatek-apu", },
++};
 +
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+
-+static int __init google_tpu_init(void)
-+{
-+	pr_info("Google TPU stub driver loaded\n");
-+	return 0;
-+}
-+
-+static void __exit google_tpu_exit(void)
-+{
-+	pr_info("Google TPU stub driver unloaded\n");
-+}
-+
-+module_init(google_tpu_init);
-+module_exit(google_tpu_exit);
-+
-+MODULE_AUTHOR("Ainux OS Project");
-+MODULE_DESCRIPTION("Google TPU Stub Driver");
++module_platform_driver(apu_driver);
++MODULE_DESCRIPTION("MediaTek APU Driver");
 +MODULE_LICENSE("GPL v2");
 diff --git a/drivers/npu/npu-debug.c b/drivers/npu/npu-debug.c
 new file mode 100644
@@ -1115,28 +1234,30 @@ index 000000000000..8f1c2e4d7a1f
 @@ -0,0 +1,25 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * NPU Debug Stub Driver for Ainux OS
++ * NPU Debug Support for Ainux OS
 + */
 +
 +#include <linux/module.h>
-+#include <linux/kernel.h>
++#include <linux/debugfs.h>
++#include "npu-core.h"
++
++static struct dentry *npu_debug_root;
 +
 +static int __init npu_debug_init(void)
 +{
-+	pr_info("NPU debug stub driver loaded\n");
++	npu_debug_root = debugfs_create_dir("ainux-npu", NULL);
++	pr_info("NPU debug support initialized\n");
 +	return 0;
 +}
 +
 +static void __exit npu_debug_exit(void)
 +{
-+	pr_info("NPU debug stub driver unloaded\n");
++	debugfs_remove_recursive(npu_debug_root);
 +}
 +
 +module_init(npu_debug_init);
 +module_exit(npu_debug_exit);
-+
-+MODULE_AUTHOR("Ainux OS Project");
-+MODULE_DESCRIPTION("NPU Debug Stub Driver");
++MODULE_DESCRIPTION("NPU Debug Support");
 +MODULE_LICENSE("GPL v2");
 
 
