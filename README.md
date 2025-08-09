@@ -28,6 +28,7 @@
 - **🧠 AI-First Architecture**: Native support for PyTorch, TensorFlow, ONNX Runtime
 - **🚀 Multi-GPU Support**: NVIDIA CUDA, AMD ROCm, Intel Arc out-of-the-box
 - **🔌 NPU Integration**: Rockchip, ARM Ethos, Intel VPU support with enhanced driver framework
+- **🔌 TPU Integration**: Google Coral, PCIe Bifurcation support
 - **💾 Flash Memory Optimization**: NVMe caching, bcache, dm-cache support
 - **🧠 Advanced Memory Management**: ZRAM compression, huge pages, shared memory pools
 - **🌐 Cluster Management**: Automatic node discovery and load balancing
