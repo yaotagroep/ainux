@@ -152,7 +152,7 @@ EXAMPLES:
     CLUSTER_MODE=sub ENABLE_GUI=true ./ainux-builder.sh
 
 REQUIREMENTS:
-    - Ubuntu 22.04 LTS host system
+    - Ubuntu 22.04 or 24.04 LTS host system
     - 30GB+ free disk space
     - Internet connection
     - sudo privileges
@@ -349,17 +349,36 @@ cleanup_build() {
 check_prerequisites() {
     log_phase "Checking Prerequisites"
     
-    # Check OS
-    if [[ ! -f /etc/os-release ]] || ! grep -q "Ubuntu 22.04" /etc/os-release; then
-        log_error "This script requires Ubuntu 22.04 LTS"
+    # Check OS - Support Ubuntu 22.04 and 24.04 LTS
+    if [[ ! -f /etc/os-release ]]; then
+        log_error "Cannot detect OS version (missing /etc/os-release)"
         exit 1
     fi
     
-    # Check disk space (30GB minimum)
-    available_space=$(df "$HOME" | awk 'NR==2 {print int($4/1024/1024)}')
-    if [[ $available_space -lt 30 ]]; then
-        log_error "Insufficient disk space. Required: 30GB, Available: ${available_space}GB"
+    if grep -q "Ubuntu" /etc/os-release && grep -qE "(22\.04|24\.04)" /etc/os-release; then
+        os_version=$(grep VERSION_ID /etc/os-release | cut -d'"' -f2)
+        log_info "Detected Ubuntu $os_version LTS - supported"
+    else
+        log_error "This script requires Ubuntu 22.04 or 24.04 LTS"
+        log_error "Detected OS: $(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2 2>/dev/null || echo 'Unknown')"
         exit 1
+    fi
+    
+    # Check disk space (30GB minimum, but allow override for CI)
+    available_space=$(df "$HOME" | awk 'NR==2 {print int($4/1024/1024)}')
+    min_space=${MIN_DISK_SPACE:-30}
+    
+    if [[ $available_space -lt $min_space ]]; then
+        if [[ "${CI:-false}" == "true" ]] || [[ "${GITHUB_ACTIONS:-false}" == "true" ]]; then
+            log_warning "Limited disk space in CI: ${available_space}GB (recommended: ${min_space}GB)"
+            log_info "Continuing with reduced disk space as this is a CI environment"
+            log_info "Consider using the workflow's disk cleanup step before building"
+        else
+            log_error "Insufficient disk space. Required: ${min_space}GB, Available: ${available_space}GB"
+            exit 1
+        fi
+    else
+        log_info "Disk space check passed: ${available_space}GB available"
     fi
     
     # Check internet connectivity (more robust for CI environments)
