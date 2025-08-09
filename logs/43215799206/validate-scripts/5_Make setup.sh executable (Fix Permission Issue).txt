@@ -1,0 +1,15 @@
+﻿2025-08-09T13:52:29.2152711Z ##[group]Run # This addresses the rootfs/setup.sh permission denied issue
+2025-08-09T13:52:29.2153186Z [36;1m# This addresses the rootfs/setup.sh permission denied issue[0m
+2025-08-09T13:52:29.2153652Z [36;1m# The build script will handle permissions, but we ensure all scripts are executable[0m
+2025-08-09T13:52:29.2154147Z [36;1mchmod +x ainux-builder.sh build-desktop.sh build-server.sh build-arm.sh[0m
+2025-08-09T13:52:29.2154490Z [36;1m[0m
+2025-08-09T13:52:29.2154804Z [36;1m# Also ensure any existing rootfs/setup.sh is executable (if it exists from previous run)[0m
+2025-08-09T13:52:29.2155211Z [36;1mif [ -f rootfs/setup.sh ]; then [0m
+2025-08-09T13:52:29.2155458Z [36;1m  chmod +x rootfs/setup.sh[0m
+2025-08-09T13:52:29.2155740Z [36;1m  echo "✅ Made existing rootfs/setup.sh executable"[0m
+2025-08-09T13:52:29.2156028Z [36;1mfi[0m
+2025-08-09T13:52:29.2156177Z [36;1m[0m
+2025-08-09T13:52:29.2156465Z [36;1mecho "🔧 Build script will handle rootfs/setup.sh permissions during execution"[0m
+2025-08-09T13:52:29.2181531Z shell: /usr/bin/bash -e {0}
+2025-08-09T13:52:29.2181759Z ##[endgroup]
+2025-08-09T13:52:29.2233989Z 🔧 Build script will handle rootfs/setup.sh permissions during execution
