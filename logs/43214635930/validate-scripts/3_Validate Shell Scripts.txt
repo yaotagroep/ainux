@@ -1,0 +1,50 @@
+﻿2025-08-09T12:52:13.5495467Z ##[group]Run sudo apt-get update
+2025-08-09T12:52:13.5496885Z [36;1msudo apt-get update[0m
+2025-08-09T12:52:13.5498125Z [36;1msudo apt-get install -y shellcheck[0m
+2025-08-09T12:52:13.5499729Z [36;1m[0m
+2025-08-09T12:52:13.5501007Z [36;1m# Check all shell scripts (warnings allowed, only errors fail)[0m
+2025-08-09T12:52:13.5503686Z [36;1mfind . -name "*.sh" -type f | xargs shellcheck -e SC2155,SC2002,SC2046,SC2116,SC2024 || true[0m
+2025-08-09T12:52:13.5505688Z [36;1m[0m
+2025-08-09T12:52:13.5506595Z [36;1m# Check for critical errors only[0m
+2025-08-09T12:52:13.5508115Z [36;1mecho "Checking for critical shellcheck errors..."[0m
+2025-08-09T12:52:13.5510080Z [36;1mif find . -name "*.sh" -type f | xargs shellcheck -S error; then[0m
+2025-08-09T12:52:13.5511813Z [36;1m    echo "✅ No critical shellcheck errors found"[0m
+2025-08-09T12:52:13.5513148Z [36;1melse[0m
+2025-08-09T12:52:13.5514176Z [36;1m    echo "❌ Critical shellcheck errors detected"[0m
+2025-08-09T12:52:13.5515500Z [36;1m    exit 1[0m
+2025-08-09T12:52:13.5516429Z [36;1mfi[0m
+2025-08-09T12:52:13.5549144Z shell: /usr/bin/bash -e {0}
+2025-08-09T12:52:13.5550321Z ##[endgroup]
+2025-08-09T12:52:13.6523621Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T12:52:13.6901099Z Hit:2 http://azure.archive.ubuntu.com/ubuntu jammy InRelease
+2025-08-09T12:52:13.6911028Z Get:6 https://packages.microsoft.com/repos/azure-cli jammy InRelease [3596 B]
+2025-08-09T12:52:13.6950047Z Get:3 http://azure.archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+2025-08-09T12:52:13.7028905Z Get:4 http://azure.archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+2025-08-09T12:52:13.7031300Z Get:7 https://packages.microsoft.com/ubuntu/22.04/prod jammy InRelease [3632 B]
+2025-08-09T12:52:13.7049533Z Get:5 http://azure.archive.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+2025-08-09T12:52:13.8506672Z Get:8 https://packages.microsoft.com/repos/azure-cli jammy/main amd64 Packages [2575 B]
+2025-08-09T12:52:13.9772333Z Get:9 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main amd64 Packages [239 kB]
+2025-08-09T12:52:13.9935070Z Get:10 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main arm64 Packages [75.0 kB]
+2025-08-09T12:52:14.1256446Z Get:11 http://azure.archive.ubuntu.com/ubuntu jammy-security/main Translation-en [379 kB]
+2025-08-09T12:52:21.2449482Z Fetched 1087 kB in 1s (1928 kB/s)
+2025-08-09T12:52:22.0563600Z Reading package lists...
+2025-08-09T12:52:22.1146231Z Reading package lists...
+2025-08-09T12:52:22.2905561Z Building dependency tree...
+2025-08-09T12:52:22.2916450Z Reading state information...
+2025-08-09T12:52:22.4442071Z shellcheck is already the newest version (0.8.0-2).
+2025-08-09T12:52:22.4442976Z 0 upgraded, 0 newly installed, 0 to remove and 16 not upgraded.
+2025-08-09T12:52:23.5995425Z 
+2025-08-09T12:52:23.5996237Z In ./ainux-builder.sh line 50:
+2025-08-09T12:52:23.5996734Z         DEFAULT_HOSTNAME="ainux-ai"
+2025-08-09T12:52:23.5997549Z         ^--------------^ SC2034 (warning): DEFAULT_HOSTNAME appears unused. Verify use (or export if used externally).
+2025-08-09T12:52:23.5998223Z 
+2025-08-09T12:52:23.5998235Z 
+2025-08-09T12:52:23.5998621Z In ./ainux-builder.sh line 1334:
+2025-08-09T12:52:23.5999427Z         log_info "Available patches: $(ls -1 "$PATCH_DIR"/*.patch 2>/dev/null | xargs -r basename -s .patch | tr '\n' ' ')"
+2025-08-09T12:52:23.6000538Z                                        ^-- SC2011 (warning): Use 'find .. -print0 | xargs -0 ..' or 'find .. -exec .. +' to allow non-alphanumeric filenames.
+2025-08-09T12:52:23.6001139Z 
+2025-08-09T12:52:23.6001276Z For more information:
+2025-08-09T12:52:23.6001863Z   https://www.shellcheck.net/wiki/SC2011 -- Use 'find .. -print0 | xargs -0 ....
+2025-08-09T12:52:23.6002736Z   https://www.shellcheck.net/wiki/SC2034 -- DEFAULT_HOSTNAME appears unused. ...
+2025-08-09T12:52:23.6022583Z Checking for critical shellcheck errors...
+2025-08-09T12:52:24.2173064Z ✅ No critical shellcheck errors found
