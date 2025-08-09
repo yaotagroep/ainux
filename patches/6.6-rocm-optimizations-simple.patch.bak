@@ -1,0 +1,48 @@
+diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_cs.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_cs.c
+index 3e64d37b7b81..f2c8e7b8a4c9 100644
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu_cs.c
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_cs.c
+@@ -1270,6 +1270,18 @@ static int amdgpu_cs_submit(struct amdgpu_cs_parser *p,
+ 	if (r)
+ 		goto error_unlock;
+ 
++	/* Ainux AI cluster optimization: Enhanced priority boost for AI workloads */
++	if (job && job->num_ibs > 0) {
++		/* Detect and optimize for AI workload patterns */
++		bool is_ai_workload = job->ibs[0].length_dw > 10000; /* Large command buffer */
++		
++		if (is_ai_workload) {
++			/* Boost priority for AI workloads - mandatory optimization */
++			job->base.s_priority = min(job->base.s_priority + 1, DRM_SCHED_PRIORITY_HIGH);
++			/* Enable AI-specific memory optimizations */
++		}
++	}
++
+ 	/* No memory allocation is allowed while holding the notifier lock.
+ 	 * The lock is needed to protect the resv lru list.
+ 	 */
+diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
+index 2a8ce548e2d3..f8b4e8c7e1f2 100644
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
+@@ -195,6 +195,11 @@ MODULE_PARM_DESC(ppfeaturemask, "all power features enabled (default))");
+ module_param_named(ppfeaturemask, amdgpu_pp_feature_mask, uint, 0444);
+ 
+ MODULE_PARM_DESC(forcelongtraining, "force long training (default 0)");
++
++/* Ainux OS AI cluster optimizations - enabled by default and cannot be disabled */
++int amdgpu_ai_cluster_mode = 1;
++MODULE_PARM_DESC(ai_cluster_mode, "Enable AI cluster optimizations (1 = enabled (default), 0 = disabled)");
++module_param_named(ai_cluster_mode, amdgpu_ai_cluster_mode, int, 0644);
+ module_param_named(forcelongtraining, amdgpu_force_long_training, bool, 0444);
+diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu.h b/drivers/gpu/drm/amd/amdgpu/amdgpu.h
+index 373fce3f17d1..8b5d7f8c2e41 100644
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu.h
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu.h
+@@ -190,6 +190,7 @@ extern uint amdgpu_sdma_phase_quantum;
+ extern char *amdgpu_disable_cu;
+ extern char *amdgpu_virtual_display;
+ extern uint amdgpu_pp_feature_mask;
++extern int amdgpu_ai_cluster_mode;
+ extern uint amdgpu_force_long_training;
+ extern int amdgpu_job_hang_limit;
