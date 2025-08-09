@@ -17,6 +17,7 @@ NC='\033[0m' # No Color
 # Configuration
 KERNEL_VERSION="6.6.58"
 BUILD_DIR="$HOME/ainux-build"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLUSTER_MODE="${CLUSTER_MODE:-main}"  # main/sub - can be set via env var
 BUILD_THREADS="${BUILD_THREADS:-$(nproc)}"
 SKIP_QEMU_TEST="${SKIP_QEMU_TEST:-false}"
@@ -836,6 +837,14 @@ NET_EOF
             log_info "Applying NPU support patch..."
             if ! patch -p1 --fuzz=3 < "$PATCH_DIR/6.6-npu-support.patch" 2>&1 | tee "$BUILD_DIR/logs/patch-npu.log"; then
                 log_warning "NPU patch failed, continuing with build..."
+            else
+                # Fix NPU Kconfig if it was truncated during patch application
+                if [[ -f "drivers/npu/Kconfig" ]]; then
+                    log_info "Verifying NPU Kconfig completeness..."
+                    if [[ -x "$REPO_ROOT/fix-npu-kconfig.sh" ]]; then
+                        "$REPO_ROOT/fix-npu-kconfig.sh" "drivers/npu/Kconfig" || log_warning "NPU Kconfig fix failed"
+                    fi
+                fi
             fi
         fi
         
@@ -872,6 +881,11 @@ NET_EOF
         log_warning "Using fallback patches..."
         create_fallback_patches
         patch -p1 --fuzz=3 < npu-support.patch 2>&1 | tee "$BUILD_DIR/logs/patch-npu.log" || log_warning "Fallback NPU patch failed"
+        # Fix NPU Kconfig if it was truncated during fallback patch application
+        if [[ -f "drivers/npu/Kconfig" && -x "$REPO_ROOT/fix-npu-kconfig.sh" ]]; then
+            log_info "Verifying fallback NPU Kconfig completeness..."
+            "$REPO_ROOT/fix-npu-kconfig.sh" "drivers/npu/Kconfig" || log_warning "NPU Kconfig fix failed"
+        fi
         patch -p1 --fuzz=3 < rocm-optimizations.patch 2>&1 | tee "$BUILD_DIR/logs/patch-rocm.log" || log_warning "Fallback ROCm patch failed"
         patch -p1 --fuzz=3 < cluster-networking.patch 2>&1 | tee "$BUILD_DIR/logs/patch-cluster.log" || log_warning "Fallback cluster networking patch failed"
     fi
