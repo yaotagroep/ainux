@@ -1,0 +1,36 @@
+<closed>[fe3ef2a]
+2025-08-09T10:38:03.791Z|patches/6.6-npu-support.patch|138|[RESOLVED][SYN]-Fixed npu-core.c diff header line count mismatch|(SUMMARY: Updated line count from 245 to 372)|@@ -0,0 +1,372 @@|2m15s|{"fix_applied":"corrected_diff_header_line_count","verification":"patch_syntax_validation","files_affected":["drivers/npu/npu-core.c"],"error_types_fixed":["expected_declaration_at_end_of_input","control_reaches_end_of_non_void_function","unused_variables"]}
+</closed>
+
+<closed>[b99f023]
+2025-01-28T15:30:00.000Z|configs/ainux-6.6-ai.config|640-695|[RESOLVED][CFG]-Fixed GPU support configuration - AMD and NVIDIA disabled|(SUMMARY: Added complete DRM/GPU configurations to kernel config)|CONFIG_HSA_AMD=y CONFIG_DRM_NOUVEAU=y CONFIG_DRM_I915=y|15m30s|{"fix_applied":"gpu_drm_configuration_complete","verification":"kernel_config_gpu_enabled","components_fixed":["AMD_GPU_HSA","NVIDIA_DRM_NOUVEAU","INTEL_DRM_I915","DRM_AMDGPU","DRM_RADEON"],"config_options_added":["CONFIG_DRM=y","CONFIG_DRM_KMS_HELPER=y","CONFIG_HSA_AMD=y","CONFIG_DRM_NOUVEAU=y","CONFIG_DRM_I915=y","CONFIG_DRM_AMDGPU=y","CONFIG_DRM_RADEON=y"],"files_affected":["configs/ainux-6.6-ai.config","configs/ainux-6.6-desktop.config","configs/ainux-6.6-server.config","configs/ainux-6.6-arm.config"]}
+</closed>
+
+<closed>[b99f023]  
+2025-01-28T15:25:00.000Z|ainux-builder.sh|2328-2330|[RESOLVED][PERM]-Fixed setup.sh permission denied error in chroot|(SUMMARY: Improved permission handling for setup.sh execution)|sudo chmod 755 rootfs/setup.sh; sudo chroot rootfs chmod +x /setup.sh|5m00s|{"fix_applied":"enhanced_permission_handling","verification":"chroot_execution_success","error_resolved":"Permission denied: rootfs/setup.sh","commands_updated":["chmod 755","chroot chmod +x"],"security_improved":"proper_file_permissions_in_chroot"}
+</closed>
+
+<closed>[b99f023]
+2025-01-28T15:45:00.000Z|ainux-builder.sh,configs/*.config|22-52,all|[RESOLVED][CFG]-Added build variants support for Desktop/Server/ARM|(SUMMARY: Implemented multi-variant build system with specialized configurations)|BUILD_VARIANT=desktop/server/arm support|45m00s|{"fix_applied":"build_variants_system","verification":"all_variants_build_successfully","variants_added":["desktop","server","arm"],"configs_created":["ainux-6.6-desktop.config","ainux-6.6-server.config","ainux-6.6-arm.config"],"features_added":["GUI_desktop","enterprise_server","raspberry_pi_arm"],"environment_variables":["BUILD_VARIANT","ARCH","KERNEL_CONFIG"]}
+</closed>
+
+<closed>[0092bbf]
+2025-08-09T10:11:51.754Z|patches/6.6-npu-support.patch|113|[RESOLVED][CFG]-Added NPU Kconfig fix script and build integration|(SUMMARY: Fixed Kconfig truncation during patch application)|endif # NPU_FRAMEWORK|5m40s|{"fix_applied":"npu_kconfig_completion_script","verification":"kernel_defconfig_success","components_verified":["NPU_FRAMEWORK","GOOGLE_TPU","NPU_DEBUG"]}
+</closed>
+
+<closed>[0092bbf]
+2025-08-09T10:11:51.754Z|patches/6.6-npu-support.patch|113|[RESOLVED][CFG]-Added NPU Kconfig fix script and build integration|(SUMMARY: Fixed Kconfig truncation during patch application)|endif # NPU_FRAMEWORK|5m40s|{"fix_applied":"npu_kconfig_completion_script","verification":"kernel_defconfig_success","components_verified":["NPU_FRAMEWORK","GOOGLE_TPU","NPU_DEBUG"]}
+</closed>
+
+<closed>[a7b3f41]
+2025-08-09T09:46:34.518Z|patches/6.6-npu-support.patch|113|[RESOLVED][CFG]-Added missing endif and completed TPU help text|(SUMMARY: Fixed incomplete NPU Kconfig structure)|endif # NPU_FRAMEWORK|1m55s|{"fix_applied":"added_missing_endif_and_tpu_help","verification":"kernel_config_success","components_verified":["NPU","TPU","GPU","CPU"]}
+</closed>
+
+<closed>[b4f9d2c]
+2025-08-09T11:39:54.099Z|ainux-builder.sh|1202-1205|[RESOLVED][CFG]-Fixed GPU/NPU support configuration and missing source files|(SUMMARY: Added NVIDIA support and comprehensive NPU fallback)|scripts/config --enable CONFIG_DRM_NOUVEAU|immediate|{"fix_applied":"gpu_npu_configuration_complete","verification":"kernel_config_test_passed","components_fixed":["AMD_GPU","NVIDIA_GPU","NPU_FRAMEWORK","ROCKCHIP_NPU","GOOGLE_TPU","MEDIATEK_APU","ARM_ETHOS_NPU","INTEL_VPU","NPU_DEBUG"],"files_created":["rockchip-npu.c","arm-ethos-npu.c","intel-vpu.c","google-tpu.c","mediatek-apu.c","npu-debug.c"],"config_checks_fixed":["CONFIG_HSA_AMD","CONFIG_DRM_NOUVEAU","CONFIG_NPU_FRAMEWORK","CONFIG_GOOGLE_TPU"]}
+</closed>
+
+<closed>[c8d5e4a]
+2025-01-28T10:15:23.456Z|.github/workflows/build-test.yml|82|[RESOLVED][DEP]-Added missing debhelper build dependency|(SUMMARY: Fixed dpkg-buildpackage failure)|sudo apt-get install -y ... debhelper|immediate|{"fix_applied":"added_debhelper_dependency","verification":"build_test_passed","error_resolved":"dpkg-checkbuilddeps: error: Unmet build dependencies: debhelper","impact":"complete_build_failure","cascade_errors_fixed":["make_errors","dpkg_buildpackage_abort"]}
+</closed>
+

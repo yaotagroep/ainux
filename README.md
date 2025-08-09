@@ -77,13 +77,25 @@
 - **Network**: Internet connection for downloads
 - **Privileges**: sudo access
 
-### Build Ainux OS
+### Build Ainux OS v2.1
 
+#### 🛠️ Quick Build (Recommended)
 ```bash
-# Clone the repository
-git clone https://github.com/yaotagroep/ainux.git
-cd ainux
+# 🖥️ Desktop Edition - Gaming + AI workstation with full GUI
+./build-desktop.sh
 
+# 🏢 Server Edition - Enterprise with high availability & security  
+./build-server.sh
+
+# 🍓 ARM Edition - Raspberry Pi & edge computing devices
+./build-arm.sh
+
+# 🤖 AI/Cluster Edition - Full AI acceleration (default)
+./ainux-builder.sh
+```
+
+#### 🔧 Traditional Build (Environment Variables)
+```bash
 # Make the builder executable
 chmod +x ainux-builder.sh
 
@@ -115,6 +127,31 @@ sudo validate-hardware
 
 # Monitor AI resources
 /usr/local/bin/ai-monitor
+```
+
+## 📖 Documentation
+
+### 📚 Essential Guides
+- **[Hardware Support](./HARDWARE_SUPPORT.md)** - Complete TPU, NPU, GPU, CPU, DPU guide
+- **[Build Variants](./BUILD_VARIANTS.md)** - Desktop, Server, ARM build options  
+- **[Issue Logger](./issue_logger.md)** - Advanced troubleshooting system v2.1
+- **[Contributing](./CONTRIBUTING.md)** - Development and contribution guidelines
+
+### 🔧 Technical Documentation
+- **[Performance Tuning](./rd.md)** - Research and development notes
+- **[Issue Methodology](./issues_logger.md)** - Enhanced issue tracking system
+
+### 🚀 Quick References
+```bash
+# Build Scripts (New v2.1)
+./build-desktop.sh   # Gaming + AI workstation
+./build-server.sh    # Enterprise deployment  
+./build-arm.sh       # Raspberry Pi/Edge
+./ainux-builder.sh   # Full AI cluster
+
+# System Verification
+./scripts/verify-logger-integrity.sh  # Check issue logger health
+./validate-build-env.sh               # Validate build environment
 ```
 
 ## 💻 Installation
