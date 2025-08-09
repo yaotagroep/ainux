@@ -922,6 +922,28 @@ config INTEL_VPU
 	help
 	  Enable support for Intel VPU for AI acceleration.
 
+config GOOGLE_TPU
+	tristate "Google TPU (Tensor Processing Unit) Support"
+	depends on X86_64 || ARM64
+	default y
+	help
+	  Enable support for Google TPU devices for AI/ML acceleration.
+
+config MEDIATEK_APU
+	tristate "MediaTek APU (AI Processing Unit) Support"
+	depends on ARM64 || X86_64
+	default y
+	help
+	  Enable support for MediaTek APU devices for AI processing.
+
+config NPU_DEBUG
+	bool "NPU Debug Support"
+	depends on NPU_FRAMEWORK
+	default y
+	help
+	  Enable debugging support for NPU devices including logging
+	  and diagnostic capabilities.
+
 endif # NPU_FRAMEWORK
 KCONFIG_EOF
     
@@ -933,6 +955,9 @@ obj-$(CONFIG_NPU_FRAMEWORK)	+= npu-core.o
 obj-$(CONFIG_ROCKCHIP_NPU)	+= rockchip-npu.o
 obj-$(CONFIG_ARM_ETHOS_NPU)	+= arm-ethos-npu.o
 obj-$(CONFIG_INTEL_VPU)		+= intel-vpu.o
+obj-$(CONFIG_GOOGLE_TPU)	+= google-tpu.o
+obj-$(CONFIG_MEDIATEK_APU)	+= mediatek-apu.o
+obj-$(CONFIG_NPU_DEBUG)		+= npu-debug.o
 MAKEFILE_EOF
     
     # Create minimal NPU core driver if it doesn't exist
@@ -970,6 +995,258 @@ MODULE_ALIAS("npu-core");
 CORE_EOF
     fi
     
+    # Create minimal rockchip-npu.c driver if it doesn't exist
+    if [[ ! -s "drivers/npu/rockchip-npu.c" ]]; then
+        log_info "Creating fallback drivers/npu/rockchip-npu.c..."
+        cat > "drivers/npu/rockchip-npu.c" << 'ROCKCHIP_EOF'
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Rockchip NPU Driver for Ainux OS - Minimal Implementation
+ * Copyright (C) 2024 Ainux OS Project
+ */
+
+#include <linux/module.h>
+#include <linux/platform_device.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <linux/of.h>
+
+#define RKNPU_DRIVER_NAME	"rockchip-npu"
+
+static int rockchip_npu_probe(struct platform_device *pdev)
+{
+	dev_info(&pdev->dev, "Rockchip NPU driver loaded (minimal)\n");
+	return 0;
+}
+
+static int rockchip_npu_remove(struct platform_device *pdev)
+{
+	dev_info(&pdev->dev, "Rockchip NPU driver unloaded\n");
+	return 0;
+}
+
+static const struct of_device_id rockchip_npu_match[] = {
+	{ .compatible = "rockchip,rk3588-npu", },
+	{ .compatible = "rockchip,rk3576-npu", },
+	{ /* sentinel */ }
+};
+MODULE_DEVICE_TABLE(of, rockchip_npu_match);
+
+static struct platform_driver rockchip_npu_driver = {
+	.probe = rockchip_npu_probe,
+	.remove = rockchip_npu_remove,
+	.driver = {
+		.name = RKNPU_DRIVER_NAME,
+		.of_match_table = rockchip_npu_match,
+	},
+};
+
+module_platform_driver(rockchip_npu_driver);
+
+MODULE_AUTHOR("Ainux OS Project");
+MODULE_DESCRIPTION("Rockchip NPU Driver - Minimal");
+MODULE_LICENSE("GPL v2");
+MODULE_ALIAS("platform:rockchip-npu");
+ROCKCHIP_EOF
+    fi
+    
+    # Create minimal arm-ethos-npu.c driver if it doesn't exist
+    if [[ ! -s "drivers/npu/arm-ethos-npu.c" ]]; then
+        log_info "Creating fallback drivers/npu/arm-ethos-npu.c..."
+        cat > "drivers/npu/arm-ethos-npu.c" << 'ETHOS_EOF'
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * ARM Ethos NPU Driver for Ainux OS - Minimal Implementation
+ * Copyright (C) 2024 Ainux OS Project
+ */
+
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+
+static int __init arm_ethos_npu_init(void)
+{
+	pr_info("ARM Ethos NPU driver initialized (minimal)\n");
+	return 0;
+}
+
+static void __exit arm_ethos_npu_exit(void)
+{
+	pr_info("ARM Ethos NPU driver unloaded\n");
+}
+
+module_init(arm_ethos_npu_init);
+module_exit(arm_ethos_npu_exit);
+
+MODULE_AUTHOR("Ainux OS Project");
+MODULE_DESCRIPTION("ARM Ethos NPU Driver - Minimal");
+MODULE_LICENSE("GPL v2");
+ETHOS_EOF
+    fi
+    
+    # Create minimal intel-vpu.c driver if it doesn't exist
+    if [[ ! -s "drivers/npu/intel-vpu.c" ]]; then
+        log_info "Creating fallback drivers/npu/intel-vpu.c..."
+        cat > "drivers/npu/intel-vpu.c" << 'INTEL_EOF'
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Intel VPU Driver for Ainux OS - Minimal Implementation
+ * Copyright (C) 2024 Ainux OS Project
+ */
+
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+
+static int __init intel_vpu_init(void)
+{
+	pr_info("Intel VPU driver initialized (minimal)\n");
+	return 0;
+}
+
+static void __exit intel_vpu_exit(void)
+{
+	pr_info("Intel VPU driver unloaded\n");
+}
+
+module_init(intel_vpu_init);
+module_exit(intel_vpu_exit);
+
+MODULE_AUTHOR("Ainux OS Project");
+MODULE_DESCRIPTION("Intel VPU Driver - Minimal");
+MODULE_LICENSE("GPL v2");
+INTEL_EOF
+    fi
+    
+    # Create minimal google-tpu.c driver if it doesn't exist
+    if [[ ! -s "drivers/npu/google-tpu.c" ]]; then
+        log_info "Creating fallback drivers/npu/google-tpu.c..."
+        cat > "drivers/npu/google-tpu.c" << 'TPU_EOF'
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Google TPU Driver for Ainux OS - Minimal Implementation
+ * Copyright (C) 2024 Ainux OS Project
+ */
+
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+
+static int __init google_tpu_init(void)
+{
+	pr_info("Google TPU driver initialized (minimal)\n");
+	return 0;
+}
+
+static void __exit google_tpu_exit(void)
+{
+	pr_info("Google TPU driver unloaded\n");
+}
+
+module_init(google_tpu_init);
+module_exit(google_tpu_exit);
+
+MODULE_AUTHOR("Ainux OS Project");
+MODULE_DESCRIPTION("Google TPU Driver - Minimal");
+MODULE_LICENSE("GPL v2");
+TPU_EOF
+    fi
+    
+    # Create minimal mediatek-apu.c driver if it doesn't exist
+    if [[ ! -s "drivers/npu/mediatek-apu.c" ]]; then
+        log_info "Creating fallback drivers/npu/mediatek-apu.c..."
+        cat > "drivers/npu/mediatek-apu.c" << 'MEDIATEK_EOF'
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * MediaTek APU Driver for Ainux OS - Minimal Implementation
+ * Copyright (C) 2024 Ainux OS Project
+ */
+
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+
+static int __init mediatek_apu_init(void)
+{
+	pr_info("MediaTek APU driver initialized (minimal)\n");
+	return 0;
+}
+
+static void __exit mediatek_apu_exit(void)
+{
+	pr_info("MediaTek APU driver unloaded\n");
+}
+
+module_init(mediatek_apu_init);
+module_exit(mediatek_apu_exit);
+
+MODULE_AUTHOR("Ainux OS Project");
+MODULE_DESCRIPTION("MediaTek APU Driver - Minimal");
+MODULE_LICENSE("GPL v2");
+MEDIATEK_EOF
+    fi
+    
+    # Create minimal npu-debug.c driver if it doesn't exist
+    if [[ ! -s "drivers/npu/npu-debug.c" ]]; then
+        log_info "Creating fallback drivers/npu/npu-debug.c..."
+        cat > "drivers/npu/npu-debug.c" << 'DEBUG_EOF'
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * NPU Debug Framework for Ainux OS - Minimal Implementation
+ * Copyright (C) 2024 Ainux OS Project
+ */
+
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <linux/proc_fs.h>
+#include <linux/seq_file.h>
+
+static struct proc_dir_entry *npu_debug_proc;
+
+static int npu_debug_show(struct seq_file *m, void *v)
+{
+	seq_printf(m, "Ainux NPU Debug Framework (minimal)\n");
+	seq_printf(m, "NPU Framework: Enabled\n");
+	return 0;
+}
+
+static int npu_debug_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, npu_debug_show, NULL);
+}
+
+static const struct proc_ops npu_debug_ops = {
+	.proc_open = npu_debug_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = single_release,
+};
+
+static int __init npu_debug_init(void)
+{
+	npu_debug_proc = proc_create("ainux-npu-debug", 0444, NULL, &npu_debug_ops);
+	if (!npu_debug_proc)
+		return -ENOMEM;
+	pr_info("NPU Debug framework initialized\n");
+	return 0;
+}
+
+static void __exit npu_debug_exit(void)
+{
+	proc_remove(npu_debug_proc);
+	pr_info("NPU Debug framework unloaded\n");
+}
+
+module_init(npu_debug_init);
+module_exit(npu_debug_exit);
+
+MODULE_AUTHOR("Ainux OS Project");
+MODULE_DESCRIPTION("NPU Debug Framework - Minimal");
+MODULE_LICENSE("GPL v2");
+DEBUG_EOF
+    fi
+    
     # Update main drivers/Kconfig to include NPU if not already included
     if ! grep -q "source \"drivers/npu/Kconfig\"" "drivers/Kconfig"; then
         log_info "Adding NPU to main drivers/Kconfig..."
@@ -986,7 +1263,7 @@ CORE_EOF
     
     # Log resolution of NPU patch issues if any were logged
     local resolution_time="immediate"
-    log_build_resolution "auto" "NPU fallback configuration files created successfully" "$resolution_time" "{\"fallback_method\":\"template_generation\",\"files_created\":[\"Kconfig\",\"Makefile\",\"npu-core.c\"]}"
+    log_build_resolution "auto" "NPU fallback configuration files created successfully" "$resolution_time" "{\"fallback_method\":\"template_generation\",\"files_created\":[\"Kconfig\",\"Makefile\",\"npu-core.c\",\"rockchip-npu.c\",\"arm-ethos-npu.c\",\"intel-vpu.c\",\"google-tpu.c\",\"mediatek-apu.c\",\"npu-debug.c\"]}"
 }
        
     # Use local patches from repository instead of downloading
@@ -1118,10 +1395,14 @@ CORE_EOF
     scripts/config --enable CONFIG_QUALCOMM_NPU
     scripts/config --enable CONFIG_MEDIATEK_APU
     
-    # Make NPU support built-in (cannot be disabled/unloaded)
+    # Make NPU/TPU/DPU support built-in (cannot be disabled/unloaded)
+    log_info "Enabling comprehensive accelerator support (NPU/TPU/DPU)..."
     scripts/config --set-val CONFIG_NPU_FRAMEWORK y
     scripts/config --set-val CONFIG_ROCKCHIP_NPU y
     scripts/config --set-val CONFIG_ARM_ETHOS_NPU y
+    scripts/config --set-val CONFIG_GOOGLE_TPU y
+    scripts/config --set-val CONFIG_MEDIATEK_APU y
+    scripts/config --set-val CONFIG_NPU_DEBUG y
     
     # AMD ROCm support (mandatory for AMD platforms) 
     log_info "Enabling mandatory AMD ROCm support..."
@@ -1133,6 +1414,13 @@ CORE_EOF
     scripts/config --enable CONFIG_HSA_AMD_SVM
     scripts/config --set-val CONFIG_HSA_AMD y
     scripts/config --set-val CONFIG_DRM_AMDGPU y
+    
+    # NVIDIA GPU support (mandatory for NVIDIA platforms)
+    log_info "Enabling mandatory NVIDIA GPU support..."
+    scripts/config --enable CONFIG_DRM_NOUVEAU
+    scripts/config --enable CONFIG_DRM_NOUVEAU_BACKLIGHT
+    scripts/config --enable CONFIG_NOUVEAU_PLATFORM_DRIVER
+    scripts/config --set-val CONFIG_DRM_NOUVEAU y
     
     # High-performance networking for clustering
     scripts/config --enable CONFIG_NET_CLS_ROUTE4
@@ -1200,7 +1488,9 @@ CORE_EOF
     # Show configuration summary
     log_info "Kernel configuration summary:"
     log_info "  AMD GPU Support: $(grep -q "CONFIG_HSA_AMD=y" .config && echo "Enabled" || echo "Disabled")"
-    log_info "  NVIDIA Support: $(grep -q "CONFIG_NOUVEAU=y" .config && echo "Enabled" || echo "Disabled")"
+    log_info "  NVIDIA Support: $(grep -q "CONFIG_DRM_NOUVEAU=y" .config && echo "Enabled" || echo "Disabled")"
+    log_info "  NPU Framework: $(grep -q "CONFIG_NPU_FRAMEWORK=y" .config && echo "Enabled" || echo "Disabled")"
+    log_info "  TPU Support: $(grep -q "CONFIG_GOOGLE_TPU=y" .config && echo "Enabled" || echo "Disabled")"
     log_info "  Container Support: $(grep -q "CONFIG_CGROUPS=y" .config && echo "Enabled" || echo "Disabled")"
     log_info "  Performance Events: $(grep -q "CONFIG_PERF_EVENTS=y" .config && echo "Enabled" || echo "Disabled")"
     
