@@ -1,0 +1,44 @@
+﻿2025-08-09T02:37:26.4041041Z ##[group]Run sudo apt-get update
+2025-08-09T02:37:26.4041822Z [36;1msudo apt-get update[0m
+2025-08-09T02:37:26.4042452Z [36;1msudo apt-get install -y shellcheck[0m
+2025-08-09T02:37:26.4043105Z [36;1m[0m
+2025-08-09T02:37:26.4043749Z [36;1m# Check all shell scripts (warnings allowed, only errors fail)[0m
+2025-08-09T02:37:26.4045513Z [36;1mfind . -name "*.sh" -type f | xargs shellcheck -e SC2155,SC2002,SC2046,SC2116,SC2024 || true[0m
+2025-08-09T02:37:26.4046533Z [36;1m[0m
+2025-08-09T02:37:26.4046978Z [36;1m# Check for critical errors only[0m
+2025-08-09T02:37:26.4047778Z [36;1mecho "Checking for critical shellcheck errors..."[0m
+2025-08-09T02:37:26.4049002Z [36;1mif find . -name "*.sh" -type f | xargs shellcheck -S error; then[0m
+2025-08-09T02:37:26.4050254Z [36;1m    echo "✅ No critical shellcheck errors found"[0m
+2025-08-09T02:37:26.4051234Z [36;1melse[0m
+2025-08-09T02:37:26.4052133Z [36;1m    echo "❌ Critical shellcheck errors detected"[0m
+2025-08-09T02:37:26.4053255Z [36;1m    exit 1[0m
+2025-08-09T02:37:26.4054025Z [36;1mfi[0m
+2025-08-09T02:37:26.4092823Z shell: /usr/bin/bash -e {0}
+2025-08-09T02:37:26.4093498Z ##[endgroup]
+2025-08-09T02:37:26.5145950Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T02:37:26.5465820Z Hit:2 http://azure.archive.ubuntu.com/ubuntu jammy InRelease
+2025-08-09T02:37:26.5507710Z Get:3 http://azure.archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+2025-08-09T02:37:26.5551565Z Get:4 http://azure.archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+2025-08-09T02:37:26.5616612Z Get:5 http://azure.archive.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+2025-08-09T02:37:26.5679205Z Get:6 https://packages.microsoft.com/repos/azure-cli jammy InRelease [3596 B]
+2025-08-09T02:37:26.5748959Z Get:7 https://packages.microsoft.com/ubuntu/22.04/prod jammy InRelease [3632 B]
+2025-08-09T02:37:26.9097096Z Get:8 http://azure.archive.ubuntu.com/ubuntu jammy-security/main Translation-en [379 kB]
+2025-08-09T02:37:26.9586647Z Get:9 https://packages.microsoft.com/repos/azure-cli jammy/main amd64 Packages [2575 B]
+2025-08-09T02:37:27.0013032Z Get:10 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main amd64 Packages [239 kB]
+2025-08-09T02:37:27.0269816Z Get:11 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main arm64 Packages [75.0 kB]
+2025-08-09T02:37:34.0001712Z Fetched 1087 kB in 1s (2008 kB/s)
+2025-08-09T02:37:34.8362320Z Reading package lists...
+2025-08-09T02:37:34.8946272Z Reading package lists...
+2025-08-09T02:37:35.0821945Z Building dependency tree...
+2025-08-09T02:37:35.0833219Z Reading state information...
+2025-08-09T02:37:35.2450917Z shellcheck is already the newest version (0.8.0-2).
+2025-08-09T02:37:35.2451934Z 0 upgraded, 0 newly installed, 0 to remove and 16 not upgraded.
+2025-08-09T02:37:36.1956989Z 
+2025-08-09T02:37:36.1957836Z In ./ainux-builder.sh line 833:
+2025-08-09T02:37:36.1958855Z         log_info "Available patches: $(ls -1 "$PATCH_DIR"/*.patch 2>/dev/null | xargs -r basename -s .patch | tr '\n' ' ')"
+2025-08-09T02:37:36.1960265Z                                        ^-- SC2011 (warning): Use 'find .. -print0 | xargs -0 ..' or 'find .. -exec .. +' to allow non-alphanumeric filenames.
+2025-08-09T02:37:36.1960903Z 
+2025-08-09T02:37:36.1961081Z For more information:
+2025-08-09T02:37:36.1961743Z   https://www.shellcheck.net/wiki/SC2011 -- Use 'find .. -print0 | xargs -0 ....
+2025-08-09T02:37:36.1985602Z Checking for critical shellcheck errors...
+2025-08-09T02:37:36.7082112Z ✅ No critical shellcheck errors found
