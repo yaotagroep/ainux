@@ -1,0 +1,25 @@
+# NPU Kconfig Fix for Ainux OS
+# This patch fixes the incomplete NPU Kconfig that was causing build failures
+# Apply this if drivers/npu/Kconfig is missing endif statement
+
+diff --git a/drivers/npu/Kconfig b/drivers/npu/Kconfig
+index f8e7d2a7b5c1..complete123456 100644
+--- a/drivers/npu/Kconfig
++++ b/drivers/npu/Kconfig
+@@ -99,5 +99,15 @@ config GOOGLE_TPU
+ 	  Enable support for Google TPU (Tensor Processing Unit).
+ 	  Google TPUs are specialized ASIC designed for neural
+ 	  network machine learning. This includes support for
+ 	  Google Coral USB Accelerator, PCIe TPU cards, and
++	  Edge TPU devices with enhanced driver framework.
++
++config NPU_DEBUG
++	bool "NPU Framework Debug Support"
++	depends on NPU_FRAMEWORK
++	default n
++	help
++	  Enable debug support for NPU framework. This includes
++	  additional logging, debugging interfaces, and validation
++	  checks for NPU operations.
++
++endif # NPU_FRAMEWORK
