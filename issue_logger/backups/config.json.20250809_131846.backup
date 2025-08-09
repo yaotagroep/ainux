@@ -1,0 +1,373 @@
+{
+  "version": "1.0.0",
+  "metadata": {
+    "created": "2025-08-09T14:30:00.000Z",
+    "description": "AI Issues Logger Configuration",
+    "author": "AI Assistant",
+    "last_modified": "2025-08-09T14:30:00.000Z"
+  },
+  
+  "logging": {
+    "auto_logging": {
+      "enabled": true,
+      "real_time": true,
+      "batch_mode": false,
+      "batch_interval_ms": 5000
+    },
+    
+    "severity_config": {
+      "minimum_threshold": "LOW",
+      "auto_escalate": true,
+      "escalation_rules": {
+        "multiple_criticals": "HIGH",
+        "security_always": "CRITICAL",
+        "performance_threshold": "MEDIUM"
+      }
+    },
+    
+    "file_settings": {
+      "max_file_size_mb": 50,
+      "backup_on_size_limit": true,
+      "compression": "gzip",
+      "encoding": "utf-8",
+      "line_ending": "LF",
+      "prevent_truncation": true,
+      "auto_rotate": true,
+      "buffer_size_kb": 64,
+      "atomic_writes": true,
+      "integrity_verification": true,
+      "backup_frequency_hours": 1,
+      "max_backups": 24,
+      "recovery_mode": "auto"
+    }
+  },
+
+  "detection": {
+    "enabled_categories": ["SYN", "LOG", "PERF", "SEC", "STY", "DOC", "TEST", "DEP", "CFG", "DB", "SHELL"],
+    "disabled_categories": [],
+    
+    "severity_mapping": {
+      "SYN": ["CRITICAL", "HIGH"],
+      "LOG": ["CRITICAL", "HIGH", "MEDIUM"],
+      "PERF": ["HIGH", "MEDIUM", "LOW"],
+      "SEC": ["CRITICAL"],
+      "STY": ["LOW", "INFO"],
+      "DOC": ["MEDIUM", "LOW", "INFO"],
+      "TEST": ["HIGH", "MEDIUM"],
+      "DEP": ["CRITICAL", "HIGH", "MEDIUM"],
+      "CFG": ["HIGH", "MEDIUM"],
+      "DB": ["CRITICAL", "HIGH", "MEDIUM"],
+      "SHELL": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+    },
+    
+    "scan_settings": {
+      "deep_scan": true,
+      "scan_dependencies": true,
+      "scan_test_files": true,
+      "scan_config_files": true,
+      "max_file_size_kb": 1024,
+      "timeout_ms": 30000
+    },
+    
+    "exclusions": {
+      "file_patterns": [
+        "*.min.js",
+        "*.map",
+        "node_modules/**",
+        "dist/**",
+        "build/**",
+        ".git/**",
+        "*.log",
+        "coverage/**",
+        "*.backup",
+        "*.swp",
+        "*.tmp"
+      ],
+      "directory_patterns": [
+        "tmp/",
+        "temp/",
+        "cache/",
+        ".vscode/",
+        ".idea/"
+      ],
+      "line_patterns": [
+        "// @ts-ignore",
+        "// eslint-disable",
+        "// TODO:",
+        "// FIXME:"
+      ]
+    }
+  },
+
+  "resolution": {
+    "auto_resolution": {
+      "enabled": true,
+      "require_confirmation": false,
+      "confidence_threshold": 0.85,
+      "max_auto_attempts": 3
+    },
+    
+    "verification": {
+      "retest_on_fix": true,
+      "run_full_test_suite": false,
+      "lint_check": true,
+      "security_scan": true,
+      "performance_check": false
+    },
+    
+    "timeout_settings": {
+      "max_resolution_time_hours": 72,
+      "auto_close_stale_issues": true,
+      "stale_threshold_days": 30,
+      "reminder_intervals_hours": [24, 48, 72]
+    }
+  },
+
+  "formatting": {
+    "code_snippets": {
+      "max_length": 500,
+      "include_context_lines": 3,
+      "highlight_syntax": true,
+      "remove_comments": false,
+      "minify_whitespace": false,
+      "prevent_truncation": true,
+      "truncation_marker": "... [TRUNCATED - see full context in file]"
+    },
+    
+    "descriptions": {
+      "max_issue_length": 100,
+      "max_summary_length": 50,
+      "include_suggestions": true,
+      "technical_language": true
+    },
+    
+    "timestamps": {
+      "format": "ISO8601",
+      "timezone": "UTC",
+      "precision": "milliseconds",
+      "locale": "en-US"
+    }
+  },
+
+  "notifications": {
+    "enabled": true,
+    
+    "channels": {
+      "console": {
+        "enabled": true,
+        "severity_threshold": "HIGH",
+        "colored_output": true,
+        "verbose": false
+      },
+      "file_log": {
+        "enabled": true,
+        "path": "logs/issues.log",
+        "severity_threshold": "MEDIUM",
+        "rotate_daily": true
+      },
+      "webhook": {
+        "enabled": false,
+        "url": "",
+        "severity_threshold": "CRITICAL",
+        "timeout_ms": 5000,
+        "retry_attempts": 3
+      },
+      "email": {
+        "enabled": false,
+        "smtp_server": "",
+        "recipients": [],
+        "severity_threshold": "CRITICAL",
+        "daily_summary": true,
+        "batch_notifications": true
+      }
+    },
+    
+    "templates": {
+      "critical_alert": "🚨 CRITICAL ISSUE: {issue_description} in {filename}:{line_range}",
+      "resolved_notice": "✅ RESOLVED: {issue_description} in {resolution_time}",
+      "daily_summary": "📊 Daily Report: {new_count} new, {resolved_count} resolved",
+      "stale_reminder": "⏰ STALE: Issue {hash} has been open for {days} days"
+    }
+  },
+
+  "performance": {
+    "caching": {
+      "enabled": true,
+      "cache_duration_minutes": 60,
+      "max_cache_size_mb": 100,
+      "cache_location": "temp/issue_cache/"
+    },
+    
+    "parallel_processing": {
+      "enabled": true,
+      "max_workers": 4,
+      "chunk_size": 50,
+      "worker_timeout_ms": 10000
+    },
+    
+    "rate_limiting": {
+      "max_issues_per_minute": 100,
+      "max_file_scans_per_second": 10,
+      "cooldown_on_limit_ms": 5000
+    }
+  },
+
+  "data_management": {
+    "retention": {
+      "keep_open_issues_days": 365,
+      "keep_closed_issues_days": 90,
+      "archive_after_days": 365,
+      "archive_location": "archive/",
+      "compress_archives": true
+    },
+    
+    "backup": {
+      "enabled": true,
+      "frequency": "daily",
+      "max_backups": 7,
+      "backup_location": "backups/",
+      "verify_integrity": true
+    },
+    
+    "export": {
+      "formats": ["json", "csv", "xml"],
+      "include_context": true,
+      "anonymize_paths": false,
+      "compress_exports": true
+    }
+  },
+
+  "security": {
+    "hash_algorithm": "sha1",
+    "hash_length": 7,
+    "sanitize_output": true,
+    "mask_sensitive_data": true,
+    
+    "sensitive_patterns": [
+      "password",
+      "api_key",
+      "secret",
+      "token",
+      "credential",
+      "private_key"
+    ]
+  },
+
+  "ai_behavior": {
+    "learning": {
+      "enabled": true,
+      "improve_detection": true,
+      "track_false_positives": true,
+      "adapt_severity": true
+    },
+    
+    "suggestions": {
+      "provide_fix_hints": true,
+      "suggest_best_practices": true,
+      "reference_documentation": true,
+      "include_examples": true
+    },
+    
+    "context_awareness": {
+      "track_file_relationships": true,
+      "understand_project_structure": true,
+      "consider_coding_style": true,
+      "respect_framework_patterns": true
+    }
+  },
+
+  "integration": {
+    "git": {
+      "enabled": true,
+      "track_commits": true,
+      "auto_link_issues": true,
+      "ignore_patterns": [".gitignore"]
+    },
+    
+    "ide": {
+      "vscode_extension": false,
+      "jetbrains_plugin": false,
+      "sublime_package": false
+    },
+    
+    "ci_cd": {
+      "github_actions": false,
+      "jenkins": false,
+      "gitlab_ci": false,
+      "fail_on_critical": true,
+      "generate_reports": true
+    },
+    
+    "external_tools": {
+      "eslint": {
+        "enabled": true,
+        "config_path": ".eslintrc.json"
+      },
+      "sonarqube": {
+        "enabled": false,
+        "server_url": "",
+        "project_key": ""
+      },
+      "jira": {
+        "enabled": false,
+        "server_url": "",
+        "project_key": "",
+        "create_tickets": false
+      }
+    }
+  },
+
+  "debugging": {
+    "debug_mode": false,
+    "verbose_logging": false,
+    "trace_execution": false,
+    "log_performance_metrics": false,
+    "save_intermediate_results": false
+  },
+
+  "language_support": {
+    "javascript": {
+      "enabled": true,
+      "frameworks": ["react", "vue", "angular", "node"],
+      "transpilers": ["babel", "typescript"]
+    },
+    "python": {
+      "enabled": true,
+      "frameworks": ["django", "flask", "fastapi"],
+      "linters": ["pylint", "flake8", "black"]
+    },
+    "java": {
+      "enabled": true,
+      "frameworks": ["spring", "hibernate"],
+      "build_tools": ["maven", "gradle"]
+    },
+    "csharp": {
+      "enabled": false,
+      "frameworks": ["dotnet", "entity_framework"],
+      "analyzers": ["roslyn"]
+    },
+    "go": {
+      "enabled": false,
+      "frameworks": ["gin", "fiber"],
+      "tools": ["gofmt", "golint"]
+    },
+    "shell": {
+      "enabled": true,
+      "shells": ["bash", "zsh", "sh", "dash", "fish"],
+      "script_types": ["sh", "bash", "zsh", "fish", "ksh", "csh"],
+      "linters": ["shellcheck", "shfmt"],
+      "security_scanners": ["bandit-shell", "semgrep"],
+      "common_patterns": {
+        "detect_unsafe_vars": true,
+        "check_command_injection": true,
+        "validate_file_permissions": true,
+        "check_path_traversal": true,
+        "detect_unquoted_vars": true,
+        "check_exit_codes": true
+      },
+      "frameworks": ["bashunit", "bats", "shunit2"],
+      "package_managers": ["apt", "yum", "dnf", "pacman", "brew", "snap"],
+      "config_files": [".bashrc", ".zshrc", ".profile", ".bash_profile"]
+    }
+  }
+}
