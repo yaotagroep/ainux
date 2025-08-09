@@ -30,11 +30,6 @@ log_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 log_phase() { echo -e "\n${PURPLE}[PHASE]${NC} $1\n"; }
 
-# Error handling
-error_exit() {
-    log_success "Build validation completed"
-}
-
 # Main execution with comprehensive error handling
 main() {
     local start_time=$(date +%s)
@@ -348,14 +343,18 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     log_success "Build process completed successfully!"
 fi
 
-# Export functions for external use
-export -f log_info log_success log_warning log_error log_phase
-export -f cleanup_build check_prerequisites
-export -f init_build build_kernel create_rootfs build_iso validate_builderror "Build failed at line $1"
+# Error handling function
+error_exit() {
+    log_error "Build failed at line $1"
     log_error "Command: $2"
     cleanup_build
     exit 1
 }
+
+# Export functions for external use
+export -f log_info log_success log_warning log_error log_phase
+export -f cleanup_build check_prerequisites
+export -f init_build build_kernel create_rootfs build_iso validate_build
 
 trap 'error_exit $LINENO "$BASH_COMMAND"' ERR
 
@@ -1707,4 +1706,5 @@ VALIDATE_EOF
             -enable-kvm -display gtk || true
     fi
     
-    log_
+    log_success "Build validation completed"
+}
