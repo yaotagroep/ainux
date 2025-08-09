@@ -1,0 +1,11 @@
+﻿2025-08-09T09:55:32.5209213Z ##[group]Run # Make build script executable if it isn't already
+2025-08-09T09:55:32.5209673Z [36;1m# Make build script executable if it isn't already[0m
+2025-08-09T09:55:32.5209970Z [36;1mchmod +x ainux-builder.sh[0m
+2025-08-09T09:55:32.5210206Z [36;1m[0m
+2025-08-09T09:55:32.5210390Z [36;1m# Verify it's now executable[0m
+2025-08-09T09:55:32.5210783Z [36;1mtest -x ainux-builder.sh || (echo "Failed to make ainux-builder.sh executable" && exit 1)[0m
+2025-08-09T09:55:32.5211640Z [36;1m[0m
+2025-08-09T09:55:32.5211859Z [36;1mecho "✅ ainux-builder.sh is now executable"[0m
+2025-08-09T09:55:32.5242106Z shell: /usr/bin/bash -e {0}
+2025-08-09T09:55:32.5242345Z ##[endgroup]
+2025-08-09T09:55:32.5297224Z ✅ ainux-builder.sh is now executable
