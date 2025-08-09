@@ -163,12 +163,22 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y bandit
         
-        # Scan for security issues
-        find . -name "*.py" -type f | xargs bandit -r || true
+        # Scan for security issues in Python files (if any exist)
+        if find . -name "*.py" -type f | grep -q .; then
+          echo "Found Python files, running bandit scan..."
+          find . -name "*.py" -type f | xargs bandit -r || true
+        else
+          echo "No Python files found, skipping bandit scan"
+        fi
         
-        # Check for hardcoded secrets
-        grep -r -i "password\|secret\|key" --include="*.sh" --include="*.py" . | \
-          grep -v "# " | grep -v "README" || true
+        # Check for hardcoded secrets in shell and Python scripts
+        echo "Checking for potential hardcoded secrets..."
+        if grep -r -i "password\|secret\|key" --include="*.sh" --include="*.py" . | \
+          grep -v "# " | grep -v "README" | grep -v "GITHUB_TOKEN"; then
+          echo "⚠️  Found potential hardcoded secrets above - please review"
+        else
+          echo "✅ No obvious hardcoded secrets found"
+        fi
 
   release:
     runs-on: ubuntu-22.04

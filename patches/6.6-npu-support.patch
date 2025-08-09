@@ -13,11 +13,12 @@ diff --git a/drivers/Makefile b/drivers/Makefile
 index e32107c3e361..4b3491d89742 100644
 --- a/drivers/Makefile
 +++ b/drivers/Makefile
-@@ -195,3 +195,4 @@ obj-$(CONFIG_MOST)		+= most/
- obj-$(CONFIG_PECI)		+= peci/
- obj-$(CONFIG_HTE)		+= hte/
+@@ -198,4 +198,5 @@ obj-$(CONFIG_HTE)		+= hte/
  obj-$(CONFIG_DRM_ACCEL)		+= accel/
+ obj-$(CONFIG_CDX_BUS)		+= cdx/
+ 
 +obj-$(CONFIG_NPU_FRAMEWORK)	+= npu/
+ obj-$(CONFIG_S390)		+= s390/
 diff --git a/drivers/npu/Kconfig b/drivers/npu/Kconfig
 new file mode 100644
 index 000000000000..f8e7d2a7b5c1
@@ -868,3 +869,5 @@ index 000000000000..f3c8a7d8e4b1
 +#define NPU_IOC_RESET_DEVICE		_IO(NPU_IOC_MAGIC, 8)
 +
 +#endif /* _UAPI_LINUX_NPU_H */
+
+
