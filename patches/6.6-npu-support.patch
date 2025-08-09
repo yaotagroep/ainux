@@ -463,7 +463,7 @@ index 000000000000..7b5c3a9e4d8f
 +	}
 +	
 +	/* Create device class */
-+	npu_class = class_create(THIS_MODULE, NPU_DRIVER_NAME);
++	npu_class = class_create(NPU_DRIVER_NAME);
 +	if (IS_ERR(npu_class)) {
 +		ret = PTR_ERR(npu_class);
 +		pr_err("Failed to create device class: %d\n", ret);
