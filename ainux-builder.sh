@@ -1517,7 +1517,7 @@ DEBUG_EOF
     
     # Show configuration summary
     log_info "Kernel configuration summary:"
-    log_info "  AMD GPU Support: $(grep -q "CONFIG_HSA_AMD=y" .config && echo "Enabled" || echo "Disabled")"
+    log_info "  AMD GPU Support: $(grep -q "CONFIG_DRM_AMDGPU=y\|CONFIG_HSA_AMD=y" .config && echo "Enabled" || echo "Disabled")"
     log_info "  NVIDIA Support: $(grep -q "CONFIG_DRM_NOUVEAU=y" .config && echo "Enabled" || echo "Disabled")"
     log_info "  NPU Framework: $(grep -q "CONFIG_NPU_FRAMEWORK=y" .config && echo "Enabled" || echo "Disabled")"
     log_info "  TPU Support: $(grep -q "CONFIG_GOOGLE_TPU=y" .config && echo "Enabled" || echo "Disabled")"
@@ -1661,6 +1661,9 @@ fi
 
 EOF
 
+    # Make setup.sh executable immediately after creation to prevent permission errors
+    sudo chmod +x rootfs/setup.sh
+
     # Add GUI packages if enabled
     if [[ "$ENABLE_GUI" == "true" ]]; then
         cat << 'EOF' >> rootfs/setup.sh
@@ -1688,6 +1691,9 @@ LIGHTDM_EOF
 
 EOF
     fi
+
+    # Ensure script remains executable after GUI append
+    sudo chmod +x rootfs/setup.sh
 
     # Continue setup script
     cat << 'EOF' >> rootfs/setup.sh
@@ -2352,6 +2358,9 @@ chmod -R 644 /etc/cluster/*.conf
 echo "Root filesystem setup completed successfully"
 exit 0
 EOF
+
+    # Ensure setup.sh is executable after final append
+    sudo chmod +x rootfs/setup.sh
 
     # Execute chroot setup with progress monitoring - OPTIMIZED for CI
     log_info "Executing system setup in chroot environment..."
