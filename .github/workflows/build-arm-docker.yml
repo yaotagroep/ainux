@@ -1,0 +1,369 @@
+# Ainux OS ARM Edition - Docker Build & Registry Push
+name: Build ARM Edition Docker
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'build-arm.sh'
+      - 'ainux-builder.sh'
+      - 'configs/ainux-6.6-arm.config'
+      - '.github/workflows/build-arm-docker.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'build-arm.sh'
+      - 'ainux-builder.sh'
+      - 'configs/ainux-6.6-arm.config'
+  workflow_dispatch:
+    inputs:
+      push_to_registry:
+        description: 'Push to GitHub Container Registry'
+        required: false
+        default: 'true'
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/ainux-arm
+
+jobs:
+  build-arm:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+    
+    - name: Free Up Disk Space
+      run: |
+        echo "⏳ Reclaiming space for Docker build..."
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /usr/local/share/boost
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache
+        sudo apt-get clean
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        df -h
+        
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          git build-essential libncurses-dev bison flex libssl-dev \
+          libelf-dev bc gcc make debootstrap live-build squashfs-tools \
+          dosfstools xorriso isolinux syslinux-utils genisoimage \
+          grub-pc-bin grub-efi-amd64-bin mtools debhelper pv \
+          gcc-aarch64-linux-gnu qemu-user-static
+          
+    - name: Fix Script Permissions
+      run: |
+        chmod +x ainux-builder.sh build-desktop.sh build-server.sh build-arm.sh
+        echo "✅ All build scripts are now executable"
+        
+    - name: Setup ARM Cross-Compilation
+      run: |
+        echo "🔧 Setting up ARM64 cross-compilation environment..."
+        # Verify cross-compilation tools
+        aarch64-linux-gnu-gcc --version
+        
+        # Enable QEMU for ARM emulation
+        sudo update-binfmts --enable qemu-aarch64
+        
+    - name: Build ARM Edition
+      env:
+        CLUSTER_MODE: main
+        ENABLE_GUI: false  # Override if needed with true
+        SKIP_QEMU_TEST: true
+        BUILD_THREADS: 2
+        SKIP_CONNECTIVITY_CHECK: true
+        BUILD_VARIANT: arm
+        ARCH: arm64
+      run: |
+        echo "🍓 Building Ainux OS ARM Edition..."
+        timeout 10800 ./build-arm.sh || {  # Extended timeout for cross-compilation
+          echo "Build failed or timed out"
+          find ~/ainux-build/logs -name "*.log" -exec tail -50 {} \; 2>/dev/null || echo "No log files found"
+          exit 1
+        }
+        
+    - name: Validate Build Artifacts
+      run: |
+        cd ~/ainux-build/iso
+        test -f ainux-arm-arm64.iso || test -f ainux-ai-cluster.iso || {
+          echo "❌ ARM ISO not found"
+          ls -la
+          exit 1
+        }
+        
+        # Use whichever ISO was created
+        if [[ -f ainux-arm-arm64.iso ]]; then
+          ISO_FILE="ainux-arm-arm64.iso"
+        else
+          ISO_FILE="ainux-ai-cluster.iso"
+        fi
+        
+        size=$(stat -c%s "$ISO_FILE")
+        if [ $size -lt 536870912 ]; then  # 512MB minimum for ARM
+          echo "❌ ISO too small: $size bytes"
+          exit 1
+        fi
+        
+        echo "✅ ARM ISO validated: $ISO_FILE ($size bytes)"
+        
+    - name: Prepare Docker Context
+      run: |
+        mkdir -p docker-build
+        cd ~/ainux-build/iso
+        
+        # Copy ISO to docker context
+        if [[ -f ainux-arm-arm64.iso ]]; then
+          cp ainux-arm-arm64.iso /home/runner/work/ainux/ainux/docker-build/
+          ISO_NAME="ainux-arm-arm64.iso"
+        else
+          cp ainux-ai-cluster.iso /home/runner/work/ainux/ainux/docker-build/
+          ISO_NAME="ainux-ai-cluster.iso"
+        fi
+        
+        # Create Dockerfile for ARM Edition
+        cat > /home/runner/work/ainux/ainux/docker-build/Dockerfile << 'EOF'
+        FROM ubuntu:22.04
+        
+        LABEL org.opencontainers.image.title="Ainux OS ARM Edition"
+        LABEL org.opencontainers.image.description="ARM64 Linux distribution optimized for Raspberry Pi and edge computing with AI acceleration"
+        LABEL org.opencontainers.image.vendor="Yaotagroep"
+        LABEL org.opencontainers.image.source="https://github.com/yaotagroep/ainux"
+        
+        # Install ARM and IoT development tools
+        RUN apt-get update && apt-get install -y \
+            qemu-system-arm \
+            qemu-utils \
+            qemu-user-static \
+            squashfs-tools \
+            xorriso \
+            curl \
+            wget \
+            htop \
+            i2c-tools \
+            python3 \
+            python3-pip \
+            python3-numpy \
+            python3-opencv \
+            && rm -rf /var/lib/apt/lists/*
+        
+        # Install ARM-specific tools
+        RUN pip3 install --no-cache-dir \
+            gpiozero \
+            RPi.GPIO \
+            tensorflow-lite-runtime \
+            onnxruntime
+        
+        # Copy the ARM ISO
+        COPY *.iso /opt/ainux/
+        
+        # Create ARM convenience scripts
+        RUN echo '#!/bin/bash\necho "Ainux OS ARM Edition Docker Container"\necho "Optimized for: Raspberry Pi, Edge Computing, IoT"\necho "Hardware Support: ARM Mali GPU, Coral TPU, ARM Ethos NPU"\necho "ISO Location: /opt/ainux/"\necho "Suggested Devices: RPi 4+, RPi 5, ARM64 SBC"\nls -la /opt/ainux/' > /usr/local/bin/ainux-info && \
+            chmod +x /usr/local/bin/ainux-info
+        
+        RUN echo '#!/bin/bash\necho "ARM Hardware Info:"\necho "Architecture: $(uname -m)"\necho "CPU cores: $(nproc)"\necho "Memory: $(free -h | grep Mem | awk '\''{print $2}'\'')"' > /usr/local/bin/arm-info && \
+            chmod +x /usr/local/bin/arm-info
+        
+        RUN echo '#!/bin/bash\necho "GPIO Tools Available:"\nwhich gpio 2>/dev/null && echo "- WiringPi GPIO" || echo "- WiringPi GPIO (not installed)"\nwhich i2cdetect && echo "- I2C tools" || echo "- I2C tools (not installed)"\npython3 -c "import gpiozero; print(\"- Python GPIO Zero\")" 2>/dev/null || echo "- Python GPIO Zero (not available)"' > /usr/local/bin/gpio-info && \
+            chmod +x /usr/local/bin/gpio-info
+        
+        # Health check
+        HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+          CMD ainux-info || exit 1
+        
+        WORKDIR /opt/ainux
+        CMD ["/usr/local/bin/ainux-info"]
+        EOF
+        
+        echo "ISO_NAME=$ISO_NAME" >> $GITHUB_ENV
+        
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Log in to Container Registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value={{branch}}-{{sha}}
+          type=raw,value=arm-{{date 'YYYYMMDD-HHmmss'}}
+          type=raw,value=raspberry-pi
+          type=raw,value=edge-ai
+        
+    - name: Build Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./docker-build
+        platforms: linux/amd64  # Container runs on x64 but contains ARM ISO
+        push: ${{ github.event_name != 'pull_request' && (github.event.inputs.push_to_registry != 'false') }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: ainux-arm-build-${{ github.sha }}
+        path: |
+          ~/ainux-build/iso/*.iso
+          ~/ainux-build/iso/*.sha256
+          ~/ainux-build/iso/*.md5
+          ~/ainux-build/build-info.txt
+          ~/ainux-build/logs/
+        retention-days: 30
+        
+    - name: Create Raspberry Pi Installation Guide
+      if: success()
+      run: |
+        mkdir -p rpi-guide
+        cat > rpi-guide/RASPBERRY_PI_INSTALLATION.md << 'EOF'
+        # 🍓 Ainux OS ARM Edition - Raspberry Pi Installation Guide
+        
+        ## 📋 Prerequisites
+        - Raspberry Pi 4B (4GB+ RAM recommended) or Raspberry Pi 5
+        - MicroSD card 32GB+ (Class 10 or better)
+        - USB-C power supply (5V 3A minimum)
+        - HDMI cable and monitor (for initial setup)
+        - USB keyboard and mouse
+        
+        ## 💾 Installation Steps
+        
+        ### 1. Download the ARM ISO
+        ```bash
+        # Pull the Docker container with the ARM ISO
+        docker pull ghcr.io/yaotagroep/ainux/ainux-arm:latest
+        
+        # Extract the ISO from the container
+        docker run --rm -v $(pwd):/output ghcr.io/yaotagroep/ainux/ainux-arm:latest \
+          cp /opt/ainux/*.iso /output/
+        ```
+        
+        ### 2. Flash to SD Card
+        ```bash
+        # Using dd (Linux/macOS)
+        sudo dd if=ainux-arm-arm64.iso of=/dev/sdX bs=4M status=progress sync
+        
+        # Using Raspberry Pi Imager (Recommended)
+        # 1. Download Raspberry Pi Imager
+        # 2. Choose "Use custom image"
+        # 3. Select the downloaded ISO
+        # 4. Write to SD card
+        ```
+        
+        ### 3. Boot Configuration
+        ```bash
+        # After flashing, mount the boot partition and edit config.txt
+        echo "# Ainux OS ARM Edition Boot Config" >> /boot/config.txt
+        echo "arm_64bit=1" >> /boot/config.txt
+        echo "dtoverlay=vc4-kms-v3d" >> /boot/config.txt
+        echo "gpu_mem=128" >> /boot/config.txt
+        ```
+        
+        ### 4. First Boot
+        1. Insert SD card into Raspberry Pi
+        2. Connect HDMI, keyboard, mouse
+        3. Power on the device
+        4. Follow the initial setup wizard
+        
+        ## 🔧 Hardware Features
+        - **GPIO**: Full 40-pin GPIO header support
+        - **I2C/SPI**: Hardware interfaces enabled
+        - **Camera**: CSI camera connector support
+        - **Display**: DSI display connector support
+        - **USB**: USB 3.0 and USB-C power
+        - **Network**: Gigabit Ethernet + WiFi 6
+        
+        ## 🧠 AI Acceleration
+        - **ARM Ethos NPU**: Native ARM neural processing
+        - **Mali GPU**: ARM Mali GPU compute
+        - **Coral TPU**: USB/M.2 Coral TPU support
+        - **TensorFlow Lite**: Optimized for ARM64
+        - **ONNX Runtime**: Cross-platform inference
+        
+        ## 📚 Development
+        ```bash
+        # GPIO control with Python
+        pip3 install gpiozero RPi.GPIO
+        
+        # AI frameworks
+        pip3 install tensorflow-lite-runtime
+        pip3 install onnxruntime
+        
+        # IoT protocols
+        pip3 install paho-mqtt CoAPthon3
+        ```
+        
+        ## 🔧 Troubleshooting
+        
+        ### Boot Issues
+        - Ensure 64-bit mode: `arm_64bit=1` in config.txt
+        - Check power supply: Use official 5V 3A adapter
+        - SD card speed: Use Class 10 or better
+        
+        ### Performance Optimization
+        ```bash
+        # Enable hardware acceleration
+        echo "gpu_freq=500" >> /boot/config.txt
+        echo "over_voltage=2" >> /boot/config.txt
+        
+        # Memory split for AI workloads
+        echo "gpu_mem=256" >> /boot/config.txt
+        ```
+        
+        ## 📞 Support
+        - GitHub Issues: https://github.com/yaotagroep/ainux/issues
+        - Documentation: https://github.com/yaotagroep/ainux/wiki
+        - Community: https://github.com/yaotagroep/ainux/discussions
+        EOF
+        
+    - name: Upload Raspberry Pi Guide
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: raspberry-pi-installation-guide
+        path: rpi-guide/
+        retention-days: 90
+        
+    - name: Container Registry Info
+      if: github.event_name != 'pull_request'
+      run: |
+        echo "🐳 ARM Edition Docker Image pushed to:"
+        echo "📦 Registry: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+        echo "🏷️ Tags: $(echo '${{ steps.meta.outputs.tags }}' | tr '\n' ' ')"
+        echo ""
+        echo "🚀 Pull and run with:"
+        echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+        echo "docker run --rm -it ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+        echo ""
+        echo "🍓 For Raspberry Pi deployment:"
+        echo "1. Pull the container to get the ARM ISO"
+        echo "2. Extract ISO: docker run --rm -v \$(pwd):/output ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest cp /opt/ainux/*.iso /output/"
+        echo "3. Flash to SD card using Raspberry Pi Imager"
+        echo "4. Boot on Raspberry Pi 4+ or Pi 5"
+        echo ""
+        echo "🔧 Alternative tags:"
+        echo "  - :raspberry-pi (same as latest)"
+        echo "  - :edge-ai (optimized for edge computing)"

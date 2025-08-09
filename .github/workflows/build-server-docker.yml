@@ -1,0 +1,239 @@
+# Ainux OS Server Edition - Docker Build & Registry Push
+name: Build Server Edition Docker
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'build-server.sh'
+      - 'ainux-builder.sh'
+      - 'configs/ainux-6.6-server.config'
+      - '.github/workflows/build-server-docker.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'build-server.sh'
+      - 'ainux-builder.sh'
+      - 'configs/ainux-6.6-server.config'
+  workflow_dispatch:
+    inputs:
+      push_to_registry:
+        description: 'Push to GitHub Container Registry'
+        required: false
+        default: 'true'
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/ainux-server
+
+jobs:
+  build-server:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+    
+    - name: Free Up Disk Space
+      run: |
+        echo "⏳ Reclaiming space for Docker build..."
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /usr/local/share/boost
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache
+        sudo apt-get clean
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        df -h
+        
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          git build-essential libncurses-dev bison flex libssl-dev \
+          libelf-dev bc gcc make debootstrap live-build squashfs-tools \
+          dosfstools xorriso isolinux syslinux-utils genisoimage \
+          grub-pc-bin grub-efi-amd64-bin mtools debhelper pv
+          
+    - name: Fix Script Permissions
+      run: |
+        chmod +x ainux-builder.sh build-desktop.sh build-server.sh build-arm.sh
+        echo "✅ All build scripts are now executable"
+        
+    - name: Build Server Edition
+      env:
+        CLUSTER_MODE: main
+        ENABLE_GUI: false
+        SKIP_QEMU_TEST: true
+        BUILD_THREADS: 2
+        SKIP_CONNECTIVITY_CHECK: true
+        BUILD_VARIANT: server
+      run: |
+        echo "🏢 Building Ainux OS Server Edition..."
+        timeout 7200 ./build-server.sh || {
+          echo "Build failed or timed out"
+          find ~/ainux-build/logs -name "*.log" -exec tail -50 {} \; 2>/dev/null || echo "No log files found"
+          exit 1
+        }
+        
+    - name: Validate Build Artifacts
+      run: |
+        cd ~/ainux-build/iso
+        test -f ainux-server-x86_64.iso || test -f ainux-ai-cluster.iso || {
+          echo "❌ Server ISO not found"
+          ls -la
+          exit 1
+        }
+        
+        # Use whichever ISO was created
+        if [[ -f ainux-server-x86_64.iso ]]; then
+          ISO_FILE="ainux-server-x86_64.iso"
+        else
+          ISO_FILE="ainux-ai-cluster.iso"
+        fi
+        
+        size=$(stat -c%s "$ISO_FILE")
+        if [ $size -lt 1073741824 ]; then
+          echo "❌ ISO too small: $size bytes"
+          exit 1
+        fi
+        
+        echo "✅ Server ISO validated: $ISO_FILE ($size bytes)"
+        
+    - name: Prepare Docker Context
+      run: |
+        mkdir -p docker-build
+        cd ~/ainux-build/iso
+        
+        # Copy ISO to docker context
+        if [[ -f ainux-server-x86_64.iso ]]; then
+          cp ainux-server-x86_64.iso /home/runner/work/ainux/ainux/docker-build/
+          ISO_NAME="ainux-server-x86_64.iso"
+        else
+          cp ainux-ai-cluster.iso /home/runner/work/ainux/ainux/docker-build/
+          ISO_NAME="ainux-ai-cluster.iso"
+        fi
+        
+        # Create Dockerfile for Server Edition
+        cat > /home/runner/work/ainux/ainux/docker-build/Dockerfile << 'EOF'
+        FROM ubuntu:22.04
+        
+        LABEL org.opencontainers.image.title="Ainux OS Server Edition"
+        LABEL org.opencontainers.image.description="Enterprise Linux distribution with AI acceleration, security hardening, and virtualization"
+        LABEL org.opencontainers.image.vendor="Yaotagroep"
+        LABEL org.opencontainers.image.source="https://github.com/yaotagroep/ainux"
+        
+        # Install enterprise management tools
+        RUN apt-get update && apt-get install -y \
+            qemu-system-x86 \
+            qemu-utils \
+            squashfs-tools \
+            xorriso \
+            curl \
+            wget \
+            htop \
+            iotop \
+            netstat-nat \
+            tcpdump \
+            iperf3 \
+            stress-ng \
+            && rm -rf /var/lib/apt/lists/*
+        
+        # Copy the Server ISO
+        COPY *.iso /opt/ainux/
+        
+        # Create enterprise convenience scripts
+        RUN echo '#!/bin/bash\necho "Ainux OS Server Edition Docker Container"\necho "Enterprise Features: Security, Virtualization, Containers"\necho "ISO Location: /opt/ainux/"\necho "Hardware Support: TPU, NPU, GPU, CPU, DPU"\nls -la /opt/ainux/' > /usr/local/bin/ainux-info && \
+            chmod +x /usr/local/bin/ainux-info
+        
+        RUN echo '#!/bin/bash\necho "System Resources:"\necho "CPU: $(nproc) cores"\necho "Memory: $(free -h | grep Mem | awk '\''{print $2}'\'')"' > /usr/local/bin/server-info && \
+            chmod +x /usr/local/bin/server-info
+        
+        # Health check
+        HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+          CMD ainux-info || exit 1
+        
+        WORKDIR /opt/ainux
+        CMD ["/usr/local/bin/ainux-info"]
+        EOF
+        
+        echo "ISO_NAME=$ISO_NAME" >> $GITHUB_ENV
+        
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Log in to Container Registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value={{branch}}-{{sha}}
+          type=raw,value=server-{{date 'YYYYMMDD-HHmmss'}}
+        
+    - name: Build Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./docker-build
+        platforms: linux/amd64
+        push: ${{ github.event_name != 'pull_request' && (github.event.inputs.push_to_registry != 'false') }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Security Scan
+      if: github.event_name != 'pull_request'
+      run: |
+        echo "🔒 Running container security scan..."
+        # Install security scanner
+        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+        
+        # Scan the built image
+        IMAGE_TAG=$(echo '${{ steps.meta.outputs.tags }}' | head -1)
+        trivy image --exit-code 0 --severity HIGH,CRITICAL "$IMAGE_TAG" || true
+        
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: ainux-server-build-${{ github.sha }}
+        path: |
+          ~/ainux-build/iso/*.iso
+          ~/ainux-build/iso/*.sha256
+          ~/ainux-build/iso/*.md5
+          ~/ainux-build/build-info.txt
+          ~/ainux-build/logs/
+        retention-days: 30
+        
+    - name: Container Registry Info
+      if: github.event_name != 'pull_request'
+      run: |
+        echo "🐳 Server Edition Docker Image pushed to:"
+        echo "📦 Registry: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+        echo "🏷️ Tags: $(echo '${{ steps.meta.outputs.tags }}' | tr '\n' ' ')"
+        echo ""
+        echo "🚀 Pull and run with:"
+        echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+        echo "docker run --rm -it ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+        echo ""
+        echo "🏢 Enterprise deployment:"
+        echo "docker run -d --name ainux-server --restart unless-stopped \\"
+        echo "  -p 80:80 -p 443:443 \\"
+        echo "  ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
