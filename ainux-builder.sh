@@ -1603,6 +1603,36 @@ create_rootfs() {
     sudo mount -o bind /dev rootfs/dev
     sudo mount -o bind /dev/pts rootfs/dev/pts
     
+    # Helper function to ensure rootfs/setup.sh has proper permissions
+    ensure_setup_permissions() {
+        local retries=3
+        local attempt=1
+        
+        while [[ $attempt -le $retries ]]; do
+            if [[ -f "rootfs/setup.sh" ]]; then
+                # Set permissions in multiple ways to ensure they stick
+                chmod +x rootfs/setup.sh 2>/dev/null || true
+                sudo chmod 755 rootfs/setup.sh 2>/dev/null || true
+                
+                # Verify permissions were set
+                if [[ -x "rootfs/setup.sh" ]]; then
+                    log_info "✅ rootfs/setup.sh permissions set successfully (attempt $attempt)"
+                    return 0
+                else
+                    log_warn "❌ Failed to set permissions on attempt $attempt"
+                fi
+            else
+                log_warn "⚠️  rootfs/setup.sh does not exist yet"
+            fi
+            
+            ((attempt++))
+            sleep 1
+        done
+        
+        log_error "Failed to set proper permissions for rootfs/setup.sh after $retries attempts"
+        return 1
+    }
+
     # Create comprehensive setup script
     cat << 'EOF' | sudo tee rootfs/setup.sh > /dev/null
 #!/bin/bash
@@ -1671,7 +1701,7 @@ fi
 EOF
 
     # Make setup.sh executable immediately after creation to prevent permission errors
-    sudo chmod +x rootfs/setup.sh
+    ensure_setup_permissions
 
     # Add GUI packages if enabled
     if [[ "$ENABLE_GUI" == "true" ]]; then
@@ -1702,7 +1732,7 @@ EOF
     fi
 
     # Ensure script remains executable after GUI append
-    sudo chmod +x rootfs/setup.sh
+    ensure_setup_permissions
 
     # Continue setup script
     cat << 'EOF' >> rootfs/setup.sh
@@ -2369,8 +2399,22 @@ exit 0
 EOF
 
     # Ensure setup.sh is executable after final append
-    sudo chmod +x rootfs/setup.sh
-    chmod +x rootfs/setup.sh 2>/dev/null || true
+    ensure_setup_permissions
+    
+    # Final permission verification before chroot execution
+    if [[ ! -x "rootfs/setup.sh" ]]; then
+        log_error "❌ Critical: rootfs/setup.sh is not executable before chroot"
+        log_info "Attempting emergency permission fix..."
+        sudo chmod 755 rootfs/setup.sh
+        chmod +x rootfs/setup.sh 2>/dev/null || true
+        
+        # Final check
+        if [[ ! -x "rootfs/setup.sh" ]]; then
+            log_error "❌ Emergency permission fix failed - cannot proceed"
+            exit 1
+        fi
+        log_info "✅ Emergency permission fix succeeded"
+    fi
 
     # Execute chroot setup with progress monitoring - OPTIMIZED for CI
     log_info "Executing system setup in chroot environment..."
