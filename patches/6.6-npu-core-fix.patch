@@ -1,0 +1,12 @@
+diff --git a/drivers/npu/npu-core.c b/drivers/npu/npu-core.c
+index 7b5c3a9e4d8f..abcd1234efgh 100644
+--- a/drivers/npu/npu-core.c
++++ b/drivers/npu/npu-core.c
+@@ -242,4 +242,7 @@ int npu_register_device(struct npu_device *npu)
+ 		goto err_init;
+ 	}
+ 	
++	dev_info(npu->dev, "NPU device registered: %s (type=%d)\n", 
++		 npu->name, npu->type);
++	
+ 	return 0;
