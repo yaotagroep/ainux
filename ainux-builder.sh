@@ -570,25 +570,47 @@ NET_EOF
     
     if [[ -d "$PATCH_DIR" ]]; then
         log_info "Using local patches from repository..."
-        # Apply patches from local repository
+        # Apply patches from local repository with error handling
         if [[ -f "$PATCH_DIR/6.6-npu-support.patch" ]]; then
             log_info "Applying NPU support patch..."
-            patch -p1 < "$PATCH_DIR/6.6-npu-support.patch" 2>&1 | tee "$BUILD_DIR/logs/patch-npu.log"
+            if ! patch -p1 < "$PATCH_DIR/6.6-npu-support.patch" 2>&1 | tee "$BUILD_DIR/logs/patch-npu.log"; then
+                log_warning "NPU patch failed, continuing with build..."
+            fi
         fi
-        if [[ -f "$PATCH_DIR/6.6-rocm-optimizations.patch" ]]; then
+        
+        # Try simplified ROCm patch first, fallback to original if needed
+        if [[ -f "$PATCH_DIR/6.6-rocm-optimizations-simple.patch" ]]; then
+            log_info "Applying simplified ROCm optimization patch..."
+            if ! patch -p1 < "$PATCH_DIR/6.6-rocm-optimizations-simple.patch" 2>&1 | tee "$BUILD_DIR/logs/patch-rocm.log"; then
+                log_warning "Simplified ROCm patch failed, trying original..."
+                if [[ -f "$PATCH_DIR/6.6-rocm-optimizations.patch" ]]; then
+                    patch -p1 < "$PATCH_DIR/6.6-rocm-optimizations.patch" 2>&1 | tee -a "$BUILD_DIR/logs/patch-rocm.log" || log_warning "Original ROCm patch also failed"
+                fi
+            fi
+        elif [[ -f "$PATCH_DIR/6.6-rocm-optimizations.patch" ]]; then
             log_info "Applying ROCm optimization patch..."
-            patch -p1 < "$PATCH_DIR/6.6-rocm-optimizations.patch" 2>&1 | tee "$BUILD_DIR/logs/patch-rocm.log"
+            patch -p1 < "$PATCH_DIR/6.6-rocm-optimizations.patch" 2>&1 | tee "$BUILD_DIR/logs/patch-rocm.log" || log_warning "ROCm patch failed"
         fi
-        if [[ -f "$PATCH_DIR/6.6-cluster-networking.patch" ]]; then
+        
+        # Try simplified cluster networking patch first, fallback to original if needed
+        if [[ -f "$PATCH_DIR/6.6-cluster-networking-simple.patch" ]]; then
+            log_info "Applying simplified cluster networking patch..."
+            if ! patch -p1 < "$PATCH_DIR/6.6-cluster-networking-simple.patch" 2>&1 | tee "$BUILD_DIR/logs/patch-cluster.log"; then
+                log_warning "Simplified cluster networking patch failed, trying original..."
+                if [[ -f "$PATCH_DIR/6.6-cluster-networking.patch" ]]; then
+                    patch -p1 < "$PATCH_DIR/6.6-cluster-networking.patch" 2>&1 | tee -a "$BUILD_DIR/logs/patch-cluster.log" || log_warning "Original cluster networking patch also failed"
+                fi
+            fi
+        elif [[ -f "$PATCH_DIR/6.6-cluster-networking.patch" ]]; then
             log_info "Applying cluster networking patch..."
-            patch -p1 < "$PATCH_DIR/6.6-cluster-networking.patch" 2>&1 | tee "$BUILD_DIR/logs/patch-cluster.log"
+            patch -p1 < "$PATCH_DIR/6.6-cluster-networking.patch" 2>&1 | tee "$BUILD_DIR/logs/patch-cluster.log" || log_warning "Cluster networking patch failed"
         fi
     else
         log_warning "Local patches not found, using fallback patches..."
         create_fallback_patches
-        patch -p1 < npu-support.patch 2>&1 | tee "$BUILD_DIR/logs/patch-npu.log"
-        patch -p1 < rocm-optimizations.patch 2>&1 | tee "$BUILD_DIR/logs/patch-rocm.log"  
-        patch -p1 < cluster-networking.patch 2>&1 | tee "$BUILD_DIR/logs/patch-cluster.log"
+        patch -p1 < npu-support.patch 2>&1 | tee "$BUILD_DIR/logs/patch-npu.log" || log_warning "Fallback NPU patch failed"
+        patch -p1 < rocm-optimizations.patch 2>&1 | tee "$BUILD_DIR/logs/patch-rocm.log" || log_warning "Fallback ROCm patch failed"
+        patch -p1 < cluster-networking.patch 2>&1 | tee "$BUILD_DIR/logs/patch-cluster.log" || log_warning "Fallback cluster networking patch failed"
     fi
     
     # Enhanced kernel configuration

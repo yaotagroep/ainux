@@ -1,0 +1,14 @@
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 270281cc36d8..c8f4e7b2a3e1 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5520,6 +5520,9 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ 	bool deliver_exact = false;
+ 	int ret = NET_RX_DROP;
+ 	__be16 type;
++	
++	/* Ainux OS cluster packet optimization - simple priority boost */
++	skb->priority = min(skb->priority + 1, 7);
+ 
+ 	net_timestamp_check(!netdev_tstamp_prequeue, skb);
+ 
