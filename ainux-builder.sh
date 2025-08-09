@@ -662,8 +662,9 @@ NET_EOF
        
     # Use local patches from repository instead of downloading
     # Look for patches in the script directory (repository root)
+    # NOTE: Save absolute path before cd into linux directory
     SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-    PATCH_DIR="$SCRIPT_DIR/patches"
+    PATCH_DIR="$(readlink -f "$SCRIPT_DIR/patches")"
     
     # Debug information for patch directory detection
     log_info "Script directory: $SCRIPT_DIR"
@@ -672,12 +673,12 @@ NET_EOF
     # Try multiple possible patch directory locations
     if [[ ! -d "$PATCH_DIR" ]]; then
         # Try current working directory
-        if [[ -d "./patches" ]]; then
-            PATCH_DIR="./patches"
-            log_info "Found patches in current directory: $PATCH_DIR"
+        if [[ -d "$(pwd)/../../patches" ]]; then
+            PATCH_DIR="$(readlink -f "$(pwd)/../../patches")"
+            log_info "Found patches relative to working directory: $PATCH_DIR"
         # Try relative to script
         elif [[ -d "$(dirname "$0")/patches" ]]; then
-            PATCH_DIR="$(dirname "$0")/patches"
+            PATCH_DIR="$(readlink -f "$(dirname "$0")/patches")"
             log_info "Found patches relative to script: $PATCH_DIR"
         fi
     fi
@@ -722,7 +723,9 @@ NET_EOF
             patch -p1 < "$PATCH_DIR/6.6-cluster-networking.patch" 2>&1 | tee "$BUILD_DIR/logs/patch-cluster.log" || log_warning "Cluster networking patch failed"
         fi
     else
-        log_warning "Local patches not found, using fallback patches..."
+        log_warning "Local patches not found at: $PATCH_DIR"
+        log_info "Directory listing: $(ls -la "$(dirname "$PATCH_DIR")" 2>/dev/null || echo 'parent directory not found')"
+        log_warning "Using fallback patches..."
         create_fallback_patches
         patch -p1 < npu-support.patch 2>&1 | tee "$BUILD_DIR/logs/patch-npu.log" || log_warning "Fallback NPU patch failed"
         patch -p1 < rocm-optimizations.patch 2>&1 | tee "$BUILD_DIR/logs/patch-rocm.log" || log_warning "Fallback ROCm patch failed"
