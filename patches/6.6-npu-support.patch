@@ -868,3 +868,5 @@ index 000000000000..f3c8a7d8e4b1
 +#define NPU_IOC_RESET_DEVICE		_IO(NPU_IOC_MAGIC, 8)
 +
 +#endif /* _UAPI_LINUX_NPU_H */
+
+
