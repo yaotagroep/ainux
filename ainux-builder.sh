@@ -589,6 +589,8 @@ build_kernel() {
     
     # NPU Support patch
     cat > npu-support.patch << 'NPU_EOF'
+diff --git a/drivers/Kconfig b/drivers/Kconfig
+index 8b9fded5bf55..a8c6b5b2c9e3 100644
 --- a/drivers/Kconfig
 +++ b/drivers/Kconfig
 @@ -240,4 +240,6 @@ source "drivers/interconnect/Kconfig"
@@ -598,6 +600,9 @@ build_kernel() {
 +source "drivers/npu/Kconfig"
 +
  endmenu
+diff --git a/drivers/npu/Kconfig b/drivers/npu/Kconfig
+new file mode 100644
+index 000000000000..f8e7d2a7b5c1
 --- /dev/null
 +++ b/drivers/npu/Kconfig
 @@ -0,0 +1,20 @@
@@ -624,6 +629,8 @@ NPU_EOF
 
     # ROCm optimization patch
     cat > rocm-optimizations.patch << 'ROCM_EOF'
+diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
+index 123456789abc..abcdef123456 100644
 --- a/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
 +++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
 @@ -190,6 +190,7 @@ module_param_named(sched_hw_submission, amdgpu_sched_hw_submission, int, 0444);
@@ -637,6 +644,8 @@ ROCM_EOF
 
     # Basic cluster networking patch  
     cat > cluster-networking.patch << 'NET_EOF'
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 123456789abc..abcdef123456 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c  
 @@ -5520,6 +5520,9 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
@@ -647,18 +656,36 @@ ROCM_EOF
 +	/* Ainux OS cluster packet optimization */
 +	skb->priority = min(skb->priority + 1, 7);
  
-
  	net_timestamp_check(!netdev_tstamp_prequeue, skb);
 NET_EOF
-   }
+    }
        
     # Use local patches from repository instead of downloading
     # Look for patches in the script directory (repository root)
     SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
     PATCH_DIR="$SCRIPT_DIR/patches"
     
+    # Debug information for patch directory detection
+    log_info "Script directory: $SCRIPT_DIR"
+    log_info "Patch directory: $PATCH_DIR"
+    
+    # Try multiple possible patch directory locations
+    if [[ ! -d "$PATCH_DIR" ]]; then
+        # Try current working directory
+        if [[ -d "./patches" ]]; then
+            PATCH_DIR="./patches"
+            log_info "Found patches in current directory: $PATCH_DIR"
+        # Try relative to script
+        elif [[ -d "$(dirname "$0")/patches" ]]; then
+            PATCH_DIR="$(dirname "$0")/patches"
+            log_info "Found patches relative to script: $PATCH_DIR"
+        fi
+    fi
+    
     if [[ -d "$PATCH_DIR" ]]; then
-        log_info "Using local patches from repository..."
+        log_info "Using local patches from repository: $PATCH_DIR"
+        # List available patches for debugging
+        log_info "Available patches: $(ls -1 "$PATCH_DIR"/*.patch 2>/dev/null | xargs -r basename -s .patch | tr '\n' ' ')"
         # Apply patches from local repository with error handling
         if [[ -f "$PATCH_DIR/6.6-npu-support.patch" ]]; then
             log_info "Applying NPU support patch..."
