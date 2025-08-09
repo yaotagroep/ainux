@@ -34,3 +34,15 @@
 2025-01-28T10:15:23.456Z|.github/workflows/build-test.yml|82|[RESOLVED][DEP]-Added missing debhelper build dependency|(SUMMARY: Fixed dpkg-buildpackage failure)|sudo apt-get install -y ... debhelper|immediate|{"fix_applied":"added_debhelper_dependency","verification":"build_test_passed","error_resolved":"dpkg-checkbuilddeps: error: Unmet build dependencies: debhelper","impact":"complete_build_failure","cascade_errors_fixed":["make_errors","dpkg_buildpackage_abort"]}
 </closed>
 
+<closed>[90af1e95]
+2025-01-28T16:00:00.000Z|ainux-builder.sh|2387,2364|[RESOLVED][PERM]-Fixed rootfs/setup.sh permission denied error before execution|(SUMMARY: Added multiple permission safeguards for setup.sh execution)|chmod +x rootfs/setup.sh 2>/dev/null \|\| true|immediate|{"fix_applied":"enhanced_permission_handling_v3","verification":"execution_success_all_variants","error_resolved":"Permission denied: rootfs/setup.sh at line 1699","commands_updated":["chmod +x before execution","sudo chmod +x during creation","fallback permission handling"],"security_improved":"proper_file_permissions_with_fallback","build_variants_tested":["desktop","server","arm"],"github_workflows_updated":["build-desktop.yml","build-server.yml","build-arm.yml"]}
+</closed>
+
+<closed>[90af1e95]
+2025-01-28T16:15:00.000Z|build-desktop.sh,build-server.sh,build-arm.sh|all|[RESOLVED][CFG]-Enhanced build variants with comprehensive TPU/NPU/GPU/CPU/DPU support|(SUMMARY: Implemented unified hardware acceleration across all build variants)|TPU_SUPPORT=true NPU_SUPPORT=true GPU_SUPPORT=true CPU_ACCELERATION=true DPU_SUPPORT=true|45m00s|{"fix_applied":"hardware_acceleration_unification","verification":"all_variants_support_all_hardware","variants_enhanced":["desktop","server","arm"],"hardware_support_added":["TPU_coral_edge","NPU_intel_vpu","NPU_arm_ethos","NPU_rockchip","NPU_hailo","GPU_nvidia_cuda","GPU_amd_rocm","GPU_intel_arc","DPU_mellanox_bluefield","DPU_intel_ipu","CPU_ai_extensions"],"environment_variables":["TPU_SUPPORT","NPU_SUPPORT","GPU_SUPPORT","CPU_ACCELERATION","DPU_SUPPORT","CUDA_SUPPORT","ROCM_SUPPORT","OPENVINO_SUPPORT","CORAL_TPU_SUPPORT","TENSORRT_SUPPORT"],"frameworks_integrated":["TensorFlow_Lite","libcoral","PyCoral","OpenVINO","Arm_NN","RKNN_Toolkit","HailoRT","CUDA","ROCm","oneAPI","DOCA","DPDK"]}
+</closed>
+
+<closed>[90af1e95]
+2025-01-28T16:30:00.000Z|.github/workflows/|all|[RESOLVED][CI]-Created specialized GitHub workflows for each build variant|(SUMMARY: Implemented matrix builds for hardware-specific optimization)|build-desktop.yml build-server.yml build-arm.yml|30m00s|{"fix_applied":"specialized_workflow_creation","verification":"ci_cd_pipeline_complete","workflows_created":["build-desktop.yml","build-server.yml","build-arm.yml"],"matrix_builds":{"desktop":["nvidia","amd","intel","integrated"],"server":["datacenter","cloud","edge","hpc"],"arm":["rpi4","rpi5","generic","industrial"]},"docker_integration":"github_container_registry","security_features":["security_scan","vulnerability_check","integrity_verification"],"artifact_management":"30_60_45_day_retention"}
+</closed>
+

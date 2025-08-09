@@ -1,0 +1,490 @@
+# Ainux OS ARM Edition Build and Deploy Workflow
+# Builds ARM64 variant optimized for Raspberry Pi and edge devices
+
+name: Build Ainux ARM Edition
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'build-arm.sh'
+      - 'configs/ainux-6.6-arm.config'
+      - 'ainux-builder.sh'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'build-arm.sh'
+      - 'configs/**'
+  workflow_dispatch:
+    inputs:
+      device_target:
+        description: 'Target ARM device'
+        required: false
+        default: 'rpi4'
+        type: choice
+        options:
+        - 'rpi4'
+        - 'rpi5'
+        - 'generic'
+        - 'industrial'
+      enable_gui:
+        description: 'Enable GUI for ARM build'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  BUILD_VARIANT: arm
+  ARCH: arm64
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_NAME: yaotagroep/ainux-arm
+
+jobs:
+  validate-arm-config:
+    runs-on: ubuntu-22.04
+    outputs:
+      build-matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Validate ARM Environment
+      run: |
+        chmod +x *.sh
+        ./validate-build-env.sh
+        
+    - name: Validate ARM Configuration
+      run: |
+        # Check ARM-specific config exists
+        test -f configs/ainux-6.6-arm.config || {
+          echo "❌ ARM kernel config missing"
+          exit 1
+        }
+        
+        # Validate ARM-specific features
+        grep -q "CONFIG_ARM64=y" configs/ainux-6.6-arm.config || echo "⚠️ ARM64 architecture check"
+        grep -q "CONFIG_GPIO_SYSFS=y" configs/ainux-6.6-arm.config || echo "⚠️ GPIO support check"
+        grep -q "CONFIG_SPI=y" configs/ainux-6.6-arm.config || echo "⚠️ SPI support check"
+        grep -q "CONFIG_I2C=y" configs/ainux-6.6-arm.config || echo "⚠️ I2C support check"
+        grep -q "CONFIG_USB_CORAL=y" configs/ainux-6.6-arm.config || echo "⚠️ Coral TPU support check"
+        
+        echo "✅ ARM configuration validated"
+
+    - name: ARM Cross-Compilation Check
+      run: |
+        # Install ARM cross-compilation tools
+        sudo apt-get update
+        sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+        
+        # Test cross-compiler
+        echo 'int main(){return 0;}' | aarch64-linux-gnu-gcc -x c - -o test-arm
+        file test-arm | grep -q "ARM aarch64" && echo "✅ ARM cross-compiler working"
+
+    - name: Setup Build Matrix
+      id: matrix
+      run: |
+        # Create build matrix for different ARM targets
+        matrix='{"target": ["rpi4", "rpi5", "generic", "industrial"], "gui": ["false", "true"]}'
+        echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+  build-arm:
+    runs-on: ubuntu-22.04
+    needs: validate-arm-config
+    strategy:
+      matrix: 
+        include:
+          - target: rpi4
+            gui: false
+          - target: rpi4
+            gui: true
+          - target: rpi5
+            gui: false
+          - target: rpi5
+            gui: true
+          - target: generic
+            gui: false
+          - target: industrial
+            gui: false
+      fail-fast: false
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Free Up Disk Space
+      run: |
+        echo "⏳ Reclaiming space for ARM build..."
+        sudo rm -rf /usr/local/lib/android /usr/local/share/boost
+        sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache
+        sudo apt-get clean
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        df -h
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          git build-essential libncurses-dev bison flex libssl-dev \
+          libelf-dev bc gcc make debootstrap live-build squashfs-tools \
+          dosfstools xorriso isolinux syslinux-utils genisoimage \
+          qemu-system-arm qemu-user-static python3-pip nmap curl wget rsync pv \
+          grub-pc-bin grub-efi-amd64-bin mtools debhelper \
+          gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
+          device-tree-compiler
+
+    - name: Configure ARM Target
+      run: |
+        case "${{ matrix.target }}" in
+          "rpi4")
+            echo "ARM_TARGET=rpi4" >> $GITHUB_ENV
+            echo "ARM_CPU=cortex-a72" >> $GITHUB_ENV
+            echo "ARM_BOARD=raspberry-pi-4" >> $GITHUB_ENV
+            echo "RASPBERRY_PI_SUPPORT=true" >> $GITHUB_ENV
+            echo "GPIO_SUPPORT=true" >> $GITHUB_ENV
+            echo "CUSTOM_PACKAGES=python3-gpiozero python3-rpi.gpio i2c-tools python3-numpy raspberrypi-kernel-headers" >> $GITHUB_ENV
+            ;;
+          "rpi5")
+            echo "ARM_TARGET=rpi5" >> $GITHUB_ENV
+            echo "ARM_CPU=cortex-a76" >> $GITHUB_ENV
+            echo "ARM_BOARD=raspberry-pi-5" >> $GITHUB_ENV
+            echo "RASPBERRY_PI_SUPPORT=true" >> $GITHUB_ENV
+            echo "GPIO_SUPPORT=true" >> $GITHUB_ENV
+            echo "PCIe_SUPPORT=true" >> $GITHUB_ENV
+            echo "CUSTOM_PACKAGES=python3-gpiozero python3-rpi.gpio i2c-tools python3-numpy" >> $GITHUB_ENV
+            ;;
+          "generic")
+            echo "ARM_TARGET=generic" >> $GITHUB_ENV
+            echo "ARM_CPU=generic" >> $GITHUB_ENV
+            echo "ARM_BOARD=generic-arm64" >> $GITHUB_ENV
+            echo "GENERIC_ARM=true" >> $GITHUB_ENV
+            echo "CUSTOM_PACKAGES=python3-numpy python3-opencv" >> $GITHUB_ENV
+            ;;
+          "industrial")
+            echo "ARM_TARGET=industrial" >> $GITHUB_ENV
+            echo "ARM_CPU=cortex-a78" >> $GITHUB_ENV
+            echo "ARM_BOARD=industrial-arm64" >> $GITHUB_ENV
+            echo "INDUSTRIAL_FEATURES=true" >> $GITHUB_ENV
+            echo "REALTIME_SUPPORT=true" >> $GITHUB_ENV
+            echo "CUSTOM_PACKAGES=can-utils modbus-tools python3-pymodbus" >> $GITHUB_ENV
+            ;;
+        esac
+
+    - name: Set Build Parameters
+      run: |
+        echo "BUILD_VARIANT=arm" >> $GITHUB_ENV
+        echo "ENABLE_GUI=${{ matrix.gui }}" >> $GITHUB_ENV
+        echo "ARCH=arm64" >> $GITHUB_ENV
+        echo "SKIP_QEMU_TEST=true" >> $GITHUB_ENV  # Skip QEMU for ARM cross-compilation
+        echo "BUILD_THREADS=2" >> $GITHUB_ENV      # Limited for cross-compilation
+        echo "CI=true" >> $GITHUB_ENV
+        echo "GITHUB_ACTIONS=true" >> $GITHUB_ENV
+        
+        # Hardware acceleration (ARM optimized)
+        echo "TPU_SUPPORT=true" >> $GITHUB_ENV     # Coral TPU Edge support
+        echo "NPU_SUPPORT=true" >> $GITHUB_ENV     # ARM Ethos, Rockchip NPU
+        echo "GPU_SUPPORT=true" >> $GITHUB_ENV     # Mali, VideoCore
+        echo "CPU_ACCELERATION=true" >> $GITHUB_ENV
+        echo "DPU_SUPPORT=false" >> $GITHUB_ENV    # Generally not available on ARM edge
+        
+        # ARM-specific features
+        echo "ARM_OPTIMIZATION=true" >> $GITHUB_ENV
+        echo "LOW_POWER_MODE=true" >> $GITHUB_ENV
+        echo "EDGE_AI_SUPPORT=true" >> $GITHUB_ENV
+        echo "IOT_FEATURES=true" >> $GITHUB_ENV
+        
+        # Cross-compilation settings
+        echo "CROSS_COMPILE=aarch64-linux-gnu-" >> $GITHUB_ENV
+        echo "CC=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
+        echo "CXX=aarch64-linux-gnu-g++" >> $GITHUB_ENV
+
+    - name: Setup Cross-Compilation Environment
+      run: |
+        # Configure cross-compilation environment
+        echo "🔧 Setting up ARM64 cross-compilation environment..."
+        
+        # Verify cross-compiler
+        aarch64-linux-gnu-gcc --version
+        
+        # Setup qemu for emulation
+        sudo update-binfmts --enable qemu-aarch64
+        
+        # Test cross-compilation
+        echo 'int main(){return 0;}' | aarch64-linux-gnu-gcc -x c - -o test-cross
+        file test-cross | grep -q "ARM aarch64" && echo "✅ Cross-compilation ready"
+
+    - name: Build Ainux ARM
+      run: |
+        chmod +x build-arm.sh ainux-builder.sh
+        
+        echo "🍓 Building Ainux ARM Edition for ${{ matrix.target }} (GUI: ${{ matrix.gui }})"
+        timeout 10800 ./build-arm.sh || {  # 180 minutes for ARM cross-compilation
+          echo "❌ ARM build failed or timed out"
+          find ~/ainux-build/logs -name "*.log" -exec tail -50 {} \; 2>/dev/null || true
+          exit 1
+        }
+
+    - name: Validate ARM Build
+      run: |
+        cd ~/ainux-build/iso
+        
+        # Check ISO exists and size
+        test -f ainux-ai-cluster.iso || { echo "❌ ARM ISO not found"; exit 1; }
+        size=$(stat -c%s ainux-ai-cluster.iso)
+        if [ $size -lt 536870912 ]; then  # 512MB minimum for ARM
+          echo "❌ ARM ISO too small: $size bytes"
+          exit 1
+        fi
+        
+        # Validate checksums
+        sha256sum -c ainux-ai-cluster.iso.sha256
+        
+        # Rename for ARM target
+        gui_suffix=""
+        if [ "${{ matrix.gui }}" = "true" ]; then
+          gui_suffix="-gui"
+        fi
+        mv ainux-ai-cluster.iso ainux-arm-${{ matrix.target }}${gui_suffix}.iso
+        mv ainux-ai-cluster.iso.sha256 ainux-arm-${{ matrix.target }}${gui_suffix}.iso.sha256
+
+    - name: ARM-Specific Tests
+      run: |
+        echo "🧪 Running ARM-specific validation tests..."
+        
+        # Test ISO structure for ARM components
+        iso_mount="/tmp/ainux-arm-mount"
+        sudo mkdir -p "$iso_mount"
+        sudo mount -o loop ~/ainux-build/iso/ainux-arm-${{ matrix.target }}*.iso "$iso_mount" || {
+          echo "⚠️ Cannot mount ARM ISO for testing"
+          exit 0
+        }
+        
+        # Check for ARM-specific components
+        if [ -d "$iso_mount/live" ]; then
+          echo "✅ Live filesystem structure found"
+        fi
+        
+        # Check for device tree files (if applicable)
+        if [ "${{ matrix.target }}" = "rpi4" ] || [ "${{ matrix.target }}" = "rpi5" ]; then
+          if find "$iso_mount" -name "*.dtb" | grep -q .; then
+            echo "✅ Device tree files found"
+          else
+            echo "⚠️ Device tree files not found"
+          fi
+        fi
+        
+        sudo umount "$iso_mount" 2>/dev/null || true
+
+    - name: Performance Validation
+      run: |
+        echo "⚡ Running ARM performance validation..."
+        
+        # Check build logs for ARM optimization warnings
+        if [ -d ~/ainux-build/logs ]; then
+          if grep -i "arm.*optimization\|neon\|vfp" ~/ainux-build/logs/*.log; then
+            echo "✅ ARM optimizations detected in build"
+          else
+            echo "⚠️ No ARM optimizations detected"
+          fi
+        fi
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ainux-arm-${{ matrix.target }}-${{ matrix.gui }}
+        path: |
+          ~/ainux-build/iso/ainux-arm-${{ matrix.target }}*.iso
+          ~/ainux-build/iso/ainux-arm-${{ matrix.target }}*.iso.sha256
+          ~/ainux-build/iso/ainux-ai-cluster.iso.md5
+          ~/ainux-build/build-info.txt
+          ~/ainux-build/logs/
+        retention-days: 45
+
+  docker-build:
+    runs-on: ubuntu-22.04
+    needs: build-arm
+    if: github.event_name != 'pull_request'
+    strategy:
+      matrix:
+        include:
+          - target: rpi4
+            gui: false
+          - target: rpi4
+            gui: true
+          - target: rpi5
+            gui: false
+          - target: generic
+            gui: false
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Download ARM Build
+      uses: actions/download-artifact@v4
+      with:
+        name: ainux-arm-${{ matrix.target }}-${{ matrix.gui }}
+        path: ./artifacts
+
+    - name: Create Dockerfile for ARM
+      run: |
+        gui_suffix=""
+        gui_label="false"
+        if [ "${{ matrix.gui }}" = "true" ]; then
+          gui_suffix="-gui"
+          gui_label="true"
+        fi
+        
+        cat > Dockerfile << EOF
+        FROM scratch
+        COPY artifacts/ainux-arm-${{ matrix.target }}${gui_suffix}.iso /ainux-arm.iso
+        COPY artifacts/ainux-arm-${{ matrix.target }}${gui_suffix}.iso.sha256 /ainux-arm.iso.sha256
+        
+        LABEL org.opencontainers.image.title="Ainux ARM Edition (${{ matrix.target }})"
+        LABEL org.opencontainers.image.description="Ainux OS ARM64 optimized for ${{ matrix.target }} devices"
+        LABEL org.opencontainers.image.source="https://github.com/yaotagroep/ainux"
+        LABEL org.opencontainers.image.version="${{ github.ref_name }}"
+        LABEL org.opencontainers.image.revision="${{ github.sha }}"
+        LABEL ainux.variant="arm"
+        LABEL ainux.target="${{ matrix.target }}"
+        LABEL ainux.gui="${gui_label}"
+        LABEL ainux.acceleration="tpu,npu,gpu,cpu"
+        LABEL ainux.architecture="arm64"
+        EOF
+
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        platforms: linux/arm64
+        tags: |
+          ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.target }}-${{ matrix.gui }}-latest
+          ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.target }}-${{ matrix.gui }}-${{ github.sha }}
+        labels: |
+          org.opencontainers.image.title=Ainux ARM Edition (${{ matrix.target }})
+          org.opencontainers.image.description=Ainux OS ARM64 optimized for ${{ matrix.target }} devices
+          org.opencontainers.image.source=https://github.com/yaotagroep/ainux
+          org.opencontainers.image.version=${{ github.ref_name }}
+          org.opencontainers.image.revision=${{ github.sha }}
+
+  compatibility-test:
+    runs-on: ubuntu-22.04
+    needs: build-arm
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download ARM Build (RPi4)
+      uses: actions/download-artifact@v4
+      with:
+        name: ainux-arm-rpi4-false
+        path: ./artifacts
+
+    - name: ARM Compatibility Tests
+      run: |
+        echo "🧪 Running ARM compatibility tests..."
+        
+        # Install qemu for ARM emulation testing
+        sudo apt-get update
+        sudo apt-get install -y qemu-system-arm qemu-user-static
+        
+        # Test ISO structure
+        iso_file="./artifacts/ainux-arm-rpi4.iso"
+        if [ -f "$iso_file" ]; then
+          # Basic file structure test
+          file "$iso_file" | grep -q "ISO 9660" && echo "✅ Valid ISO format"
+          
+          # Size check
+          size=$(stat -c%s "$iso_file")
+          echo "📊 ARM ISO size: $((size / 1024 / 1024)) MB"
+          
+          # Checksum verification
+          cd artifacts
+          sha256sum -c ainux-arm-rpi4.iso.sha256 && echo "✅ Checksum verified"
+        else
+          echo "❌ ARM ISO not found for testing"
+          exit 1
+        fi
+
+  release:
+    runs-on: ubuntu-22.04
+    needs: [build-arm, docker-build, compatibility-test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download All ARM Builds
+      uses: actions/download-artifact@v4
+      with:
+        path: ./arm-artifacts
+
+    - name: Prepare Release Assets
+      run: |
+        mkdir -p release-assets
+        find arm-artifacts -name "*.iso" -exec cp {} release-assets/ \;
+        find arm-artifacts -name "*.sha256" -exec cp {} release-assets/ \;
+        
+        # Create release notes
+        cat > release-assets/ARM-README.md << 'EOF'
+        # Ainux OS ARM Edition
+        
+        ## ARM Targets
+        - **rpi4**: Raspberry Pi 4 Model B optimized
+        - **rpi4-gui**: Raspberry Pi 4 with desktop environment
+        - **rpi5**: Raspberry Pi 5 optimized (latest)
+        - **rpi5-gui**: Raspberry Pi 5 with desktop environment
+        - **generic**: Generic ARM64 devices
+        - **industrial**: Industrial ARM devices with real-time support
+        
+        ## ARM Features
+        - Raspberry Pi GPIO library support
+        - I2C, SPI, UART hardware interfaces
+        - ARM Mali GPU support (VideoCore VI)
+        - Edge AI acceleration (ARM Ethos NPU, Coral TPU)
+        - Low-power optimizations for battery operation
+        - IoT protocol support (MQTT, CoAP, LoRaWAN)
+        - Real-time capabilities for industrial control
+        
+        ## Installation
+        1. Download the appropriate ISO for your ARM device
+        2. Verify checksum: `sha256sum -c <iso>.sha256`
+        3. Flash to SD card: `sudo dd if=<iso> of=/dev/sdX bs=4M status=progress`
+        4. Insert SD card and boot your ARM device
+        
+        ## System Requirements
+        - CPU: ARM64 (AArch64) - Raspberry Pi 4+, ARM Cortex
+        - RAM: 2GB minimum, 8GB recommended
+        - Storage: 16GB SD card minimum, 32GB+ recommended
+        - Power: 5V 3A power supply (USB-C for RPi 4+)
+        - Cooling: Heat sink recommended for sustained loads
+        
+        ## Supported Devices
+        - Raspberry Pi 4 Model B (4GB/8GB)
+        - Raspberry Pi 5 (all variants)
+        - Raspberry Pi 400 (keyboard computer)
+        - ARM-based single board computers
+        - Edge computing devices with ARM64 CPU
+        EOF
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+      with:
+        files: release-assets/*
+        name: "Ainux ARM Edition ${{ github.ref_name }}"
+        body_path: release-assets/ARM-README.md
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

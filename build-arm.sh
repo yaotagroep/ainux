@@ -35,6 +35,20 @@ export EDGE_AI_SUPPORT="true"
 export IOT_FEATURES="true"
 export RASPBERRY_PI_SUPPORT="true"
 
+# Hardware acceleration support - ARM optimized
+export TPU_SUPPORT="true"     # Coral TPU Edge support
+export NPU_SUPPORT="true"     # ARM Ethos, Rockchip NPU
+export GPU_SUPPORT="true"     # Mali, VideoCore
+export CPU_ACCELERATION="true"
+export DPU_SUPPORT="false"    # Generally not available on ARM edge
+
+# ARM AI Framework support
+export CORAL_TPU_SUPPORT="true"  # Primary TPU option for ARM
+export OPENVINO_SUPPORT="true"   # Intel OpenVINO ARM support
+export TENSORFLOW_LITE_SUPPORT="true"
+export ONNX_RUNTIME_SUPPORT="true"
+export RKNN_SUPPORT="true"       # Rockchip NPU support
+
 # Performance settings for ARM builds
 export BUILD_THREADS="${BUILD_THREADS:-4}"  # Limited for ARM cross-compilation
 export SKIP_QEMU_TEST="${SKIP_QEMU_TEST:-true}"  # Skip QEMU for ARM
@@ -50,10 +64,13 @@ echo -e "  📦 Build Variant: ${BUILD_VARIANT}"
 echo -e "  🖥️  GUI Enabled: ${ENABLE_GUI}"
 echo -e "  🏗️  Architecture: ${ARCH}"
 echo -e "  🧵 Build Threads: ${BUILD_THREADS}"
-echo -e "  🔌 GPIO Support: ${GPIO_SUPPORT}"
-echo -e "  🔋 Low Power Mode: ${LOW_POWER_MODE}"
+echo -e "  ⚡ Low Power Mode: ${LOW_POWER_MODE}"
+echo -e "  🔧 GPIO Support: ${GPIO_SUPPORT}"
 echo -e "  🤖 Edge AI: ${EDGE_AI_SUPPORT}"
-echo -e "  🍓 Raspberry Pi: ${RASPBERRY_PI_SUPPORT}"
+echo -e "  🧠 TPU Support: ${TPU_SUPPORT}"
+echo -e "  ⚡ NPU Support: ${NPU_SUPPORT}"
+echo -e "  🎨 GPU Support: ${GPU_SUPPORT}"
+echo -e "  🍓 RPi Support: ${RASPBERRY_PI_SUPPORT}"
 echo ""
 
 # Check prerequisites

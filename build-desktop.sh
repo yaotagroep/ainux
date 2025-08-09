@@ -34,6 +34,20 @@ export MULTIMEDIA_CODECS="true"
 export BLUETOOTH_SUPPORT="true"
 export WIFI_SUPPORT="true"
 
+# Hardware acceleration support - Full stack enabled
+export TPU_SUPPORT="true"
+export NPU_SUPPORT="true"
+export GPU_SUPPORT="true"
+export CPU_ACCELERATION="true"
+export DPU_SUPPORT="true"
+
+# AI Framework support
+export CUDA_SUPPORT="true"
+export ROCM_SUPPORT="true"
+export OPENVINO_SUPPORT="true"
+export CORAL_TPU_SUPPORT="true"
+export TENSORRT_SUPPORT="true"
+
 # Performance settings for desktop builds
 export BUILD_THREADS="${BUILD_THREADS:-$(nproc)}"
 export SKIP_QEMU_TEST="${SKIP_QEMU_TEST:-false}"
@@ -46,6 +60,10 @@ echo -e "  🧵 Build Threads: ${BUILD_THREADS}"
 echo -e "  🎮 Gaming Support: ${GAMING_SUPPORT}"
 echo -e "  🎵 Multimedia: ${MULTIMEDIA_CODECS}"
 echo -e "  📡 WiFi/Bluetooth: ${WIFI_SUPPORT}/${BLUETOOTH_SUPPORT}"
+echo -e "  🧠 TPU Support: ${TPU_SUPPORT}"
+echo -e "  ⚡ NPU Support: ${NPU_SUPPORT}"
+echo -e "  🎨 GPU Support: ${GPU_SUPPORT}"
+echo -e "  🌐 DPU Support: ${DPU_SUPPORT}"
 echo ""
 
 # Check prerequisites

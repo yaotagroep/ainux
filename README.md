@@ -77,7 +77,9 @@
 - **Network**: Internet connection for downloads
 - **Privileges**: sudo access
 
-### Build Ainux OS v2.1
+### Build Ainux OS v3.0
+
+Ainux OS now offers three specialized build variants with comprehensive TPU/NPU/GPU/CPU/DPU hardware acceleration support:
 
 #### 🛠️ Quick Build (Recommended)
 ```bash
@@ -90,8 +92,35 @@
 # 🍓 ARM Edition - Raspberry Pi & edge computing devices
 ./build-arm.sh
 
-# 🤖 AI/Cluster Edition - Full AI acceleration (default)
+# 🤖 AI/Cluster Edition - Full AI acceleration (legacy)
 ./ainux-builder.sh
+```
+
+#### 🎯 Build Variants Features
+
+| Variant | GUI | Target Use Case | Hardware Support |
+|---------|-----|-----------------|------------------|
+| **Desktop** | ✅ XFCE4 | Gaming, development, multimedia | Full TPU/NPU/GPU/CPU/DPU |
+| **Server** | ❌ Headless | Enterprise, cloud, data centers | Full TPU/NPU/GPU/CPU/DPU |
+| **ARM** | 🔄 Optional | Edge computing, IoT, Raspberry Pi | TPU/NPU/GPU/CPU |
+
+#### 🔧 Hardware-Specific Builds
+```bash
+# Desktop variants for specific GPU vendors
+NVIDIA_SUPPORT=true ./build-desktop.sh    # NVIDIA RTX/Tesla optimized
+AMD_SUPPORT=true ./build-desktop.sh       # AMD Radeon/Instinct optimized
+INTEL_GPU_SUPPORT=true ./build-desktop.sh # Intel Arc/Xe optimized
+
+# Server profiles for different workloads  
+SERVER_PROFILE=datacenter ./build-server.sh  # Enterprise data center
+SERVER_PROFILE=cloud ./build-server.sh       # Cloud-native
+SERVER_PROFILE=edge ./build-server.sh        # Edge computing
+SERVER_PROFILE=hpc ./build-server.sh         # High-performance computing
+
+# ARM targets for specific devices
+ARM_TARGET=rpi4 ./build-arm.sh               # Raspberry Pi 4 optimized
+ARM_TARGET=rpi5 ./build-arm.sh               # Raspberry Pi 5 optimized
+ARM_TARGET=industrial ./build-arm.sh         # Industrial real-time
 ```
 
 #### 🔧 Traditional Build (Environment Variables)

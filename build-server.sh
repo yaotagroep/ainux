@@ -35,6 +35,21 @@ export CONTAINER_RUNTIME="true"
 export ENTERPRISE_STORAGE="true"
 export HIGH_AVAILABILITY="true"
 
+# Hardware acceleration support - Full enterprise stack
+export TPU_SUPPORT="true"
+export NPU_SUPPORT="true"
+export GPU_SUPPORT="true"
+export CPU_ACCELERATION="true"
+export DPU_SUPPORT="true"
+
+# Enterprise AI Framework support
+export CUDA_SUPPORT="true"
+export ROCM_SUPPORT="true"
+export OPENVINO_SUPPORT="true"
+export CORAL_TPU_SUPPORT="false"  # Typically not needed on servers
+export TENSORRT_SUPPORT="true"
+export TRITON_SUPPORT="true"  # NVIDIA Triton Inference Server
+
 # Performance settings for server builds
 export BUILD_THREADS="${BUILD_THREADS:-$(nproc)}"
 export SKIP_QEMU_TEST="${SKIP_QEMU_TEST:-false}"
@@ -48,6 +63,10 @@ echo -e "  🛡️  Security Hardening: ${SECURITY_HARDENING}"
 echo -e "  🐳 Container Runtime: ${CONTAINER_RUNTIME}"
 echo -e "  💾 Enterprise Storage: ${ENTERPRISE_STORAGE}"
 echo -e "  🔄 High Availability: ${HIGH_AVAILABILITY}"
+echo -e "  🧠 TPU Support: ${TPU_SUPPORT}"
+echo -e "  ⚡ NPU Support: ${NPU_SUPPORT}"
+echo -e "  🎨 GPU Support: ${GPU_SUPPORT}"
+echo -e "  🌐 DPU Support: ${DPU_SUPPORT}"
 echo ""
 
 # Check prerequisites

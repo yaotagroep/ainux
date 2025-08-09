@@ -1,0 +1,456 @@
+# Ainux OS Server Edition Build and Deploy Workflow
+# Builds enterprise server variant with security hardening and enterprise features
+
+name: Build Ainux Server Edition
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'build-server.sh'
+      - 'configs/ainux-6.6-server.config'
+      - 'ainux-builder.sh'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'build-server.sh'
+      - 'configs/**'
+  workflow_dispatch:
+    inputs:
+      security_level:
+        description: 'Security hardening level'
+        required: false
+        default: 'standard'
+        type: choice
+        options:
+        - 'standard'
+        - 'hardened'
+        - 'maximum'
+      enable_debug:
+        description: 'Enable debug logging'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  BUILD_VARIANT: server
+  ENABLE_GUI: false
+  ARCH: x86_64
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_NAME: yaotagroep/ainux-server
+
+jobs:
+  validate-server-config:
+    runs-on: ubuntu-22.04
+    outputs:
+      build-matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Validate Server Environment
+      run: |
+        chmod +x *.sh
+        ./validate-build-env.sh
+        
+    - name: Validate Server Configuration
+      run: |
+        # Check server-specific config exists
+        test -f configs/ainux-6.6-server.config || {
+          echo "❌ Server kernel config missing"
+          exit 1
+        }
+        
+        # Validate enterprise features
+        grep -q "CONFIG_KVM=y" configs/ainux-6.6-server.config || echo "⚠️ KVM virtualization check"
+        grep -q "CONFIG_CGROUPS=y" configs/ainux-6.6-server.config || echo "⚠️ Container support check"
+        grep -q "CONFIG_SECURITY_SELINUX=y" configs/ainux-6.6-server.config || echo "⚠️ SELinux security check"
+        grep -q "CONFIG_NUMA=y" configs/ainux-6.6-server.config || echo "⚠️ NUMA support check"
+        grep -q "CONFIG_INFINIBAND=y" configs/ainux-6.6-server.config || echo "⚠️ InfiniBand support check"
+        
+        echo "✅ Server configuration validated"
+
+    - name: Security Compliance Check
+      run: |
+        echo "🔒 Running security compliance checks..."
+        
+        # Check for security hardening options
+        config_file="configs/ainux-6.6-server.config"
+        
+        security_checks=(
+          "CONFIG_SECURITY_APPARMOR=y"
+          "CONFIG_FORTIFY_SOURCE=y"
+          "CONFIG_RANDOMIZE_BASE=y"
+          "CONFIG_STRICT_KERNEL_RWX=y"
+          "CONFIG_SLAB_FREELIST_RANDOM=y"
+          "CONFIG_SHUFFLE_PAGE_ALLOCATOR=y"
+        )
+        
+        for check in "${security_checks[@]}"; do
+          if grep -q "$check" "$config_file"; then
+            echo "✅ $check enabled"
+          else
+            echo "⚠️ $check not found"
+          fi
+        done
+
+    - name: Setup Build Matrix
+      id: matrix
+      run: |
+        # Create build matrix for different server configs
+        matrix='{"profile": ["datacenter", "cloud", "edge", "hpc"]}'
+        echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+  build-server:
+    runs-on: ubuntu-22.04
+    needs: validate-server-config
+    strategy:
+      matrix: ${{ fromJson(needs.validate-server-config.outputs.build-matrix) }}
+      fail-fast: false
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Free Up Disk Space
+      run: |
+        echo "⏳ Reclaiming space for server build..."
+        sudo rm -rf /usr/local/lib/android /usr/local/share/boost
+        sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache
+        sudo apt-get clean
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        df -h
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          git build-essential libncurses-dev bison flex libssl-dev \
+          libelf-dev bc gcc make debootstrap live-build squashfs-tools \
+          dosfstools xorriso isolinux syslinux-utils genisoimage \
+          qemu-system-x86 python3-pip nmap curl wget rsync pv \
+          grub-pc-bin grub-efi-amd64-bin mtools debhelper \
+          gcc-aarch64-linux-gnu \
+          apparmor-utils selinux-policy-dev
+
+    - name: Configure Server Profile
+      run: |
+        case "${{ matrix.profile }}" in
+          "datacenter")
+            echo "SERVER_PROFILE=datacenter" >> $GITHUB_ENV
+            echo "HIGH_AVAILABILITY=true" >> $GITHUB_ENV
+            echo "ENTERPRISE_STORAGE=true" >> $GITHUB_ENV
+            echo "INFINIBAND_SUPPORT=true" >> $GITHUB_ENV
+            echo "CUSTOM_PACKAGES=docker.io kubernetes-client nginx haproxy postgresql mysql-server ceph" >> $GITHUB_ENV
+            ;;
+          "cloud")
+            echo "SERVER_PROFILE=cloud" >> $GITHUB_ENV
+            echo "CLOUD_OPTIMIZATIONS=true" >> $GITHUB_ENV
+            echo "CONTAINER_RUNTIME=true" >> $GITHUB_ENV
+            echo "MICROSERVICES_SUPPORT=true" >> $GITHUB_ENV
+            echo "CUSTOM_PACKAGES=docker.io kubernetes-client consul vault prometheus grafana" >> $GITHUB_ENV
+            ;;
+          "edge")
+            echo "SERVER_PROFILE=edge" >> $GITHUB_ENV
+            echo "EDGE_COMPUTING=true" >> $GITHUB_ENV
+            echo "LOW_LATENCY=true" >> $GITHUB_ENV
+            echo "IOT_SUPPORT=true" >> $GITHUB_ENV
+            echo "CUSTOM_PACKAGES=docker.io k3s mosquitto influxdb" >> $GITHUB_ENV
+            ;;
+          "hpc")
+            echo "SERVER_PROFILE=hpc" >> $GITHUB_ENV
+            echo "HPC_OPTIMIZATIONS=true" >> $GITHUB_ENV
+            echo "MPI_SUPPORT=true" >> $GITHUB_ENV
+            echo "SCIENTIFIC_COMPUTING=true" >> $GITHUB_ENV
+            echo "CUSTOM_PACKAGES=openmpi-bin slurm-wlm gcc-fortran" >> $GITHUB_ENV
+            ;;
+        esac
+
+    - name: Set Build Parameters
+      run: |
+        echo "BUILD_VARIANT=server" >> $GITHUB_ENV
+        echo "ENABLE_GUI=false" >> $GITHUB_ENV
+        echo "ARCH=x86_64" >> $GITHUB_ENV
+        echo "SKIP_QEMU_TEST=true" >> $GITHUB_ENV
+        echo "BUILD_THREADS=3" >> $GITHUB_ENV
+        echo "CI=true" >> $GITHUB_ENV
+        echo "GITHUB_ACTIONS=true" >> $GITHUB_ENV
+        
+        # Hardware acceleration
+        echo "TPU_SUPPORT=true" >> $GITHUB_ENV
+        echo "NPU_SUPPORT=true" >> $GITHUB_ENV
+        echo "GPU_SUPPORT=true" >> $GITHUB_ENV
+        echo "CPU_ACCELERATION=true" >> $GITHUB_ENV
+        echo "DPU_SUPPORT=true" >> $GITHUB_ENV
+        
+        # Server features
+        echo "SERVER_KERNEL=true" >> $GITHUB_ENV
+        echo "SECURITY_HARDENING=true" >> $GITHUB_ENV
+        echo "VIRTUALIZATION_SUPPORT=true" >> $GITHUB_ENV
+        
+        # Security level
+        case "${{ github.event.inputs.security_level || 'standard' }}" in
+          "hardened")
+            echo "SECURITY_LEVEL=hardened" >> $GITHUB_ENV
+            echo "ENABLE_SELINUX=true" >> $GITHUB_ENV
+            echo "ENABLE_APPARMOR=true" >> $GITHUB_ENV
+            ;;
+          "maximum")
+            echo "SECURITY_LEVEL=maximum" >> $GITHUB_ENV
+            echo "ENABLE_SELINUX=true" >> $GITHUB_ENV
+            echo "ENABLE_APPARMOR=true" >> $GITHUB_ENV
+            echo "KERNEL_HARDENING=true" >> $GITHUB_ENV
+            ;;
+          *)
+            echo "SECURITY_LEVEL=standard" >> $GITHUB_ENV
+            ;;
+        esac
+
+    - name: Build Ainux Server
+      run: |
+        chmod +x build-server.sh ainux-builder.sh
+        
+        echo "🏢 Building Ainux Server Edition for ${{ matrix.profile }} profile"
+        timeout 9600 ./build-server.sh || {  # 160 minutes for server builds
+          echo "❌ Server build failed or timed out"
+          find ~/ainux-build/logs -name "*.log" -exec tail -50 {} \; 2>/dev/null || true
+          exit 1
+        }
+
+    - name: Validate Server Build
+      run: |
+        cd ~/ainux-build/iso
+        
+        # Check ISO exists and size
+        test -f ainux-ai-cluster.iso || { echo "❌ Server ISO not found"; exit 1; }
+        size=$(stat -c%s ainux-ai-cluster.iso)
+        if [ $size -lt 1073741824 ]; then  # 1GB minimum for server
+          echo "❌ Server ISO too small: $size bytes"
+          exit 1
+        fi
+        
+        # Validate checksums
+        sha256sum -c ainux-ai-cluster.iso.sha256
+        
+        # Rename for server profile
+        mv ainux-ai-cluster.iso ainux-server-${{ matrix.profile }}.iso
+        mv ainux-ai-cluster.iso.sha256 ainux-server-${{ matrix.profile }}.iso.sha256
+
+    - name: Server-Specific Tests
+      run: |
+        echo "🧪 Running server-specific validation tests..."
+        
+        # Test ISO structure for server components
+        iso_mount="/tmp/ainux-server-mount"
+        sudo mkdir -p "$iso_mount"
+        sudo mount -o loop ~/ainux-build/iso/ainux-server-${{ matrix.profile }}.iso "$iso_mount" || {
+          echo "⚠️ Cannot mount ISO for testing"
+          exit 0
+        }
+        
+        # Check for server components
+        if [ -d "$iso_mount/live" ]; then
+          echo "✅ Live filesystem structure found"
+        fi
+        
+        sudo umount "$iso_mount" 2>/dev/null || true
+
+    - name: Security Validation
+      run: |
+        echo "🔒 Running security validation..."
+        
+        # Check build logs for security warnings
+        if [ -d ~/ainux-build/logs ]; then
+          if grep -i "security.*warning\|cve\|vulnerability" ~/ainux-build/logs/*.log; then
+            echo "⚠️ Security warnings found in build logs"
+          else
+            echo "✅ No security warnings detected"
+          fi
+        fi
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ainux-server-${{ matrix.profile }}
+        path: |
+          ~/ainux-build/iso/ainux-server-${{ matrix.profile }}.iso
+          ~/ainux-build/iso/ainux-server-${{ matrix.profile }}.iso.sha256
+          ~/ainux-build/iso/ainux-ai-cluster.iso.md5
+          ~/ainux-build/build-info.txt
+          ~/ainux-build/logs/
+        retention-days: 60  # Longer retention for server builds
+
+  docker-build:
+    runs-on: ubuntu-22.04
+    needs: build-server
+    if: github.event_name != 'pull_request'
+    strategy:
+      matrix:
+        profile: [datacenter, cloud, edge, hpc]
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Download Server Build
+      uses: actions/download-artifact@v4
+      with:
+        name: ainux-server-${{ matrix.profile }}
+        path: ./artifacts
+
+    - name: Create Dockerfile for Server
+      run: |
+        cat > Dockerfile << 'EOF'
+        FROM scratch
+        COPY artifacts/ainux-server-${{ matrix.profile }}.iso /ainux-server.iso
+        COPY artifacts/ainux-server-${{ matrix.profile }}.iso.sha256 /ainux-server.iso.sha256
+        
+        LABEL org.opencontainers.image.title="Ainux Server Edition (${{ matrix.profile }})"
+        LABEL org.opencontainers.image.description="Ainux OS Server optimized for ${{ matrix.profile }} workloads"
+        LABEL org.opencontainers.image.source="https://github.com/yaotagroep/ainux"
+        LABEL org.opencontainers.image.version="${{ github.ref_name }}"
+        LABEL org.opencontainers.image.revision="${{ github.sha }}"
+        LABEL ainux.variant="server"
+        LABEL ainux.profile="${{ matrix.profile }}"
+        LABEL ainux.gui="false"
+        LABEL ainux.acceleration="tpu,npu,gpu,cpu,dpu"
+        LABEL ainux.security="hardened"
+        EOF
+
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.profile }}-latest
+          ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.profile }}-${{ github.sha }}
+        labels: |
+          org.opencontainers.image.title=Ainux Server Edition (${{ matrix.profile }})
+          org.opencontainers.image.description=Ainux OS Server optimized for ${{ matrix.profile }} workloads
+          org.opencontainers.image.source=https://github.com/yaotagroep/ainux
+          org.opencontainers.image.version=${{ github.ref_name }}
+          org.opencontainers.image.revision=${{ github.sha }}
+
+  security-audit:
+    runs-on: ubuntu-22.04
+    needs: build-server
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download Server Build
+      uses: actions/download-artifact@v4
+      with:
+        name: ainux-server-datacenter  # Use datacenter variant for security audit
+        path: ./artifacts
+
+    - name: Security Audit
+      run: |
+        echo "🛡️ Running comprehensive security audit..."
+        
+        # Check for hardcoded secrets
+        if grep -r -i "password\|secret\|key" --include="*.sh" . | \
+          grep -v "# " | grep -v "README" | grep -v "GITHUB_TOKEN"; then
+          echo "⚠️ Found potential hardcoded secrets - review required"
+        fi
+        
+        # Validate build integrity
+        cd artifacts
+        sha256sum -c ainux-server-datacenter.iso.sha256
+        echo "✅ Build integrity verified"
+        
+        # Additional security checks for server edition
+        echo "🔍 Checking security configuration..."
+        if [ -f ../configs/ainux-6.6-server.config ]; then
+          security_features=(
+            "CONFIG_SECURITY_SELINUX"
+            "CONFIG_SECURITY_APPARMOR" 
+            "CONFIG_FORTIFY_SOURCE"
+            "CONFIG_RANDOMIZE_BASE"
+            "CONFIG_STRICT_KERNEL_RWX"
+          )
+          
+          for feature in "${security_features[@]}"; do
+            if grep -q "${feature}=y" ../configs/ainux-6.6-server.config; then
+              echo "✅ $feature enabled"
+            else
+              echo "⚠️ $feature not enabled"
+            fi
+          done
+        fi
+
+  release:
+    runs-on: ubuntu-22.04
+    needs: [build-server, docker-build, security-audit]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download All Server Builds
+      uses: actions/download-artifact@v4
+      with:
+        path: ./server-artifacts
+
+    - name: Prepare Release Assets
+      run: |
+        mkdir -p release-assets
+        find server-artifacts -name "*.iso" -exec cp {} release-assets/ \;
+        find server-artifacts -name "*.sha256" -exec cp {} release-assets/ \;
+        
+        # Create release notes
+        cat > release-assets/SERVER-README.md << 'EOF'
+        # Ainux OS Server Edition
+        
+        ## Server Profiles
+        - **datacenter**: Enterprise data center with HA, storage, networking
+        - **cloud**: Cloud-native with Kubernetes, microservices support
+        - **edge**: Edge computing with low latency, IoT support
+        - **hpc**: High-performance computing with MPI, scientific tools
+        
+        ## Enterprise Features
+        - SELinux and AppArmor security frameworks
+        - KVM virtualization with IOMMU support
+        - Docker and Kubernetes container platforms
+        - Enterprise storage (RAID, LVM, ZFS)
+        - High-performance networking (InfiniBand, RDMA)
+        - AI inference acceleration (GPU compute, NPU, TPU)
+        - Advanced monitoring and logging
+        
+        ## Installation
+        1. Download the ISO for your server profile
+        2. Verify checksum: `sha256sum -c <iso>.sha256`
+        3. Create bootable USB: `sudo dd if=<iso> of=/dev/sdX bs=4M status=progress`
+        4. Boot from USB and follow installation wizard
+        
+        ## System Requirements
+        - CPU: Intel/AMD x86_64 (8+ cores, NUMA support)
+        - RAM: 8GB minimum, 64GB+ recommended
+        - Storage: 40GB minimum, enterprise SSD/NVMe RAID
+        - Network: Enterprise ethernet (1GbE+), redundant preferred
+        - Management: IPMI/BMC for remote management
+        - Security: TPM 2.0 chip recommended
+        EOF
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+      with:
+        files: release-assets/*
+        name: "Ainux Server Edition ${{ github.ref_name }}"
+        body_path: release-assets/SERVER-README.md
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

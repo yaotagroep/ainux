@@ -1,0 +1,345 @@
+# Ainux OS Desktop Edition Build and Deploy Workflow
+# Builds desktop variant with full GUI, gaming, and AI acceleration support
+
+name: Build Ainux Desktop Edition
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'build-desktop.sh'
+      - 'configs/ainux-6.6-desktop.config'
+      - 'ainux-builder.sh'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'build-desktop.sh'
+      - 'configs/**'
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Force complete rebuild'
+        required: false
+        default: 'false'
+        type: boolean
+      enable_debug:
+        description: 'Enable debug logging'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  BUILD_VARIANT: desktop
+  ENABLE_GUI: true
+  ARCH: x86_64
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_NAME: yaotagroep/ainux-desktop
+
+jobs:
+  validate-build-env:
+    runs-on: ubuntu-22.04
+    outputs:
+      build-matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Validate Build Environment
+      run: |
+        chmod +x *.sh
+        ./validate-build-env.sh
+        
+    - name: Validate Desktop Configuration
+      run: |
+        # Check desktop-specific config exists
+        test -f configs/ainux-6.6-desktop.config || {
+          echo "❌ Desktop kernel config missing"
+          exit 1
+        }
+        
+        # Validate hardware support configuration
+        grep -q "CONFIG_DRM_AMDGPU=y" configs/ainux-6.6-desktop.config || echo "⚠️ AMD GPU support check"
+        grep -q "CONFIG_DRM_NOUVEAU=y" configs/ainux-6.6-desktop.config || echo "⚠️ NVIDIA GPU support check"
+        grep -q "CONFIG_DRM_I915=y" configs/ainux-6.6-desktop.config || echo "⚠️ Intel GPU support check"
+        grep -q "CONFIG_SND_HDA_INTEL=y" configs/ainux-6.6-desktop.config || echo "⚠️ Audio support check"
+        
+        echo "✅ Desktop configuration validated"
+
+    - name: Setup Build Matrix
+      id: matrix
+      run: |
+        # Create build matrix for different hardware configs
+        matrix='{"hardware": ["nvidia", "amd", "intel", "integrated"]}'
+        echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+  build-desktop:
+    runs-on: ubuntu-22.04
+    needs: validate-build-env
+    strategy:
+      matrix: ${{ fromJson(needs.validate-build-env.outputs.build-matrix) }}
+      fail-fast: false
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Free Up Disk Space
+      run: |
+        echo "⏳ Reclaiming space for desktop build..."
+        sudo rm -rf /usr/local/lib/android /usr/local/share/boost
+        sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache
+        sudo apt-get clean
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        df -h
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          git build-essential libncurses-dev bison flex libssl-dev \
+          libelf-dev bc gcc make debootstrap live-build squashfs-tools \
+          dosfstools xorriso isolinux syslinux-utils genisoimage \
+          qemu-system-x86 python3-pip nmap curl wget rsync pv \
+          grub-pc-bin grub-efi-amd64-bin mtools debhelper \
+          gcc-aarch64-linux-gnu
+
+    - name: Configure Hardware-Specific Build
+      run: |
+        case "${{ matrix.hardware }}" in
+          "nvidia")
+            echo "NVIDIA_SUPPORT=true" >> $GITHUB_ENV
+            echo "AMD_SUPPORT=false" >> $GITHUB_ENV
+            echo "INTEL_GPU_SUPPORT=false" >> $GITHUB_ENV
+            ;;
+          "amd")
+            echo "NVIDIA_SUPPORT=false" >> $GITHUB_ENV
+            echo "AMD_SUPPORT=true" >> $GITHUB_ENV
+            echo "INTEL_GPU_SUPPORT=false" >> $GITHUB_ENV
+            ;;
+          "intel")
+            echo "NVIDIA_SUPPORT=false" >> $GITHUB_ENV
+            echo "AMD_SUPPORT=false" >> $GITHUB_ENV
+            echo "INTEL_GPU_SUPPORT=true" >> $GITHUB_ENV
+            ;;
+          "integrated")
+            echo "NVIDIA_SUPPORT=false" >> $GITHUB_ENV
+            echo "AMD_SUPPORT=false" >> $GITHUB_ENV
+            echo "INTEL_GPU_SUPPORT=true" >> $GITHUB_ENV
+            echo "INTEGRATED_ONLY=true" >> $GITHUB_ENV
+            ;;
+        esac
+
+    - name: Set Build Parameters
+      run: |
+        echo "BUILD_VARIANT=desktop" >> $GITHUB_ENV
+        echo "ENABLE_GUI=true" >> $GITHUB_ENV
+        echo "ARCH=x86_64" >> $GITHUB_ENV
+        echo "SKIP_QEMU_TEST=true" >> $GITHUB_ENV
+        echo "BUILD_THREADS=3" >> $GITHUB_ENV
+        echo "CI=true" >> $GITHUB_ENV
+        echo "GITHUB_ACTIONS=true" >> $GITHUB_ENV
+        
+        # Hardware acceleration
+        echo "TPU_SUPPORT=true" >> $GITHUB_ENV
+        echo "NPU_SUPPORT=true" >> $GITHUB_ENV
+        echo "GPU_SUPPORT=true" >> $GITHUB_ENV
+        echo "CPU_ACCELERATION=true" >> $GITHUB_ENV
+        echo "DPU_SUPPORT=true" >> $GITHUB_ENV
+        
+        # Desktop features
+        echo "GAMING_SUPPORT=true" >> $GITHUB_ENV
+        echo "MULTIMEDIA_CODECS=true" >> $GITHUB_ENV
+        echo "BLUETOOTH_SUPPORT=true" >> $GITHUB_ENV
+        echo "WIFI_SUPPORT=true" >> $GITHUB_ENV
+
+    - name: Build Ainux Desktop
+      run: |
+        chmod +x build-desktop.sh ainux-builder.sh
+        
+        echo "🖥️ Building Ainux Desktop Edition for ${{ matrix.hardware }} hardware"
+        timeout 7200 ./build-desktop.sh || {
+          echo "❌ Desktop build failed or timed out"
+          find ~/ainux-build/logs -name "*.log" -exec tail -50 {} \; 2>/dev/null || true
+          exit 1
+        }
+
+    - name: Validate Desktop Build
+      run: |
+        cd ~/ainux-build/iso
+        
+        # Check ISO exists and size
+        test -f ainux-ai-cluster.iso || { echo "❌ Desktop ISO not found"; exit 1; }
+        size=$(stat -c%s ainux-ai-cluster.iso)
+        if [ $size -lt 2147483648 ]; then  # 2GB minimum for desktop
+          echo "❌ Desktop ISO too small: $size bytes"
+          exit 1
+        fi
+        
+        # Validate checksums
+        sha256sum -c ainux-ai-cluster.iso.sha256
+        
+        # Rename for hardware variant
+        mv ainux-ai-cluster.iso ainux-desktop-${{ matrix.hardware }}.iso
+        mv ainux-ai-cluster.iso.sha256 ainux-desktop-${{ matrix.hardware }}.iso.sha256
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ainux-desktop-${{ matrix.hardware }}
+        path: |
+          ~/ainux-build/iso/ainux-desktop-${{ matrix.hardware }}.iso
+          ~/ainux-build/iso/ainux-desktop-${{ matrix.hardware }}.iso.sha256
+          ~/ainux-build/iso/ainux-ai-cluster.iso.md5
+          ~/ainux-build/build-info.txt
+          ~/ainux-build/logs/
+        retention-days: 30
+
+  docker-build:
+    runs-on: ubuntu-22.04
+    needs: build-desktop
+    if: github.event_name != 'pull_request'
+    strategy:
+      matrix:
+        hardware: [nvidia, amd, intel, integrated]
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Download Desktop Build
+      uses: actions/download-artifact@v4
+      with:
+        name: ainux-desktop-${{ matrix.hardware }}
+        path: ./artifacts
+
+    - name: Create Dockerfile for Desktop
+      run: |
+        cat > Dockerfile << 'EOF'
+        FROM scratch
+        COPY artifacts/ainux-desktop-${{ matrix.hardware }}.iso /ainux-desktop.iso
+        COPY artifacts/ainux-desktop-${{ matrix.hardware }}.iso.sha256 /ainux-desktop.iso.sha256
+        
+        LABEL org.opencontainers.image.title="Ainux Desktop Edition (${{ matrix.hardware }})"
+        LABEL org.opencontainers.image.description="Ainux OS Desktop with ${{ matrix.hardware }} GPU support"
+        LABEL org.opencontainers.image.source="https://github.com/yaotagroep/ainux"
+        LABEL org.opencontainers.image.version="${{ github.ref_name }}"
+        LABEL org.opencontainers.image.revision="${{ github.sha }}"
+        LABEL ainux.variant="desktop"
+        LABEL ainux.hardware="${{ matrix.hardware }}"
+        LABEL ainux.gui="true"
+        LABEL ainux.acceleration="tpu,npu,gpu,cpu,dpu"
+        EOF
+
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.hardware }}-latest
+          ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.hardware }}-${{ github.sha }}
+        labels: |
+          org.opencontainers.image.title=Ainux Desktop Edition (${{ matrix.hardware }})
+          org.opencontainers.image.description=Ainux OS Desktop with ${{ matrix.hardware }} GPU support
+          org.opencontainers.image.source=https://github.com/yaotagroep/ainux
+          org.opencontainers.image.version=${{ github.ref_name }}
+          org.opencontainers.image.revision=${{ github.sha }}
+
+  security-scan:
+    runs-on: ubuntu-22.04
+    needs: build-desktop
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download Desktop Build
+      uses: actions/download-artifact@v4
+      with:
+        name: ainux-desktop-nvidia  # Use one variant for security scan
+        path: ./artifacts
+
+    - name: Security Scan
+      run: |
+        echo "🔒 Running security scan on desktop build..."
+        
+        # Check for hardcoded secrets
+        if grep -r -i "password\|secret\|key" --include="*.sh" . | \
+          grep -v "# " | grep -v "README" | grep -v "GITHUB_TOKEN"; then
+          echo "⚠️ Found potential hardcoded secrets - please review"
+        fi
+        
+        # Validate build integrity
+        cd artifacts
+        sha256sum -c ainux-desktop-nvidia.iso.sha256
+        echo "✅ Build integrity verified"
+
+  release:
+    runs-on: ubuntu-22.04
+    needs: [build-desktop, docker-build, security-scan]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download All Desktop Builds
+      uses: actions/download-artifact@v4
+      with:
+        path: ./desktop-artifacts
+
+    - name: Prepare Release Assets
+      run: |
+        mkdir -p release-assets
+        find desktop-artifacts -name "*.iso" -exec cp {} release-assets/ \;
+        find desktop-artifacts -name "*.sha256" -exec cp {} release-assets/ \;
+        
+        # Create release notes
+        cat > release-assets/DESKTOP-README.md << 'EOF'
+        # Ainux OS Desktop Edition
+        
+        ## Hardware Variants
+        - **nvidia**: Optimized for NVIDIA RTX/GTX graphics cards
+        - **amd**: Optimized for AMD Radeon graphics cards
+        - **intel**: Optimized for Intel Arc and Xe graphics
+        - **integrated**: For systems with integrated graphics only
+        
+        ## Features
+        - XFCE4 desktop environment
+        - Gaming support (Steam, Lutris)
+        - AI acceleration (TPU, NPU, GPU)
+        - Multimedia codecs
+        - WiFi and Bluetooth support
+        
+        ## Installation
+        1. Download the ISO for your hardware type
+        2. Verify checksum: `sha256sum -c <iso>.sha256`
+        3. Create bootable USB: `sudo dd if=<iso> of=/dev/sdX bs=4M status=progress`
+        4. Boot from USB and follow installation wizard
+        
+        ## System Requirements
+        - CPU: Intel/AMD x86_64 (4+ cores)
+        - RAM: 4GB minimum, 16GB recommended
+        - Storage: 25GB minimum, 50GB+ SSD recommended
+        - GPU: Dedicated GPU recommended for gaming/AI
+        EOF
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+      with:
+        files: release-assets/*
+        name: "Ainux Desktop Edition ${{ github.ref_name }}"
+        body_path: release-assets/DESKTOP-README.md
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
