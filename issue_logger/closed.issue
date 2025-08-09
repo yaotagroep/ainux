@@ -10,3 +10,7 @@
 2025-08-09T09:46:34.518Z|patches/6.6-npu-support.patch|113|[RESOLVED][CFG]-Added missing endif and completed TPU help text|(SUMMARY: Fixed incomplete NPU Kconfig structure)|endif # NPU_FRAMEWORK|1m55s|{"fix_applied":"added_missing_endif_and_tpu_help","verification":"kernel_config_success","components_verified":["NPU","TPU","GPU","CPU"]}
 </closed>
 
+<closed>[b4f9d2c]
+2025-08-09T11:39:54.099Z|ainux-builder.sh|1202-1205|[RESOLVED][CFG]-Fixed GPU/NPU support configuration and missing source files|(SUMMARY: Added NVIDIA support and comprehensive NPU fallback)|scripts/config --enable CONFIG_DRM_NOUVEAU|immediate|{"fix_applied":"gpu_npu_configuration_complete","verification":"kernel_config_test_passed","components_fixed":["AMD_GPU","NVIDIA_GPU","NPU_FRAMEWORK","ROCKCHIP_NPU","GOOGLE_TPU","MEDIATEK_APU","ARM_ETHOS_NPU","INTEL_VPU","NPU_DEBUG"],"files_created":["rockchip-npu.c","arm-ethos-npu.c","intel-vpu.c","google-tpu.c","mediatek-apu.c","npu-debug.c"],"config_checks_fixed":["CONFIG_HSA_AMD","CONFIG_DRM_NOUVEAU","CONFIG_NPU_FRAMEWORK","CONFIG_GOOGLE_TPU"]}
+</closed>
+
