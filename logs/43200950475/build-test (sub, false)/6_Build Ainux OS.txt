@@ -1,0 +1,262 @@
+﻿2025-08-09T00:51:53.4091490Z ##[group]Run chmod +x ainux-builder.sh
+2025-08-09T00:51:53.4091887Z [36;1mchmod +x ainux-builder.sh[0m
+2025-08-09T00:51:53.4092604Z [36;1m[0m
+2025-08-09T00:51:53.4092821Z [36;1m# Add debug output[0m
+2025-08-09T00:51:53.4093099Z [36;1mset -x[0m
+2025-08-09T00:51:53.4093312Z [36;1m[0m
+2025-08-09T00:51:53.4093546Z [36;1m# Run build with timeout (2 hours max)[0m
+2025-08-09T00:51:53.4093910Z [36;1mtimeout 7200 ./ainux-builder.sh || {[0m
+2025-08-09T00:51:53.4094250Z [36;1m  echo "Build timed out or failed"[0m
+2025-08-09T00:51:53.4094627Z [36;1m  echo "=== Last 100 lines of any available logs ==="[0m
+2025-08-09T00:51:53.4095204Z [36;1m  find ~/ainux-build/logs -name "*.log" -exec tail -50 {} \; 2>/dev/null || echo "No log files found"[0m
+2025-08-09T00:51:53.4095711Z [36;1m  [0m
+2025-08-09T00:51:53.4095953Z [36;1m  echo "=== Environment Variables ==="[0m
+2025-08-09T00:51:53.4096371Z [36;1m  env | grep -E "(CLUSTER_MODE|ENABLE_GUI|SKIP_|BUILD_)" || true[0m
+2025-08-09T00:51:53.4096765Z [36;1m  [0m
+2025-08-09T00:51:53.4097004Z [36;1m  echo "=== Disk Usage ==="[0m
+2025-08-09T00:51:53.4097272Z [36;1m  df -h || true[0m
+2025-08-09T00:51:53.4097483Z [36;1m  [0m
+2025-08-09T00:51:53.4097681Z [36;1m  echo "=== Memory Usage ==="[0m
+2025-08-09T00:51:53.4097942Z [36;1m  free -h || true[0m
+2025-08-09T00:51:53.4098163Z [36;1m  [0m
+2025-08-09T00:51:53.4098337Z [36;1m  exit 1[0m
+2025-08-09T00:51:53.4098526Z [36;1m}[0m
+2025-08-09T00:51:53.4125178Z shell: /usr/bin/bash -e {0}
+2025-08-09T00:51:53.4125424Z env:
+2025-08-09T00:51:53.4125612Z   CLUSTER_MODE: sub
+2025-08-09T00:51:53.4125817Z   ENABLE_GUI: false
+2025-08-09T00:51:53.4126034Z   SKIP_QEMU_TEST: true
+2025-08-09T00:51:53.4126258Z   BUILD_THREADS: 2
+2025-08-09T00:51:53.4126489Z   SKIP_CONNECTIVITY_CHECK: true
+2025-08-09T00:51:53.4126746Z ##[endgroup]
+2025-08-09T00:51:53.4186022Z + timeout 7200 ./ainux-builder.sh
+2025-08-09T00:51:53.4266500Z 
+2025-08-09T00:51:53.4267438Z [0;35m[PHASE][0m Starting Ainux OS AI Cluster Builder Process
+2025-08-09T00:51:53.4267974Z 
+2025-08-09T00:51:53.4267980Z 
+2025-08-09T00:51:53.4268171Z [0;35m[PHASE][0m Checking Prerequisites
+2025-08-09T00:51:53.4268427Z 
+2025-08-09T00:51:53.4316742Z [0;34m[INFO][0m Detected Ubuntu 22.04 LTS - supported
+2025-08-09T00:51:53.4346691Z [0;34m[INFO][0m Disk space check passed: 36GB available
+2025-08-09T00:51:53.4347606Z [0;34m[INFO][0m Checking internet connectivity...
+2025-08-09T00:51:53.4348677Z [1;33m[WARNING][0m Skipping connectivity check (SKIP_CONNECTIVITY_CHECK=true)
+2025-08-09T00:51:53.4349628Z [0;32m[SUCCESS][0m Prerequisites check passed
+2025-08-09T00:51:53.4350082Z 
+2025-08-09T00:51:53.4350561Z [0;35m[PHASE][0m Initializing Ainux OS AI Cluster Build Environment
+2025-08-09T00:51:53.4351101Z 
+2025-08-09T00:51:53.4351390Z [0;34m[INFO][0m Build Configuration:
+2025-08-09T00:51:53.4351854Z [0;34m[INFO][0m   Kernel Version: 6.6.58
+2025-08-09T00:51:53.4352526Z [0;34m[INFO][0m   Cluster Mode: sub
+2025-08-09T00:51:53.4352896Z [0;34m[INFO][0m   Build Threads: 2
+2025-08-09T00:51:53.4353712Z [0;34m[INFO][0m   GUI Enabled: false
+2025-08-09T00:51:53.4354158Z [0;34m[INFO][0m   Build Directory: /home/runner/ainux-build
+2025-08-09T00:51:53.4354649Z [0;34m[INFO][0m Installing build dependencies...
+2025-08-09T00:51:53.4457314Z 
+2025-08-09T00:51:53.4457919Z WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+2025-08-09T00:51:53.4458516Z 
+2025-08-09T00:51:55.2760403Z 16 packages can be upgraded. Run 'apt list --upgradable' to see them.
+2025-08-09T00:51:55.2882828Z 
+2025-08-09T00:51:55.2883370Z WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+2025-08-09T00:51:55.2883833Z 
+2025-08-09T00:51:55.3283204Z Reading package lists...
+2025-08-09T00:51:55.5580772Z Building dependency tree...
+2025-08-09T00:51:55.5593657Z Reading state information...
+2025-08-09T00:51:55.7286972Z bc is already the newest version (1.07.1-3build1).
+2025-08-09T00:51:55.7288025Z bison is already the newest version (2:3.8.2+dfsg-1build1).
+2025-08-09T00:51:55.7292748Z build-essential is already the newest version (12.9ubuntu3).
+2025-08-09T00:51:55.7293686Z dosfstools is already the newest version (4.2-1build3).
+2025-08-09T00:51:55.7294499Z flex is already the newest version (2.6.4-8build2).
+2025-08-09T00:51:55.7295354Z gcc is already the newest version (4:11.2.0-1ubuntu1).
+2025-08-09T00:51:55.7295967Z genisoimage is already the newest version (9:1.1.11-3.2ubuntu1).
+2025-08-09T00:51:55.7296550Z make is already the newest version (4.3-4.1build1).
+2025-08-09T00:51:55.7297160Z mtools is already the newest version (4.0.33-1+really4.0.32-1build1).
+2025-08-09T00:51:55.7297764Z pv is already the newest version (1.6.6-1build2).
+2025-08-09T00:51:55.7298333Z squashfs-tools is already the newest version (1:4.5-3build1).
+2025-08-09T00:51:55.7299083Z isolinux is already the newest version (3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1).
+2025-08-09T00:51:55.7299971Z syslinux-utils is already the newest version (3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1).
+2025-08-09T00:51:55.7300694Z xorriso is already the newest version (1.5.4-2).
+2025-08-09T00:51:55.7301162Z curl is already the newest version (7.81.0-1ubuntu1.20).
+2025-08-09T00:51:55.7301712Z debootstrap is already the newest version (1.0.126+nmu1ubuntu0.8).
+2025-08-09T00:51:55.7302511Z grub-efi-amd64-bin is already the newest version (2.06-2ubuntu14.8).
+2025-08-09T00:51:55.7303092Z grub-pc-bin is already the newest version (2.06-2ubuntu7.2).
+2025-08-09T00:51:55.7303627Z libelf-dev is already the newest version (0.186-1ubuntu0.1).
+2025-08-09T00:51:55.7304175Z libncurses-dev is already the newest version (6.3-2ubuntu0.1).
+2025-08-09T00:51:55.7304732Z libssl-dev is already the newest version (3.0.2-0ubuntu1.19).
+2025-08-09T00:51:55.7305308Z live-build is already the newest version (3.0~a57-1ubuntu41.22.04.1).
+2025-08-09T00:51:55.7305943Z qemu-system-x86 is already the newest version (1:6.2+dfsg-2ubuntu6.26).
+2025-08-09T00:51:55.7306529Z rsync is already the newest version (3.2.7-0ubuntu0.22.04.4).
+2025-08-09T00:51:55.7307036Z wget is already the newest version (1.21.2-2ubuntu1.1).
+2025-08-09T00:51:55.7307629Z nmap is already the newest version (7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1).
+2025-08-09T00:51:55.7308278Z python3-pip is already the newest version (22.0.2+dfsg-1ubuntu0.6).
+2025-08-09T00:51:55.7308889Z git is already the newest version (1:2.50.1-0ppa1~ubuntu22.04.1).
+2025-08-09T00:51:55.7755804Z The following NEW packages will be installed:
+2025-08-09T00:51:55.7766310Z   dialog
+2025-08-09T00:51:55.8109089Z 0 upgraded, 1 newly installed, 0 to remove and 16 not upgraded.
+2025-08-09T00:51:55.8484171Z Need to get 303 kB of archives.
+2025-08-09T00:51:55.8484880Z After this operation, 1258 kB of additional disk space will be used.
+2025-08-09T00:51:55.8485667Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T00:51:55.9687379Z Get:2 http://azure.archive.ubuntu.com/ubuntu jammy/universe amd64 dialog amd64 1.3-20211214-1 [303 kB]
+2025-08-09T00:51:56.2909207Z Fetched 303 kB in 0s (2238 kB/s)
+2025-08-09T00:51:56.3141965Z Selecting previously unselected package dialog.
+2025-08-09T00:51:56.3216166Z (Reading database ... 
+2025-08-09T00:51:56.3216874Z (Reading database ... 5%
+2025-08-09T00:51:56.3217386Z (Reading database ... 10%
+2025-08-09T00:51:56.3217974Z (Reading database ... 15%
+2025-08-09T00:51:56.3218551Z (Reading database ... 20%
+2025-08-09T00:51:56.3219048Z (Reading database ... 25%
+2025-08-09T00:51:56.3219381Z (Reading database ... 30%
+2025-08-09T00:51:56.3219714Z (Reading database ... 35%
+2025-08-09T00:51:56.3220040Z (Reading database ... 40%
+2025-08-09T00:51:56.3220378Z (Reading database ... 45%
+2025-08-09T00:51:56.3220703Z (Reading database ... 50%
+2025-08-09T00:51:56.3287116Z (Reading database ... 55%
+2025-08-09T00:51:56.3326722Z (Reading database ... 60%
+2025-08-09T00:51:56.3347319Z (Reading database ... 65%
+2025-08-09T00:51:56.3445281Z (Reading database ... 70%
+2025-08-09T00:51:56.3649791Z (Reading database ... 75%
+2025-08-09T00:51:56.3681216Z (Reading database ... 80%
+2025-08-09T00:51:56.4040390Z (Reading database ... 85%
+2025-08-09T00:51:56.4171563Z (Reading database ... 90%
+2025-08-09T00:51:56.4356880Z (Reading database ... 95%
+2025-08-09T00:51:56.4357676Z (Reading database ... 100%
+2025-08-09T00:51:56.4358348Z (Reading database ... 270634 files and directories currently installed.)
+2025-08-09T00:51:56.4429708Z Preparing to unpack .../dialog_1.3-20211214-1_amd64.deb ...
+2025-08-09T00:51:56.4441354Z Unpacking dialog (1.3-20211214-1) ...
+2025-08-09T00:51:56.6778207Z Setting up dialog (1.3-20211214-1) ...
+2025-08-09T00:51:56.6804305Z Processing triggers for man-db (2.10.2-1) ...
+2025-08-09T00:51:57.2708371Z NEEDRESTART-VER: 3.5
+2025-08-09T00:51:57.5177137Z NEEDRESTART-KCUR: 6.8.0-1031-azure
+2025-08-09T00:51:57.5177710Z NEEDRESTART-KEXP: 6.8.0-1031-azure
+2025-08-09T00:51:57.5178068Z NEEDRESTART-KSTA: 1
+2025-08-09T00:51:57.5178427Z NEEDRESTART-SVC: hosted-compute-agent.service
+2025-08-09T00:51:59.0816830Z [0;32m[SUCCESS][0m Build environment initialized
+2025-08-09T00:51:59.0817301Z 
+2025-08-09T00:51:59.0817644Z [0;35m[PHASE][0m Building Custom Kernel 6.6.58 with AI Optimizations
+2025-08-09T00:51:59.0818077Z 
+2025-08-09T00:51:59.0818271Z [0;34m[INFO][0m Downloading Linux kernel 6.6.58...
+2025-08-09T00:51:59.0835345Z Cloning into 'linux'...
+2025-08-09T00:52:44.0608504Z warning: refs/tags/v6.6.58 19f281632b8e2bc9105e5fbc5e1bbe98a30367ee is not a commit!
+2025-08-09T00:52:44.0620126Z Note: switching to '18916a684a8b836957df88438f9bca590799d04c'.
+2025-08-09T00:52:44.0620718Z 
+2025-08-09T00:52:44.0621032Z You are in 'detached HEAD' state. You can look around, make experimental
+2025-08-09T00:52:44.0622289Z changes and commit them, and you can discard any commits you make in this
+2025-08-09T00:52:44.0623559Z state without impacting any branches by switching back to a branch.
+2025-08-09T00:52:44.0624064Z 
+2025-08-09T00:52:44.0624349Z If you want to create a new branch to retain commits you create, you may
+2025-08-09T00:52:44.0625047Z do so (now or later) by using -c with the switch command. Example:
+2025-08-09T00:52:44.0625497Z 
+2025-08-09T00:52:44.0625650Z   git switch -c <new-branch-name>
+2025-08-09T00:52:44.0625926Z 
+2025-08-09T00:52:44.0626079Z Or undo this operation with:
+2025-08-09T00:52:44.0626325Z 
+2025-08-09T00:52:44.0626442Z   git switch -
+2025-08-09T00:52:44.0626631Z 
+2025-08-09T00:52:44.0626953Z Turn off this advice by setting config variable advice.detachedHead to false
+2025-08-09T00:52:44.0627434Z 
+2025-08-09T00:52:45.1509017Z Updating files:  22% (18095/81804)
+2025-08-09T00:52:45.2003027Z Updating files:  23% (18815/81804)
+2025-08-09T00:52:45.2433268Z Updating files:  24% (19633/81804)
+2025-08-09T00:52:45.2841626Z Updating files:  25% (20451/81804)
+2025-08-09T00:52:45.3380552Z Updating files:  26% (21270/81804)
+2025-08-09T00:52:45.3840938Z Updating files:  27% (22088/81804)
+2025-08-09T00:52:45.4267775Z Updating files:  28% (22906/81804)
+2025-08-09T00:52:45.4756913Z Updating files:  29% (23724/81804)
+2025-08-09T00:52:45.5270740Z Updating files:  30% (24542/81804)
+2025-08-09T00:52:45.5870527Z Updating files:  31% (25360/81804)
+2025-08-09T00:52:45.6592868Z Updating files:  32% (26178/81804)
+2025-08-09T00:52:45.7356220Z Updating files:  33% (26996/81804)
+2025-08-09T00:52:45.8213790Z Updating files:  34% (27814/81804)
+2025-08-09T00:52:45.8916473Z Updating files:  35% (28632/81804)
+2025-08-09T00:52:45.9532818Z Updating files:  36% (29450/81804)
+2025-08-09T00:52:46.0222345Z Updating files:  37% (30268/81804)
+2025-08-09T00:52:46.0980921Z Updating files:  38% (31086/81804)
+2025-08-09T00:52:46.1162416Z Updating files:  39% (31904/81804)
+2025-08-09T00:52:46.1752561Z Updating files:  39% (32093/81804)
+2025-08-09T00:52:47.1171462Z Updating files:  40% (32722/81804)
+2025-08-09T00:52:47.1326354Z Updating files:  40% (33466/81804)
+2025-08-09T00:52:47.2069189Z Updating files:  41% (33540/81804)
+2025-08-09T00:52:47.2729471Z Updating files:  42% (34358/81804)
+2025-08-09T00:52:47.3265726Z Updating files:  43% (35176/81804)
+2025-08-09T00:52:47.3726421Z Updating files:  44% (35994/81804)
+2025-08-09T00:52:47.4467285Z Updating files:  45% (36812/81804)
+2025-08-09T00:52:47.5163391Z Updating files:  46% (37630/81804)
+2025-08-09T00:52:47.5818069Z Updating files:  47% (38448/81804)
+2025-08-09T00:52:47.6610711Z Updating files:  48% (39266/81804)
+2025-08-09T00:52:47.7298245Z Updating files:  49% (40084/81804)
+2025-08-09T00:52:47.8048536Z Updating files:  50% (40902/81804)
+2025-08-09T00:52:47.8755504Z Updating files:  51% (41721/81804)
+2025-08-09T00:52:47.9350924Z Updating files:  52% (42539/81804)
+2025-08-09T00:52:48.0074232Z Updating files:  53% (43357/81804)
+2025-08-09T00:52:48.0758182Z Updating files:  54% (44175/81804)
+2025-08-09T00:52:48.1160182Z Updating files:  55% (44993/81804)
+2025-08-09T00:52:48.1541132Z Updating files:  55% (45424/81804)
+2025-08-09T00:52:48.2581316Z Updating files:  56% (45811/81804)
+2025-08-09T00:52:48.3451990Z Updating files:  57% (46629/81804)
+2025-08-09T00:52:48.4428710Z Updating files:  58% (47447/81804)
+2025-08-09T00:52:48.5288896Z Updating files:  59% (48265/81804)
+2025-08-09T00:52:48.6285111Z Updating files:  60% (49083/81804)
+2025-08-09T00:52:48.7053633Z Updating files:  61% (49901/81804)
+2025-08-09T00:52:48.7875274Z Updating files:  62% (50719/81804)
+2025-08-09T00:52:48.8584056Z Updating files:  63% (51537/81804)
+2025-08-09T00:52:48.9389128Z Updating files:  64% (52355/81804)
+2025-08-09T00:52:49.0041109Z Updating files:  65% (53173/81804)
+2025-08-09T00:52:49.1138258Z Updating files:  66% (53991/81804)
+2025-08-09T00:52:49.1159707Z Updating files:  67% (54809/81804)
+2025-08-09T00:52:49.1987281Z Updating files:  67% (54824/81804)
+2025-08-09T00:52:49.2492697Z Updating files:  68% (55627/81804)
+2025-08-09T00:52:49.3111789Z Updating files:  69% (56445/81804)
+2025-08-09T00:52:49.3924908Z Updating files:  70% (57263/81804)
+2025-08-09T00:52:49.4671236Z Updating files:  71% (58081/81804)
+2025-08-09T00:52:49.5381577Z Updating files:  72% (58899/81804)
+2025-08-09T00:52:49.6226068Z Updating files:  73% (59717/81804)
+2025-08-09T00:52:49.7091524Z Updating files:  74% (60535/81804)
+2025-08-09T00:52:49.7781432Z Updating files:  75% (61353/81804)
+2025-08-09T00:52:49.8223228Z Updating files:  76% (62172/81804)
+2025-08-09T00:52:49.8674892Z Updating files:  77% (62990/81804)
+2025-08-09T00:52:49.9227897Z Updating files:  78% (63808/81804)
+2025-08-09T00:52:49.9711425Z Updating files:  79% (64626/81804)
+2025-08-09T00:52:50.0234494Z Updating files:  80% (65444/81804)
+2025-08-09T00:52:50.0755943Z Updating files:  81% (66262/81804)
+2025-08-09T00:52:50.1160591Z Updating files:  82% (67080/81804)
+2025-08-09T00:52:50.1254959Z Updating files:  82% (67753/81804)
+2025-08-09T00:52:50.2094945Z Updating files:  83% (67898/81804)
+2025-08-09T00:52:50.2859855Z Updating files:  84% (68716/81804)
+2025-08-09T00:52:50.3655429Z Updating files:  85% (69534/81804)
+2025-08-09T00:52:50.4390517Z Updating files:  86% (70352/81804)
+2025-08-09T00:52:50.4892647Z Updating files:  87% (71170/81804)
+2025-08-09T00:52:50.5476590Z Updating files:  88% (71988/81804)
+2025-08-09T00:52:50.6279230Z Updating files:  89% (72806/81804)
+2025-08-09T00:52:50.7124398Z Updating files:  90% (73624/81804)
+2025-08-09T00:52:50.7709971Z Updating files:  91% (74442/81804)
+2025-08-09T00:52:50.8207938Z Updating files:  92% (75260/81804)
+2025-08-09T00:52:50.8857379Z Updating files:  93% (76078/81804)
+2025-08-09T00:52:50.9576590Z Updating files:  94% (76896/81804)
+2025-08-09T00:52:51.0170697Z Updating files:  95% (77714/81804)
+2025-08-09T00:52:51.0553144Z Updating files:  96% (78532/81804)
+2025-08-09T00:52:51.0994641Z Updating files:  97% (79350/81804)
+2025-08-09T00:52:51.1159371Z Updating files:  98% (80168/81804)
+2025-08-09T00:52:51.1440046Z Updating files:  98% (80453/81804)
+2025-08-09T00:52:51.1846590Z Updating files:  99% (80986/81804)
+2025-08-09T00:52:51.1847341Z Updating files: 100% (81804/81804)
+2025-08-09T00:52:51.1848050Z Updating files: 100% (81804/81804), done.
+2025-08-09T00:52:51.2751718Z [0;34m[INFO][0m Applying AI/NPU optimization patches...
+2025-08-09T00:52:51.2787168Z [1;33m[WARNING][0m Local patches not found, using fallback patches...
+2025-08-09T00:52:51.2787907Z [1;33m[WARNING][0m Using fallback patch configuration...
+2025-08-09T00:52:51.3467645Z patching file drivers/Kconfig
+2025-08-09T00:52:51.3468900Z Hunk #1 succeeded at 243 with fuzz 2 (offset 3 lines).
+2025-08-09T00:52:51.3473971Z patching file drivers/npu/Kconfig
+2025-08-09T00:52:51.3474736Z patch: **** malformed patch at line 31:  
+2025-08-09T00:52:51.3475823Z 
+2025-08-09T00:52:51.3476568Z [1;33m[WARNING][0m Fallback NPU patch failed
+2025-08-09T00:52:51.3497044Z patching file drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
+2025-08-09T00:52:51.3499884Z Hunk #1 FAILED at 190.
+2025-08-09T00:52:51.3506445Z 1 out of 1 hunk FAILED -- saving rejects to file drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c.rej
+2025-08-09T00:52:51.3510828Z [1;33m[WARNING][0m Fallback ROCm patch failed
+2025-08-09T00:52:51.3533435Z patching file net/core/dev.c
+2025-08-09T00:52:51.3540769Z Hunk #1 succeeded at 5354 with fuzz 2 (offset -166 lines).
+2025-08-09T00:52:51.3549442Z [0;34m[INFO][0m Configuring kernel for AI workloads...
+2025-08-09T00:52:51.4290761Z [0;34m[INFO][0m Applying AI hardware optimizations to kernel config...
+2025-08-09T00:52:51.9724063Z   HOSTCC  scripts/basic/fixdep
+2025-08-09T00:52:52.3688128Z   HOSTCC  scripts/kconfig/conf.o
+2025-08-09T00:52:52.5977990Z   HOSTCC  scripts/kconfig/confdata.o
+2025-08-09T00:52:52.6989869Z ##[error]The operation was canceled.

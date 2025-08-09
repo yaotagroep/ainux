@@ -1,0 +1,78 @@
+﻿2025-08-09T00:48:40.5099961Z ##[group]Run actions/checkout@v4
+2025-08-09T00:48:40.5100798Z with:
+2025-08-09T00:48:40.5101163Z   lfs: true
+2025-08-09T00:48:40.5101550Z   repository: yaotagroep/ainux
+2025-08-09T00:48:40.5102176Z   token: ***
+2025-08-09T00:48:40.5102910Z   ssh-strict: true
+2025-08-09T00:48:40.5103494Z   ssh-user: git
+2025-08-09T00:48:40.5103900Z   persist-credentials: true
+2025-08-09T00:48:40.5104354Z   clean: true
+2025-08-09T00:48:40.5104753Z   sparse-checkout-cone-mode: true
+2025-08-09T00:48:40.5105239Z   fetch-depth: 1
+2025-08-09T00:48:40.5105639Z   fetch-tags: false
+2025-08-09T00:48:40.5106069Z   show-progress: true
+2025-08-09T00:48:40.5106536Z   submodules: false
+2025-08-09T00:48:40.5106981Z   set-safe-directory: true
+2025-08-09T00:48:40.5107791Z ##[endgroup]
+2025-08-09T00:48:40.6155813Z Syncing repository: yaotagroep/ainux
+2025-08-09T00:48:40.6157530Z ##[group]Getting Git version info
+2025-08-09T00:48:40.6158197Z Working directory is '/home/runner/work/ainux/ainux'
+2025-08-09T00:48:40.6159081Z [command]/usr/bin/git version
+2025-08-09T00:48:40.6227215Z git version 2.50.1
+2025-08-09T00:48:40.6275925Z [command]/usr/bin/git lfs version
+2025-08-09T00:48:41.3822245Z git-lfs/3.7.0 (GitHub; linux amd64; go 1.24.4)
+2025-08-09T00:48:41.3836524Z ##[endgroup]
+2025-08-09T00:48:41.3851187Z Temporarily overriding HOME='/home/runner/work/_temp/c58ee2a8-7bb4-4f7d-8bd5-470bd8f4230a' before making global git config changes
+2025-08-09T00:48:41.3852752Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-09T00:48:41.3856736Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ainux/ainux
+2025-08-09T00:48:41.3888293Z Deleting the contents of '/home/runner/work/ainux/ainux'
+2025-08-09T00:48:41.3891812Z ##[group]Initializing the repository
+2025-08-09T00:48:41.3896380Z [command]/usr/bin/git init /home/runner/work/ainux/ainux
+2025-08-09T00:48:41.3958540Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-09T00:48:41.3959696Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-09T00:48:41.3960599Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-09T00:48:41.3961370Z hint:
+2025-08-09T00:48:41.3962176Z hint: 	git config --global init.defaultBranch <name>
+2025-08-09T00:48:41.3963285Z hint:
+2025-08-09T00:48:41.3964248Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-09T00:48:41.3965990Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-09T00:48:41.3967422Z hint:
+2025-08-09T00:48:41.3968127Z hint: 	git branch -m <name>
+2025-08-09T00:48:41.3968921Z hint:
+2025-08-09T00:48:41.3969973Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-09T00:48:41.3971563Z Initialized empty Git repository in /home/runner/work/ainux/ainux/.git/
+2025-08-09T00:48:41.3975481Z [command]/usr/bin/git remote add origin https://github.com/yaotagroep/ainux
+2025-08-09T00:48:41.4010733Z ##[endgroup]
+2025-08-09T00:48:41.4011924Z ##[group]Disabling automatic garbage collection
+2025-08-09T00:48:41.4015634Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-09T00:48:41.4043577Z ##[endgroup]
+2025-08-09T00:48:41.4044568Z ##[group]Setting up auth
+2025-08-09T00:48:41.4053530Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-09T00:48:41.4083247Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-09T00:48:41.4313112Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-09T00:48:41.4340677Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-09T00:48:41.4563309Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-09T00:48:41.4596132Z ##[endgroup]
+2025-08-09T00:48:41.4600027Z [command]/usr/bin/git lfs install --local
+2025-08-09T00:48:41.5161865Z Updated Git hooks.
+2025-08-09T00:48:41.5162738Z Git LFS initialized.
+2025-08-09T00:48:41.5222770Z ##[group]Fetching the repository
+2025-08-09T00:48:41.5294567Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8a9c55df94bfbdcdb2b513d732b435246cae438e:refs/remotes/origin/main
+2025-08-09T00:48:41.9580759Z From https://github.com/yaotagroep/ainux
+2025-08-09T00:48:41.9586342Z  * [new ref]         8a9c55df94bfbdcdb2b513d732b435246cae438e -> origin/main
+2025-08-09T00:48:41.9606543Z ##[endgroup]
+2025-08-09T00:48:41.9607528Z ##[group]Determining the checkout info
+2025-08-09T00:48:41.9609205Z ##[endgroup]
+2025-08-09T00:48:41.9609917Z ##[group]Fetching LFS objects
+2025-08-09T00:48:41.9614436Z [command]/usr/bin/git lfs fetch origin refs/remotes/origin/main
+2025-08-09T00:48:41.9827844Z Fetching reference refs/remotes/origin/main
+2025-08-09T00:48:42.0286594Z ##[endgroup]
+2025-08-09T00:48:42.0290169Z [command]/usr/bin/git sparse-checkout disable
+2025-08-09T00:48:42.0328041Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-09T00:48:42.0352631Z ##[group]Checking out the ref
+2025-08-09T00:48:42.0355833Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-09T00:48:42.0507887Z Switched to a new branch 'main'
+2025-08-09T00:48:42.0510739Z branch 'main' set up to track 'origin/main'.
+2025-08-09T00:48:42.0737096Z ##[endgroup]
+2025-08-09T00:48:42.0771126Z [command]/usr/bin/git log -1 --format=%H
+2025-08-09T00:48:42.0794103Z 8a9c55df94bfbdcdb2b513d732b435246cae438e

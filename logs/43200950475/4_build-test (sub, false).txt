@@ -1,0 +1,1023 @@
+﻿2025-08-09T00:48:39.0442514Z Current runner version: '2.327.1'
+2025-08-09T00:48:39.0467363Z ##[group]Runner Image Provisioner
+2025-08-09T00:48:39.0468187Z Hosted Compute Agent
+2025-08-09T00:48:39.0468750Z Version: 20250711.363
+2025-08-09T00:48:39.0469431Z Commit: 6785254374ce925a23743850c1cb91912ce5c14c
+2025-08-09T00:48:39.0470133Z Build Date: 2025-07-11T20:04:25Z
+2025-08-09T00:48:39.0470746Z ##[endgroup]
+2025-08-09T00:48:39.0471251Z ##[group]Operating System
+2025-08-09T00:48:39.0471894Z Ubuntu
+2025-08-09T00:48:39.0472630Z 22.04.5
+2025-08-09T00:48:39.0473125Z LTS
+2025-08-09T00:48:39.0473642Z ##[endgroup]
+2025-08-09T00:48:39.0474158Z ##[group]Runner Image
+2025-08-09T00:48:39.0474700Z Image: ubuntu-22.04
+2025-08-09T00:48:39.0475612Z Version: 20250804.2.0
+2025-08-09T00:48:39.0476735Z Included Software: https://github.com/actions/runner-images/blob/ubuntu22/20250804.2/images/ubuntu/Ubuntu2204-Readme.md
+2025-08-09T00:48:39.0478507Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu22%2F20250804.2
+2025-08-09T00:48:39.0479545Z ##[endgroup]
+2025-08-09T00:48:39.0482546Z ##[group]GITHUB_TOKEN Permissions
+2025-08-09T00:48:39.0484763Z Actions: write
+2025-08-09T00:48:39.0485320Z Attestations: write
+2025-08-09T00:48:39.0485910Z Checks: write
+2025-08-09T00:48:39.0486438Z Contents: write
+2025-08-09T00:48:39.0486932Z Deployments: write
+2025-08-09T00:48:39.0487524Z Discussions: write
+2025-08-09T00:48:39.0488031Z Issues: write
+2025-08-09T00:48:39.0488536Z Metadata: read
+2025-08-09T00:48:39.0489085Z Models: read
+2025-08-09T00:48:39.0489577Z Packages: write
+2025-08-09T00:48:39.0490098Z Pages: write
+2025-08-09T00:48:39.0490608Z PullRequests: write
+2025-08-09T00:48:39.0491203Z RepositoryProjects: write
+2025-08-09T00:48:39.0491760Z SecurityEvents: write
+2025-08-09T00:48:39.0492622Z Statuses: write
+2025-08-09T00:48:39.0493166Z ##[endgroup]
+2025-08-09T00:48:39.0495465Z Secret source: Actions
+2025-08-09T00:48:39.0496565Z Prepare workflow directory
+2025-08-09T00:48:39.0813791Z Prepare all required actions
+2025-08-09T00:48:39.0852742Z Getting action download info
+2025-08-09T00:48:39.3653363Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-08-09T00:48:39.3654545Z Version: 4.2.2
+2025-08-09T00:48:39.3655765Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-08-09T00:48:39.3657259Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-08-09T00:48:39.3658119Z ##[endgroup]
+2025-08-09T00:48:39.4524035Z ##[group]Download immutable action package 'actions/upload-artifact@v4'
+2025-08-09T00:48:39.4524940Z Version: 4.6.2
+2025-08-09T00:48:39.4525714Z Digest: sha256:290722aa3281d5caf23d0acdc3dbeb3424786a1a01a9cc97e72f147225e37c38
+2025-08-09T00:48:39.4526835Z Source commit SHA: ea165f8d65b6e75b540449e92b4886f43607fa02
+2025-08-09T00:48:39.4527582Z ##[endgroup]
+2025-08-09T00:48:39.6458602Z Complete job name: build-test (sub, false)
+2025-08-09T00:48:39.7139855Z ##[group]Run actions/checkout@v4
+2025-08-09T00:48:39.7140686Z with:
+2025-08-09T00:48:39.7141057Z   lfs: true
+2025-08-09T00:48:39.7141453Z   repository: yaotagroep/ainux
+2025-08-09T00:48:39.7142256Z   token: ***
+2025-08-09T00:48:39.7142653Z   ssh-strict: true
+2025-08-09T00:48:39.7143052Z   ssh-user: git
+2025-08-09T00:48:39.7143451Z   persist-credentials: true
+2025-08-09T00:48:39.7143907Z   clean: true
+2025-08-09T00:48:39.7144304Z   sparse-checkout-cone-mode: true
+2025-08-09T00:48:39.7144789Z   fetch-depth: 1
+2025-08-09T00:48:39.7145182Z   fetch-tags: false
+2025-08-09T00:48:39.7145587Z   show-progress: true
+2025-08-09T00:48:39.7145998Z   submodules: false
+2025-08-09T00:48:39.7146397Z   set-safe-directory: true
+2025-08-09T00:48:39.7147082Z ##[endgroup]
+2025-08-09T00:48:39.8291266Z Syncing repository: yaotagroep/ainux
+2025-08-09T00:48:39.8293232Z ##[group]Getting Git version info
+2025-08-09T00:48:39.8293946Z Working directory is '/home/runner/work/ainux/ainux'
+2025-08-09T00:48:39.8295007Z [command]/usr/bin/git version
+2025-08-09T00:48:39.8328949Z git version 2.50.1
+2025-08-09T00:48:39.8378402Z [command]/usr/bin/git lfs version
+2025-08-09T00:48:40.8720969Z git-lfs/3.7.0 (GitHub; linux amd64; go 1.24.4)
+2025-08-09T00:48:40.8746933Z ##[endgroup]
+2025-08-09T00:48:40.8768106Z Temporarily overriding HOME='/home/runner/work/_temp/ea837962-0939-4aa5-89ca-c857b30f3638' before making global git config changes
+2025-08-09T00:48:40.8771444Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-09T00:48:40.8776401Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ainux/ainux
+2025-08-09T00:48:40.8814763Z Deleting the contents of '/home/runner/work/ainux/ainux'
+2025-08-09T00:48:40.8818802Z ##[group]Initializing the repository
+2025-08-09T00:48:40.8823761Z [command]/usr/bin/git init /home/runner/work/ainux/ainux
+2025-08-09T00:48:40.8883793Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-09T00:48:40.8885414Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-09T00:48:40.8887552Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-09T00:48:40.8889202Z hint:
+2025-08-09T00:48:40.8890203Z hint: 	git config --global init.defaultBranch <name>
+2025-08-09T00:48:40.8891544Z hint:
+2025-08-09T00:48:40.8893072Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-09T00:48:40.8895396Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-09T00:48:40.8897123Z hint:
+2025-08-09T00:48:40.8897934Z hint: 	git branch -m <name>
+2025-08-09T00:48:40.8898912Z hint:
+2025-08-09T00:48:40.8900231Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-09T00:48:40.8902824Z Initialized empty Git repository in /home/runner/work/ainux/ainux/.git/
+2025-08-09T00:48:40.8905801Z [command]/usr/bin/git remote add origin https://github.com/yaotagroep/ainux
+2025-08-09T00:48:40.8934519Z ##[endgroup]
+2025-08-09T00:48:40.8935949Z ##[group]Disabling automatic garbage collection
+2025-08-09T00:48:40.8939186Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-09T00:48:40.8966373Z ##[endgroup]
+2025-08-09T00:48:40.8967840Z ##[group]Setting up auth
+2025-08-09T00:48:40.8974394Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-09T00:48:40.9006585Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-09T00:48:40.9252352Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-09T00:48:40.9285475Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-09T00:48:40.9521349Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-09T00:48:40.9555801Z ##[endgroup]
+2025-08-09T00:48:40.9560438Z [command]/usr/bin/git lfs install --local
+2025-08-09T00:48:41.0178090Z Updated Git hooks.
+2025-08-09T00:48:41.0179505Z Git LFS initialized.
+2025-08-09T00:48:41.0192434Z ##[group]Fetching the repository
+2025-08-09T00:48:41.0202975Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8a9c55df94bfbdcdb2b513d732b435246cae438e:refs/remotes/origin/main
+2025-08-09T00:48:41.2291235Z From https://github.com/yaotagroep/ainux
+2025-08-09T00:48:41.2293585Z  * [new ref]         8a9c55df94bfbdcdb2b513d732b435246cae438e -> origin/main
+2025-08-09T00:48:41.2316306Z ##[endgroup]
+2025-08-09T00:48:41.2317383Z ##[group]Determining the checkout info
+2025-08-09T00:48:41.2318906Z ##[endgroup]
+2025-08-09T00:48:41.2320052Z ##[group]Fetching LFS objects
+2025-08-09T00:48:41.2324320Z [command]/usr/bin/git lfs fetch origin refs/remotes/origin/main
+2025-08-09T00:48:41.2547224Z Fetching reference refs/remotes/origin/main
+2025-08-09T00:48:41.3041553Z ##[endgroup]
+2025-08-09T00:48:41.3044654Z [command]/usr/bin/git sparse-checkout disable
+2025-08-09T00:48:41.3085051Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-09T00:48:41.3113638Z ##[group]Checking out the ref
+2025-08-09T00:48:41.3116865Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-09T00:48:41.3274372Z Switched to a new branch 'main'
+2025-08-09T00:48:41.3277108Z branch 'main' set up to track 'origin/main'.
+2025-08-09T00:48:41.3546756Z ##[endgroup]
+2025-08-09T00:48:41.3551780Z [command]/usr/bin/git log -1 --format=%H
+2025-08-09T00:48:41.3574100Z 8a9c55df94bfbdcdb2b513d732b435246cae438e
+2025-08-09T00:48:41.3788782Z ##[group]Run echo "⏳ Reclaiming space..."
+2025-08-09T00:48:41.3790126Z [36;1mecho "⏳ Reclaiming space..."[0m
+2025-08-09T00:48:41.3791457Z [36;1msudo rm -rf /usr/local/lib/android[0m
+2025-08-09T00:48:41.3792966Z [36;1msudo rm -rf /usr/local/share/boost[0m
+2025-08-09T00:48:41.3794289Z [36;1msudo rm -rf /usr/share/dotnet[0m
+2025-08-09T00:48:41.3795530Z [36;1msudo rm -rf /opt/ghc[0m
+2025-08-09T00:48:41.3796723Z [36;1msudo rm -rf /opt/hostedtoolcache[0m
+2025-08-09T00:48:41.3798012Z [36;1msudo apt-get clean[0m
+2025-08-09T00:48:41.3799177Z [36;1msudo rm -rf "$AGENT_TOOLSDIRECTORY"[0m
+2025-08-09T00:48:41.3800446Z [36;1mdf -h[0m
+2025-08-09T00:48:41.3801304Z [36;1m [0m
+2025-08-09T00:48:41.3834403Z shell: /usr/bin/bash -e {0}
+2025-08-09T00:48:41.3835476Z ##[endgroup]
+2025-08-09T00:48:41.3913254Z ⏳ Reclaiming space...
+2025-08-09T00:51:15.0520236Z Filesystem      Size  Used Avail Use% Mounted on
+2025-08-09T00:51:15.0521538Z /dev/root        73G   36G   37G  50% /
+2025-08-09T00:51:15.0522788Z tmpfs           7.9G  172K  7.9G   1% /dev/shm
+2025-08-09T00:51:15.0523708Z tmpfs           3.2G  1.1M  3.2G   1% /run
+2025-08-09T00:51:15.0524632Z tmpfs           5.0M     0  5.0M   0% /run/lock
+2025-08-09T00:51:15.0525557Z /dev/sda15      105M  6.1M   99M   6% /boot/efi
+2025-08-09T00:51:15.0526465Z /dev/sdb1        74G  4.1G   66G   6% /mnt
+2025-08-09T00:51:15.0527373Z tmpfs           1.6G   12K  1.6G   1% /run/user/1001
+2025-08-09T00:51:15.0574175Z ##[group]Run sudo apt-get update
+2025-08-09T00:51:15.0574584Z [36;1msudo apt-get update[0m
+2025-08-09T00:51:15.0574904Z [36;1msudo apt-get install -y \[0m
+2025-08-09T00:51:15.0575416Z [36;1m  git build-essential libncurses-dev bison flex libssl-dev \[0m
+2025-08-09T00:51:15.0576021Z [36;1m  libelf-dev bc gcc make debootstrap live-build squashfs-tools \[0m
+2025-08-09T00:51:15.0576621Z [36;1m  dosfstools xorriso isolinux syslinux-utils genisoimage \[0m
+2025-08-09T00:51:15.0577193Z [36;1m  qemu-system-x86 python3-pip nmap curl wget rsync pv \[0m
+2025-08-09T00:51:15.0577678Z [36;1m  grub-pc-bin grub-efi-amd64-bin mtools[0m
+2025-08-09T00:51:15.0578035Z [36;1m  [0m
+2025-08-09T00:51:15.0607350Z shell: /usr/bin/bash -e {0}
+2025-08-09T00:51:15.0607687Z ##[endgroup]
+2025-08-09T00:51:15.2377787Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T00:51:15.2733617Z Get:6 https://packages.microsoft.com/repos/azure-cli jammy InRelease [3596 B]
+2025-08-09T00:51:15.2938460Z Hit:2 http://azure.archive.ubuntu.com/ubuntu jammy InRelease
+2025-08-09T00:51:15.2945075Z Get:7 https://packages.microsoft.com/ubuntu/22.04/prod jammy InRelease [3632 B]
+2025-08-09T00:51:15.3208195Z Get:3 http://azure.archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+2025-08-09T00:51:15.3228972Z Get:4 http://azure.archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+2025-08-09T00:51:15.3253100Z Get:5 http://azure.archive.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+2025-08-09T00:51:15.3947950Z Get:8 https://packages.microsoft.com/repos/azure-cli jammy/main amd64 Packages [2575 B]
+2025-08-09T00:51:15.5824164Z Get:9 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main arm64 Packages [75.0 kB]
+2025-08-09T00:51:15.5912010Z Get:10 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main amd64 Packages [239 kB]
+2025-08-09T00:51:15.8274177Z Get:11 http://azure.archive.ubuntu.com/ubuntu jammy-security/main Translation-en [379 kB]
+2025-08-09T00:51:25.2272888Z Fetched 1087 kB in 1s (1572 kB/s)
+2025-08-09T00:51:26.1726777Z Reading package lists...
+2025-08-09T00:51:26.2352412Z Reading package lists...
+2025-08-09T00:51:26.4907663Z Building dependency tree...
+2025-08-09T00:51:26.4921473Z Reading state information...
+2025-08-09T00:51:26.6883883Z bc is already the newest version (1.07.1-3build1).
+2025-08-09T00:51:26.6886574Z bc set to manually installed.
+2025-08-09T00:51:26.6887332Z bison is already the newest version (2:3.8.2+dfsg-1build1).
+2025-08-09T00:51:26.6888335Z build-essential is already the newest version (12.9ubuntu3).
+2025-08-09T00:51:26.6889154Z build-essential set to manually installed.
+2025-08-09T00:51:26.6890010Z dosfstools is already the newest version (4.2-1build3).
+2025-08-09T00:51:26.6890860Z dosfstools set to manually installed.
+2025-08-09T00:51:26.6891707Z flex is already the newest version (2.6.4-8build2).
+2025-08-09T00:51:26.6892936Z gcc is already the newest version (4:11.2.0-1ubuntu1).
+2025-08-09T00:51:26.6894037Z make is already the newest version (4.3-4.1build1).
+2025-08-09T00:51:26.6895193Z squashfs-tools is already the newest version (1:4.5-3build1).
+2025-08-09T00:51:26.6896407Z squashfs-tools set to manually installed.
+2025-08-09T00:51:26.6897377Z xorriso is already the newest version (1.5.4-2).
+2025-08-09T00:51:26.6898536Z curl is already the newest version (7.81.0-1ubuntu1.20).
+2025-08-09T00:51:26.6899478Z grub-efi-amd64-bin is already the newest version (2.06-2ubuntu14.8).
+2025-08-09T00:51:26.6900570Z grub-efi-amd64-bin set to manually installed.
+2025-08-09T00:51:26.6901345Z grub-pc-bin is already the newest version (2.06-2ubuntu7.2).
+2025-08-09T00:51:26.6902484Z grub-pc-bin set to manually installed.
+2025-08-09T00:51:26.6903325Z libncurses-dev is already the newest version (6.3-2ubuntu0.1).
+2025-08-09T00:51:26.6904104Z libncurses-dev set to manually installed.
+2025-08-09T00:51:26.6904869Z libssl-dev is already the newest version (3.0.2-0ubuntu1.19).
+2025-08-09T00:51:26.6905552Z rsync is already the newest version (3.2.7-0ubuntu0.22.04.4).
+2025-08-09T00:51:26.6906904Z wget is already the newest version (1.21.2-2ubuntu1.1).
+2025-08-09T00:51:26.6907759Z python3-pip is already the newest version (22.0.2+dfsg-1ubuntu0.6).
+2025-08-09T00:51:26.6908498Z git is already the newest version (1:2.50.1-0ppa1~ubuntu22.04.1).
+2025-08-09T00:51:26.6909217Z The following additional packages will be installed:
+2025-08-09T00:51:26.6909981Z   cpu-checker gstreamer1.0-plugins-base gstreamer1.0-plugins-good
+2025-08-09T00:51:26.6910877Z   gstreamer1.0-x ibverbs-providers ipxe-qemu ipxe-qemu-256k-compat-efi-roms
+2025-08-09T00:51:26.6911645Z   libaa1 libasyncns0 libavc1394-0 libboost-iostreams1.74.0
+2025-08-09T00:51:26.6912773Z   libboost-thread1.74.0 libbrlapi0.8 libcaca0 libcacard0 libcdparanoia0
+2025-08-09T00:51:26.6913658Z   libdaxctl1 libdecor-0-0 libdecor-0-plugin-1-cairo libdv4 libfdt1 libflac8
+2025-08-09T00:51:26.6914586Z   libgfapi0 libgfrpc0 libgfxdr0 libglusterfs0 libgstreamer-plugins-base1.0-0
+2025-08-09T00:51:26.6915540Z   libgstreamer-plugins-good1.0-0 libibverbs1 libiec61883-0 libiscsi7
+2025-08-09T00:51:26.6916397Z   libjack-jackd2-0 liblinear4 libmp3lame0 libmpg123-0 libndctl6
+2025-08-09T00:51:26.6917347Z   libnl-route-3-200 libopus0 liborc-0.4-0 libpcsclite1 libpmem1 libpmemobj1
+2025-08-09T00:51:26.6918254Z   libpulse0 librados2 libraw1394-11 librbd1 librdmacm1 libsamplerate0
+2025-08-09T00:51:26.6919078Z   libsdl2-2.0-0 libshout3 libsndfile1 libspeex1 libspice-server1 libtag1v5
+2025-08-09T00:51:26.6919870Z   libtag1v5-vanilla libtheora0 libtwolame0 liburing2 libusbredirparser1
+2025-08-09T00:51:26.6920671Z   libv4l-0 libv4lconvert0 libvirglrenderer1 libvisual-0.4-0 libvorbisenc2
+2025-08-09T00:51:26.6921474Z   libvpx7 libvte-2.91-0 libvte-2.91-common libwavpack1 libxv1 lua-lpeg
+2025-08-09T00:51:26.6922422Z   msr-tools nmap-common ovmf qemu-block-extra qemu-system-common
+2025-08-09T00:51:26.6923152Z   qemu-system-data qemu-system-gui qemu-utils seabios syslinux-common
+2025-08-09T00:51:26.6923770Z Suggested packages:
+2025-08-09T00:51:26.6924667Z   squid-deb-proxy-client debian-archive-keyring arch-test wodim cdrkit-doc
+2025-08-09T00:51:26.6925540Z   gvfs libdv-bin oss-compat libvisual-0.4-plugins jackd2 liblinear-tools
+2025-08-09T00:51:26.6926297Z   liblinear-dev opus-tools pcscd pulseaudio libraw1394-doc speex
+2025-08-09T00:51:26.6927055Z   gstreamer1.0-libav gstreamer1.0-plugins-ugly memtest86+ | memtest86 syslinux
+2025-08-09T00:51:26.6927798Z   | grub win32-loader gnu-fdisk floppyd ncat ndiff zenmap doc-base samba vde2
+2025-08-09T00:51:26.6928417Z   libcrypt-passwdmd5-perl
+2025-08-09T00:51:26.7295409Z The following NEW packages will be installed:
+2025-08-09T00:51:26.7296658Z   cpu-checker debootstrap genisoimage gstreamer1.0-plugins-base
+2025-08-09T00:51:26.7298070Z   gstreamer1.0-plugins-good gstreamer1.0-x ibverbs-providers ipxe-qemu
+2025-08-09T00:51:26.7299443Z   ipxe-qemu-256k-compat-efi-roms isolinux libaa1 libasyncns0 libavc1394-0
+2025-08-09T00:51:26.7300827Z   libboost-iostreams1.74.0 libboost-thread1.74.0 libbrlapi0.8 libcaca0
+2025-08-09T00:51:26.7301797Z   libcacard0 libcdparanoia0 libdaxctl1 libdecor-0-0 libdecor-0-plugin-1-cairo
+2025-08-09T00:51:26.7302787Z   libdv4 libelf-dev libfdt1 libflac8 libgfapi0 libgfrpc0 libgfxdr0
+2025-08-09T00:51:26.7303785Z   libglusterfs0 libgstreamer-plugins-base1.0-0 libgstreamer-plugins-good1.0-0
+2025-08-09T00:51:26.7305012Z   libibverbs1 libiec61883-0 libiscsi7 libjack-jackd2-0 liblinear4 libmp3lame0
+2025-08-09T00:51:26.7306198Z   libmpg123-0 libndctl6 libnl-route-3-200 libopus0 liborc-0.4-0 libpcsclite1
+2025-08-09T00:51:26.7307441Z   libpmem1 libpmemobj1 libpulse0 librados2 libraw1394-11 librbd1 librdmacm1
+2025-08-09T00:51:26.7308526Z   libsamplerate0 libsdl2-2.0-0 libshout3 libsndfile1 libspeex1
+2025-08-09T00:51:26.7309317Z   libspice-server1 libtag1v5 libtag1v5-vanilla libtheora0 libtwolame0
+2025-08-09T00:51:26.7310206Z   liburing2 libusbredirparser1 libv4l-0 libv4lconvert0 libvirglrenderer1
+2025-08-09T00:51:26.7311025Z   libvisual-0.4-0 libvorbisenc2 libvpx7 libvte-2.91-0 libvte-2.91-common
+2025-08-09T00:51:26.7312639Z   libwavpack1 libxv1 live-build lua-lpeg msr-tools mtools nmap nmap-common
+2025-08-09T00:51:26.7313463Z   ovmf pv qemu-block-extra qemu-system-common qemu-system-data qemu-system-gui
+2025-08-09T00:51:26.7314170Z   qemu-system-x86 qemu-utils seabios syslinux-common syslinux-utils
+2025-08-09T00:51:26.7512044Z 0 upgraded, 90 newly installed, 0 to remove and 16 not upgraded.
+2025-08-09T00:51:26.7513167Z Need to get 53.2 MB of archives.
+2025-08-09T00:51:26.7513816Z After this operation, 193 MB of additional disk space will be used.
+2025-08-09T00:51:26.7514683Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T00:51:26.7940533Z Get:2 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 msr-tools amd64 1.3-4 [10.3 kB]
+2025-08-09T00:51:26.8091241Z Get:3 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 cpu-checker amd64 0.7-1.3build1 [6800 B]
+2025-08-09T00:51:26.8237806Z Get:4 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 genisoimage amd64 9:1.1.11-3.2ubuntu1 [370 kB]
+2025-08-09T00:51:26.8412697Z Get:5 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libcdparanoia0 amd64 3.10.2+debian-14build2 [49.3 kB]
+2025-08-09T00:51:26.8560379Z Get:6 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 liborc-0.4-0 amd64 1:0.4.32-2ubuntu0.1 [228 kB]
+2025-08-09T00:51:26.8720768Z Get:7 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgstreamer-plugins-base1.0-0 amd64 1.20.1-1ubuntu0.4 [848 kB]
+2025-08-09T00:51:26.9006831Z Get:8 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libopus0 amd64 1.3.1-0.1build2 [203 kB]
+2025-08-09T00:51:26.9172553Z Get:9 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libtheora0 amd64 1.1.1+dfsg.1-15ubuntu4 [209 kB]
+2025-08-09T00:51:26.9334762Z Get:10 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libvisual-0.4-0 amd64 0.4.0-17build2 [108 kB]
+2025-08-09T00:51:26.9487413Z Get:11 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libvorbisenc2 amd64 1.3.7-1build2 [82.6 kB]
+2025-08-09T00:51:26.9653616Z Get:12 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 gstreamer1.0-plugins-base amd64 1.20.1-1ubuntu0.4 [712 kB]
+2025-08-09T00:51:26.9926960Z Get:13 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libaa1 amd64 1.4p5-50build1 [51.9 kB]
+2025-08-09T00:51:27.0072783Z Get:14 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libraw1394-11 amd64 2.1.2-2build2 [27.0 kB]
+2025-08-09T00:51:27.0351465Z Get:15 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libavc1394-0 amd64 0.5.4-5build2 [17.0 kB]
+2025-08-09T00:51:27.0621586Z Get:16 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libcaca0 amd64 0.99.beta19-2.2ubuntu4 [224 kB]
+2025-08-09T00:51:27.1196882Z Get:17 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libdv4 amd64 1.0.0-14build1 [61.9 kB]
+2025-08-09T00:51:27.1354311Z Get:18 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libflac8 amd64 1.3.3-2ubuntu0.2 [111 kB]
+2025-08-09T00:51:27.1528019Z Get:19 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgstreamer-plugins-good1.0-0 amd64 1.20.3-0ubuntu1.3 [30.1 kB]
+2025-08-09T00:51:27.2252977Z Get:20 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libiec61883-0 amd64 1.2.0-4build3 [25.9 kB]
+2025-08-09T00:51:27.2597823Z Get:21 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libsamplerate0 amd64 0.2.2-1build1 [1359 kB]
+2025-08-09T00:51:27.3310463Z Get:22 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libjack-jackd2-0 amd64 1.9.20~dfsg-1 [293 kB]
+2025-08-09T00:51:27.3477323Z Get:23 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libmp3lame0 amd64 3.100-3build2 [141 kB]
+2025-08-09T00:51:27.3622742Z Get:24 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libmpg123-0 amd64 1.29.3-1ubuntu0.1 [172 kB]
+2025-08-09T00:51:27.3767614Z Get:25 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libasyncns0 amd64 0.8-6build2 [12.8 kB]
+2025-08-09T00:51:27.3900867Z Get:26 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsndfile1 amd64 1.0.31-2ubuntu0.2 [196 kB]
+2025-08-09T00:51:27.4046770Z Get:27 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpulse0 amd64 1:15.99.1+dfsg1-1ubuntu2.2 [298 kB]
+2025-08-09T00:51:27.4203448Z Get:28 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libspeex1 amd64 1.2~rc1.2-1.1ubuntu3 [57.9 kB]
+2025-08-09T00:51:27.4338096Z Get:29 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libshout3 amd64 2.4.5-1build3 [54.5 kB]
+2025-08-09T00:51:27.4483321Z Get:30 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libtag1v5-vanilla amd64 1.11.1+dfsg.1-3ubuntu3 [304 kB]
+2025-08-09T00:51:27.4639986Z Get:31 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libtag1v5 amd64 1.11.1+dfsg.1-3ubuntu3 [11.5 kB]
+2025-08-09T00:51:27.4775105Z Get:32 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libtwolame0 amd64 0.4.0-2build2 [52.5 kB]
+2025-08-09T00:51:27.4912005Z Get:33 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libv4lconvert0 amd64 1.22.1-2build1 [82.4 kB]
+2025-08-09T00:51:27.5054509Z Get:34 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libv4l-0 amd64 1.22.1-2build1 [44.9 kB]
+2025-08-09T00:51:27.5196980Z Get:35 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libvpx7 amd64 1.11.0-2ubuntu2.4 [1078 kB]
+2025-08-09T00:51:27.5563104Z Get:36 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libwavpack1 amd64 5.4.0-1build2 [83.7 kB]
+2025-08-09T00:51:27.5706744Z Get:37 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 gstreamer1.0-plugins-good amd64 1.20.3-0ubuntu1.3 [2010 kB]
+2025-08-09T00:51:27.6214067Z Get:38 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libxv1 amd64 2:1.0.11-1build2 [11.2 kB]
+2025-08-09T00:51:27.6798586Z Get:39 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 gstreamer1.0-x amd64 1.20.1-1ubuntu0.4 [85.1 kB]
+2025-08-09T00:51:27.6952360Z Get:40 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libnl-route-3-200 amd64 3.5.0-0.1 [180 kB]
+2025-08-09T00:51:27.7126764Z Get:41 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libibverbs1 amd64 39.0-1 [69.3 kB]
+2025-08-09T00:51:27.7279062Z Get:42 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 ibverbs-providers amd64 39.0-1 [341 kB]
+2025-08-09T00:51:27.7458528Z Get:43 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 ipxe-qemu all 1.21.1+git-20220113.fbbdc3926-0ubuntu1 [1569 kB]
+2025-08-09T00:51:27.7809778Z Get:44 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 ipxe-qemu-256k-compat-efi-roms all 1.0.0+git-20150424.a25a16d-0ubuntu4 [552 kB]
+2025-08-09T00:51:27.8090760Z Get:45 http://azure.archive.ubuntu.com/ubuntu jammy/universe amd64 isolinux all 3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1 [60.1 kB]
+2025-08-09T00:51:27.8244353Z Get:46 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libboost-iostreams1.74.0 amd64 1.74.0-14ubuntu3 [245 kB]
+2025-08-09T00:51:27.8411662Z Get:47 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libboost-thread1.74.0 amd64 1.74.0-14ubuntu3 [262 kB]
+2025-08-09T00:51:27.8579794Z Get:48 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libbrlapi0.8 amd64 6.4-4ubuntu3 [28.7 kB]
+2025-08-09T00:51:27.8731727Z Get:49 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpcsclite1 amd64 1.9.5-3ubuntu1 [19.8 kB]
+2025-08-09T00:51:27.8883431Z Get:50 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libcacard0 amd64 1:2.8.0-3build2 [38.0 kB]
+2025-08-09T00:51:27.9034266Z Get:51 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libdaxctl1 amd64 72.1-1 [19.8 kB]
+2025-08-09T00:51:27.9180569Z Get:52 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libdecor-0-0 amd64 0.1.0-3build1 [15.1 kB]
+2025-08-09T00:51:27.9329241Z Get:53 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libdecor-0-plugin-1-cairo amd64 0.1.0-3build1 [20.4 kB]
+2025-08-09T00:51:27.9477345Z Get:54 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libelf-dev amd64 0.186-1ubuntu0.1 [64.4 kB]
+2025-08-09T00:51:27.9615178Z Get:55 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgfxdr0 amd64 10.1-1ubuntu0.2 [22.3 kB]
+2025-08-09T00:51:27.9754162Z Get:56 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libglusterfs0 amd64 10.1-1ubuntu0.2 [287 kB]
+2025-08-09T00:51:28.0347532Z Get:57 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgfrpc0 amd64 10.1-1ubuntu0.2 [47.1 kB]
+2025-08-09T00:51:28.0487090Z Get:58 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgfapi0 amd64 10.1-1ubuntu0.2 [77.3 kB]
+2025-08-09T00:51:28.0630270Z Get:59 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 librdmacm1 amd64 39.0-1 [71.2 kB]
+2025-08-09T00:51:28.0775053Z Get:60 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libiscsi7 amd64 1.19.0-3build2 [70.6 kB]
+2025-08-09T00:51:28.0921805Z Get:61 http://azure.archive.ubuntu.com/ubuntu jammy/universe amd64 liblinear4 amd64 2.3.0+dfsg-5 [41.4 kB]
+2025-08-09T00:51:28.1063025Z Get:62 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libndctl6 amd64 72.1-1 [57.7 kB]
+2025-08-09T00:51:28.1204743Z Get:63 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libpmem1 amd64 1.11.1-3build1 [81.4 kB]
+2025-08-09T00:51:28.1347363Z Get:64 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libpmemobj1 amd64 1.11.1-3build1 [124 kB]
+2025-08-09T00:51:28.1491709Z Get:65 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 librados2 amd64 17.2.7-0ubuntu0.22.04.2 [3594 kB]
+2025-08-09T00:51:28.2003585Z Get:66 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 librbd1 amd64 17.2.7-0ubuntu0.22.04.2 [3548 kB]
+2025-08-09T00:51:28.2411548Z Get:67 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsdl2-2.0-0 amd64 2.0.20+dfsg-2ubuntu1.22.04.1 [582 kB]
+2025-08-09T00:51:28.2585742Z Get:68 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libspice-server1 amd64 0.15.0-2ubuntu4 [351 kB]
+2025-08-09T00:51:28.2738223Z Get:69 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 liburing2 amd64 2.1-2build1 [10.3 kB]
+2025-08-09T00:51:28.2871138Z Get:70 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libusbredirparser1 amd64 0.11.0-2build1 [15.9 kB]
+2025-08-09T00:51:28.3030843Z Get:71 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libvirglrenderer1 amd64 0.9.1-1~exp1ubuntu2 [188 kB]
+2025-08-09T00:51:28.3182544Z Get:72 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libvte-2.91-common amd64 0.68.0-1ubuntu0.1 [9408 B]
+2025-08-09T00:51:28.3345997Z Get:73 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libvte-2.91-0 amd64 0.68.0-1ubuntu0.1 [214 kB]
+2025-08-09T00:51:28.3494040Z Get:74 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 debootstrap all 1.0.126+nmu1ubuntu0.8 [40.6 kB]
+2025-08-09T00:51:28.3630548Z Get:75 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 live-build all 3.0~a57-1ubuntu41.22.04.1 [132 kB]
+2025-08-09T00:51:28.4223011Z Get:76 http://azure.archive.ubuntu.com/ubuntu jammy/universe amd64 lua-lpeg amd64 1.0.2-1 [31.4 kB]
+2025-08-09T00:51:28.4363809Z Get:77 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 mtools amd64 4.0.33-1+really4.0.32-1build1 [201 kB]
+2025-08-09T00:51:28.4516787Z Get:78 http://azure.archive.ubuntu.com/ubuntu jammy-updates/universe amd64 nmap-common all 7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1 [3940 kB]
+2025-08-09T00:51:28.4942542Z Get:79 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 pv amd64 1.6.6-1build2 [44.5 kB]
+2025-08-09T00:51:28.5083092Z Get:80 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libfdt1 amd64 1.6.1-1 [20.0 kB]
+2025-08-09T00:51:28.5231414Z Get:81 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 qemu-system-common amd64 1:6.2+dfsg-2ubuntu6.26 [2047 kB]
+2025-08-09T00:51:28.5538570Z Get:82 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 qemu-system-data all 1:6.2+dfsg-2ubuntu6.26 [1430 kB]
+2025-08-09T00:51:28.5776872Z Get:83 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 seabios all 1.15.0-1 [174 kB]
+2025-08-09T00:51:28.5931330Z Get:84 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 qemu-system-x86 amd64 1:6.2+dfsg-2ubuntu6.26 [10.1 MB]
+2025-08-09T00:51:28.6714662Z Get:85 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 qemu-utils amd64 1:6.2+dfsg-2ubuntu6.26 [1527 kB]
+2025-08-09T00:51:28.6983939Z Get:86 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 qemu-block-extra amd64 1:6.2+dfsg-2ubuntu6.26 [68.2 kB]
+2025-08-09T00:51:28.7125477Z Get:87 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 qemu-system-gui amd64 1:6.2+dfsg-2ubuntu6.26 [220 kB]
+2025-08-09T00:51:28.7281767Z Get:88 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 syslinux-common all 3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1 [1271 kB]
+2025-08-09T00:51:28.7533191Z Get:89 http://azure.archive.ubuntu.com/ubuntu jammy/universe amd64 syslinux-utils amd64 3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1 [50.9 kB]
+2025-08-09T00:51:28.7676191Z Get:90 http://azure.archive.ubuntu.com/ubuntu jammy-updates/universe amd64 nmap amd64 7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1 [1731 kB]
+2025-08-09T00:51:28.7926664Z Get:91 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 ovmf all 2022.02-3ubuntu0.22.04.3 [7561 kB]
+2025-08-09T00:51:29.3120447Z Fetched 53.2 MB in 2s (25.3 MB/s)
+2025-08-09T00:51:29.3940313Z Selecting previously unselected package msr-tools.
+2025-08-09T00:51:29.4598778Z (Reading database ... 
+2025-08-09T00:51:29.4599132Z (Reading database ... 5%
+2025-08-09T00:51:29.4599415Z (Reading database ... 10%
+2025-08-09T00:51:29.4599705Z (Reading database ... 15%
+2025-08-09T00:51:29.4599979Z (Reading database ... 20%
+2025-08-09T00:51:29.4600435Z (Reading database ... 25%
+2025-08-09T00:51:29.4600834Z (Reading database ... 30%
+2025-08-09T00:51:29.4601245Z (Reading database ... 35%
+2025-08-09T00:51:29.4601683Z (Reading database ... 40%
+2025-08-09T00:51:29.4601964Z (Reading database ... 45%
+2025-08-09T00:51:29.4602772Z (Reading database ... 50%
+2025-08-09T00:51:30.1364875Z (Reading database ... 55%
+2025-08-09T00:51:30.6413637Z (Reading database ... 60%
+2025-08-09T00:51:31.1697389Z (Reading database ... 65%
+2025-08-09T00:51:31.8944820Z (Reading database ... 70%
+2025-08-09T00:51:32.6948205Z (Reading database ... 75%
+2025-08-09T00:51:33.6334612Z (Reading database ... 80%
+2025-08-09T00:51:35.1526206Z (Reading database ... 85%
+2025-08-09T00:51:37.0092026Z (Reading database ... 90%
+2025-08-09T00:51:38.4903495Z (Reading database ... 95%
+2025-08-09T00:51:38.4904326Z (Reading database ... 100%
+2025-08-09T00:51:38.4905398Z (Reading database ... 267991 files and directories currently installed.)
+2025-08-09T00:51:38.4977431Z Preparing to unpack .../00-msr-tools_1.3-4_amd64.deb ...
+2025-08-09T00:51:38.4996011Z Unpacking msr-tools (1.3-4) ...
+2025-08-09T00:51:38.5639083Z Selecting previously unselected package cpu-checker.
+2025-08-09T00:51:38.5824435Z Preparing to unpack .../01-cpu-checker_0.7-1.3build1_amd64.deb ...
+2025-08-09T00:51:38.5833605Z Unpacking cpu-checker (0.7-1.3build1) ...
+2025-08-09T00:51:38.6667397Z Selecting previously unselected package genisoimage.
+2025-08-09T00:51:38.6850644Z Preparing to unpack .../02-genisoimage_9%3a1.1.11-3.2ubuntu1_amd64.deb ...
+2025-08-09T00:51:38.6859174Z Unpacking genisoimage (9:1.1.11-3.2ubuntu1) ...
+2025-08-09T00:51:38.8386439Z Selecting previously unselected package libcdparanoia0:amd64.
+2025-08-09T00:51:38.8576136Z Preparing to unpack .../03-libcdparanoia0_3.10.2+debian-14build2_amd64.deb ...
+2025-08-09T00:51:38.8598919Z Unpacking libcdparanoia0:amd64 (3.10.2+debian-14build2) ...
+2025-08-09T00:51:38.9086875Z Selecting previously unselected package liborc-0.4-0:amd64.
+2025-08-09T00:51:38.9271573Z Preparing to unpack .../04-liborc-0.4-0_1%3a0.4.32-2ubuntu0.1_amd64.deb ...
+2025-08-09T00:51:38.9280793Z Unpacking liborc-0.4-0:amd64 (1:0.4.32-2ubuntu0.1) ...
+2025-08-09T00:51:38.9568728Z Selecting previously unselected package libgstreamer-plugins-base1.0-0:amd64.
+2025-08-09T00:51:38.9755709Z Preparing to unpack .../05-libgstreamer-plugins-base1.0-0_1.20.1-1ubuntu0.4_amd64.deb ...
+2025-08-09T00:51:38.9764816Z Unpacking libgstreamer-plugins-base1.0-0:amd64 (1.20.1-1ubuntu0.4) ...
+2025-08-09T00:51:39.0142767Z Selecting previously unselected package libopus0:amd64.
+2025-08-09T00:51:39.0329256Z Preparing to unpack .../06-libopus0_1.3.1-0.1build2_amd64.deb ...
+2025-08-09T00:51:39.0340966Z Unpacking libopus0:amd64 (1.3.1-0.1build2) ...
+2025-08-09T00:51:39.0607672Z Selecting previously unselected package libtheora0:amd64.
+2025-08-09T00:51:39.0794299Z Preparing to unpack .../07-libtheora0_1.1.1+dfsg.1-15ubuntu4_amd64.deb ...
+2025-08-09T00:51:39.0806884Z Unpacking libtheora0:amd64 (1.1.1+dfsg.1-15ubuntu4) ...
+2025-08-09T00:51:39.1087996Z Selecting previously unselected package libvisual-0.4-0:amd64.
+2025-08-09T00:51:39.1280750Z Preparing to unpack .../08-libvisual-0.4-0_0.4.0-17build2_amd64.deb ...
+2025-08-09T00:51:39.1289631Z Unpacking libvisual-0.4-0:amd64 (0.4.0-17build2) ...
+2025-08-09T00:51:39.1550750Z Selecting previously unselected package libvorbisenc2:amd64.
+2025-08-09T00:51:39.1742025Z Preparing to unpack .../09-libvorbisenc2_1.3.7-1build2_amd64.deb ...
+2025-08-09T00:51:39.1754231Z Unpacking libvorbisenc2:amd64 (1.3.7-1build2) ...
+2025-08-09T00:51:39.2029431Z Selecting previously unselected package gstreamer1.0-plugins-base:amd64.
+2025-08-09T00:51:39.2219308Z Preparing to unpack .../10-gstreamer1.0-plugins-base_1.20.1-1ubuntu0.4_amd64.deb ...
+2025-08-09T00:51:39.2230990Z Unpacking gstreamer1.0-plugins-base:amd64 (1.20.1-1ubuntu0.4) ...
+2025-08-09T00:51:39.2619193Z Selecting previously unselected package libaa1:amd64.
+2025-08-09T00:51:39.2817058Z Preparing to unpack .../11-libaa1_1.4p5-50build1_amd64.deb ...
+2025-08-09T00:51:39.2827114Z Unpacking libaa1:amd64 (1.4p5-50build1) ...
+2025-08-09T00:51:39.3095227Z Selecting previously unselected package libraw1394-11:amd64.
+2025-08-09T00:51:39.3286793Z Preparing to unpack .../12-libraw1394-11_2.1.2-2build2_amd64.deb ...
+2025-08-09T00:51:39.3300778Z Unpacking libraw1394-11:amd64 (2.1.2-2build2) ...
+2025-08-09T00:51:39.3556030Z Selecting previously unselected package libavc1394-0:amd64.
+2025-08-09T00:51:39.3741410Z Preparing to unpack .../13-libavc1394-0_0.5.4-5build2_amd64.deb ...
+2025-08-09T00:51:39.3751815Z Unpacking libavc1394-0:amd64 (0.5.4-5build2) ...
+2025-08-09T00:51:39.4000354Z Selecting previously unselected package libcaca0:amd64.
+2025-08-09T00:51:39.4190707Z Preparing to unpack .../14-libcaca0_0.99.beta19-2.2ubuntu4_amd64.deb ...
+2025-08-09T00:51:39.4200202Z Unpacking libcaca0:amd64 (0.99.beta19-2.2ubuntu4) ...
+2025-08-09T00:51:39.4510110Z Selecting previously unselected package libdv4:amd64.
+2025-08-09T00:51:39.4702867Z Preparing to unpack .../15-libdv4_1.0.0-14build1_amd64.deb ...
+2025-08-09T00:51:39.4716991Z Unpacking libdv4:amd64 (1.0.0-14build1) ...
+2025-08-09T00:51:39.5006506Z Selecting previously unselected package libflac8:amd64.
+2025-08-09T00:51:39.5197702Z Preparing to unpack .../16-libflac8_1.3.3-2ubuntu0.2_amd64.deb ...
+2025-08-09T00:51:39.5208325Z Unpacking libflac8:amd64 (1.3.3-2ubuntu0.2) ...
+2025-08-09T00:51:39.5468221Z Selecting previously unselected package libgstreamer-plugins-good1.0-0:amd64.
+2025-08-09T00:51:39.5657288Z Preparing to unpack .../17-libgstreamer-plugins-good1.0-0_1.20.3-0ubuntu1.3_amd64.deb ...
+2025-08-09T00:51:39.5668912Z Unpacking libgstreamer-plugins-good1.0-0:amd64 (1.20.3-0ubuntu1.3) ...
+2025-08-09T00:51:39.5927090Z Selecting previously unselected package libiec61883-0:amd64.
+2025-08-09T00:51:39.6118875Z Preparing to unpack .../18-libiec61883-0_1.2.0-4build3_amd64.deb ...
+2025-08-09T00:51:39.6128101Z Unpacking libiec61883-0:amd64 (1.2.0-4build3) ...
+2025-08-09T00:51:39.6394556Z Selecting previously unselected package libsamplerate0:amd64.
+2025-08-09T00:51:39.6585098Z Preparing to unpack .../19-libsamplerate0_0.2.2-1build1_amd64.deb ...
+2025-08-09T00:51:39.6595111Z Unpacking libsamplerate0:amd64 (0.2.2-1build1) ...
+2025-08-09T00:51:39.6919456Z Selecting previously unselected package libjack-jackd2-0:amd64.
+2025-08-09T00:51:39.7108176Z Preparing to unpack .../20-libjack-jackd2-0_1.9.20~dfsg-1_amd64.deb ...
+2025-08-09T00:51:39.7116805Z Unpacking libjack-jackd2-0:amd64 (1.9.20~dfsg-1) ...
+2025-08-09T00:51:39.7415485Z Selecting previously unselected package libmp3lame0:amd64.
+2025-08-09T00:51:39.7603658Z Preparing to unpack .../21-libmp3lame0_3.100-3build2_amd64.deb ...
+2025-08-09T00:51:39.7621971Z Unpacking libmp3lame0:amd64 (3.100-3build2) ...
+2025-08-09T00:51:39.7883394Z Selecting previously unselected package libmpg123-0:amd64.
+2025-08-09T00:51:39.8074518Z Preparing to unpack .../22-libmpg123-0_1.29.3-1ubuntu0.1_amd64.deb ...
+2025-08-09T00:51:39.8085054Z Unpacking libmpg123-0:amd64 (1.29.3-1ubuntu0.1) ...
+2025-08-09T00:51:39.8345193Z Selecting previously unselected package libasyncns0:amd64.
+2025-08-09T00:51:39.8531527Z Preparing to unpack .../23-libasyncns0_0.8-6build2_amd64.deb ...
+2025-08-09T00:51:39.8541687Z Unpacking libasyncns0:amd64 (0.8-6build2) ...
+2025-08-09T00:51:39.8785632Z Selecting previously unselected package libsndfile1:amd64.
+2025-08-09T00:51:39.8972340Z Preparing to unpack .../24-libsndfile1_1.0.31-2ubuntu0.2_amd64.deb ...
+2025-08-09T00:51:39.8981661Z Unpacking libsndfile1:amd64 (1.0.31-2ubuntu0.2) ...
+2025-08-09T00:51:39.9322842Z Selecting previously unselected package libpulse0:amd64.
+2025-08-09T00:51:39.9515424Z Preparing to unpack .../25-libpulse0_1%3a15.99.1+dfsg1-1ubuntu2.2_amd64.deb ...
+2025-08-09T00:51:39.9664113Z Unpacking libpulse0:amd64 (1:15.99.1+dfsg1-1ubuntu2.2) ...
+2025-08-09T00:51:39.9977541Z Selecting previously unselected package libspeex1:amd64.
+2025-08-09T00:51:40.0165610Z Preparing to unpack .../26-libspeex1_1.2~rc1.2-1.1ubuntu3_amd64.deb ...
+2025-08-09T00:51:40.0175723Z Unpacking libspeex1:amd64 (1.2~rc1.2-1.1ubuntu3) ...
+2025-08-09T00:51:40.0435651Z Selecting previously unselected package libshout3:amd64.
+2025-08-09T00:51:40.0621089Z Preparing to unpack .../27-libshout3_2.4.5-1build3_amd64.deb ...
+2025-08-09T00:51:40.0631674Z Unpacking libshout3:amd64 (2.4.5-1build3) ...
+2025-08-09T00:51:40.0902694Z Selecting previously unselected package libtag1v5-vanilla:amd64.
+2025-08-09T00:51:40.1089777Z Preparing to unpack .../28-libtag1v5-vanilla_1.11.1+dfsg.1-3ubuntu3_amd64.deb ...
+2025-08-09T00:51:40.1099574Z Unpacking libtag1v5-vanilla:amd64 (1.11.1+dfsg.1-3ubuntu3) ...
+2025-08-09T00:51:40.1391631Z Selecting previously unselected package libtag1v5:amd64.
+2025-08-09T00:51:40.1579542Z Preparing to unpack .../29-libtag1v5_1.11.1+dfsg.1-3ubuntu3_amd64.deb ...
+2025-08-09T00:51:40.1589837Z Unpacking libtag1v5:amd64 (1.11.1+dfsg.1-3ubuntu3) ...
+2025-08-09T00:51:40.1844180Z Selecting previously unselected package libtwolame0:amd64.
+2025-08-09T00:51:40.2031904Z Preparing to unpack .../30-libtwolame0_0.4.0-2build2_amd64.deb ...
+2025-08-09T00:51:40.2042647Z Unpacking libtwolame0:amd64 (0.4.0-2build2) ...
+2025-08-09T00:51:40.2311902Z Selecting previously unselected package libv4lconvert0:amd64.
+2025-08-09T00:51:40.2501052Z Preparing to unpack .../31-libv4lconvert0_1.22.1-2build1_amd64.deb ...
+2025-08-09T00:51:40.2511128Z Unpacking libv4lconvert0:amd64 (1.22.1-2build1) ...
+2025-08-09T00:51:40.2800518Z Selecting previously unselected package libv4l-0:amd64.
+2025-08-09T00:51:40.2991606Z Preparing to unpack .../32-libv4l-0_1.22.1-2build1_amd64.deb ...
+2025-08-09T00:51:40.3001810Z Unpacking libv4l-0:amd64 (1.22.1-2build1) ...
+2025-08-09T00:51:40.3280004Z Selecting previously unselected package libvpx7:amd64.
+2025-08-09T00:51:40.3470876Z Preparing to unpack .../33-libvpx7_1.11.0-2ubuntu2.4_amd64.deb ...
+2025-08-09T00:51:40.3486854Z Unpacking libvpx7:amd64 (1.11.0-2ubuntu2.4) ...
+2025-08-09T00:51:40.3889243Z Selecting previously unselected package libwavpack1:amd64.
+2025-08-09T00:51:40.4078740Z Preparing to unpack .../34-libwavpack1_5.4.0-1build2_amd64.deb ...
+2025-08-09T00:51:40.4091251Z Unpacking libwavpack1:amd64 (5.4.0-1build2) ...
+2025-08-09T00:51:40.4354035Z Selecting previously unselected package gstreamer1.0-plugins-good:amd64.
+2025-08-09T00:51:40.4543034Z Preparing to unpack .../35-gstreamer1.0-plugins-good_1.20.3-0ubuntu1.3_amd64.deb ...
+2025-08-09T00:51:40.4552483Z Unpacking gstreamer1.0-plugins-good:amd64 (1.20.3-0ubuntu1.3) ...
+2025-08-09T00:51:40.5147062Z Selecting previously unselected package libxv1:amd64.
+2025-08-09T00:51:40.5337856Z Preparing to unpack .../36-libxv1_2%3a1.0.11-1build2_amd64.deb ...
+2025-08-09T00:51:40.5346844Z Unpacking libxv1:amd64 (2:1.0.11-1build2) ...
+2025-08-09T00:51:40.5588315Z Selecting previously unselected package gstreamer1.0-x:amd64.
+2025-08-09T00:51:40.5775025Z Preparing to unpack .../37-gstreamer1.0-x_1.20.1-1ubuntu0.4_amd64.deb ...
+2025-08-09T00:51:40.5784017Z Unpacking gstreamer1.0-x:amd64 (1.20.1-1ubuntu0.4) ...
+2025-08-09T00:51:40.6050496Z Selecting previously unselected package libnl-route-3-200:amd64.
+2025-08-09T00:51:40.6239644Z Preparing to unpack .../38-libnl-route-3-200_3.5.0-0.1_amd64.deb ...
+2025-08-09T00:51:40.6250971Z Unpacking libnl-route-3-200:amd64 (3.5.0-0.1) ...
+2025-08-09T00:51:40.6536451Z Selecting previously unselected package libibverbs1:amd64.
+2025-08-09T00:51:40.6722284Z Preparing to unpack .../39-libibverbs1_39.0-1_amd64.deb ...
+2025-08-09T00:51:40.6730812Z Unpacking libibverbs1:amd64 (39.0-1) ...
+2025-08-09T00:51:40.7015191Z Selecting previously unselected package ibverbs-providers:amd64.
+2025-08-09T00:51:40.7205583Z Preparing to unpack .../40-ibverbs-providers_39.0-1_amd64.deb ...
+2025-08-09T00:51:40.7352707Z Unpacking ibverbs-providers:amd64 (39.0-1) ...
+2025-08-09T00:51:40.7688647Z Selecting previously unselected package ipxe-qemu.
+2025-08-09T00:51:40.7874216Z Preparing to unpack .../41-ipxe-qemu_1.21.1+git-20220113.fbbdc3926-0ubuntu1_all.deb ...
+2025-08-09T00:51:40.7883048Z Unpacking ipxe-qemu (1.21.1+git-20220113.fbbdc3926-0ubuntu1) ...
+2025-08-09T00:51:40.8290426Z Selecting previously unselected package ipxe-qemu-256k-compat-efi-roms.
+2025-08-09T00:51:40.8480472Z Preparing to unpack .../42-ipxe-qemu-256k-compat-efi-roms_1.0.0+git-20150424.a25a16d-0ubuntu4_all.deb ...
+2025-08-09T00:51:40.8491403Z Unpacking ipxe-qemu-256k-compat-efi-roms (1.0.0+git-20150424.a25a16d-0ubuntu4) ...
+2025-08-09T00:51:40.9031305Z Selecting previously unselected package isolinux.
+2025-08-09T00:51:40.9219250Z Preparing to unpack .../43-isolinux_3%3a6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1_all.deb ...
+2025-08-09T00:51:40.9228709Z Unpacking isolinux (3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1) ...
+2025-08-09T00:51:40.9511542Z Selecting previously unselected package libboost-iostreams1.74.0:amd64.
+2025-08-09T00:51:40.9703216Z Preparing to unpack .../44-libboost-iostreams1.74.0_1.74.0-14ubuntu3_amd64.deb ...
+2025-08-09T00:51:40.9716081Z Unpacking libboost-iostreams1.74.0:amd64 (1.74.0-14ubuntu3) ...
+2025-08-09T00:51:41.0069550Z Selecting previously unselected package libboost-thread1.74.0:amd64.
+2025-08-09T00:51:41.0255805Z Preparing to unpack .../45-libboost-thread1.74.0_1.74.0-14ubuntu3_amd64.deb ...
+2025-08-09T00:51:41.0264639Z Unpacking libboost-thread1.74.0:amd64 (1.74.0-14ubuntu3) ...
+2025-08-09T00:51:41.0588272Z Selecting previously unselected package libbrlapi0.8:amd64.
+2025-08-09T00:51:41.0770633Z Preparing to unpack .../46-libbrlapi0.8_6.4-4ubuntu3_amd64.deb ...
+2025-08-09T00:51:41.0786250Z Unpacking libbrlapi0.8:amd64 (6.4-4ubuntu3) ...
+2025-08-09T00:51:41.1055073Z Selecting previously unselected package libpcsclite1:amd64.
+2025-08-09T00:51:41.1237407Z Preparing to unpack .../47-libpcsclite1_1.9.5-3ubuntu1_amd64.deb ...
+2025-08-09T00:51:41.1257658Z Unpacking libpcsclite1:amd64 (1.9.5-3ubuntu1) ...
+2025-08-09T00:51:41.1533552Z Selecting previously unselected package libcacard0:amd64.
+2025-08-09T00:51:41.1715095Z Preparing to unpack .../48-libcacard0_1%3a2.8.0-3build2_amd64.deb ...
+2025-08-09T00:51:41.1724142Z Unpacking libcacard0:amd64 (1:2.8.0-3build2) ...
+2025-08-09T00:51:41.2003204Z Selecting previously unselected package libdaxctl1:amd64.
+2025-08-09T00:51:41.2186029Z Preparing to unpack .../49-libdaxctl1_72.1-1_amd64.deb ...
+2025-08-09T00:51:41.2195368Z Unpacking libdaxctl1:amd64 (72.1-1) ...
+2025-08-09T00:51:41.2432873Z Selecting previously unselected package libdecor-0-0:amd64.
+2025-08-09T00:51:41.2613541Z Preparing to unpack .../50-libdecor-0-0_0.1.0-3build1_amd64.deb ...
+2025-08-09T00:51:41.2621604Z Unpacking libdecor-0-0:amd64 (0.1.0-3build1) ...
+2025-08-09T00:51:41.2837767Z Selecting previously unselected package libdecor-0-plugin-1-cairo:amd64.
+2025-08-09T00:51:41.3019652Z Preparing to unpack .../51-libdecor-0-plugin-1-cairo_0.1.0-3build1_amd64.deb ...
+2025-08-09T00:51:41.3031647Z Unpacking libdecor-0-plugin-1-cairo:amd64 (0.1.0-3build1) ...
+2025-08-09T00:51:41.3258319Z Selecting previously unselected package libelf-dev:amd64.
+2025-08-09T00:51:41.3441380Z Preparing to unpack .../52-libelf-dev_0.186-1ubuntu0.1_amd64.deb ...
+2025-08-09T00:51:41.3459138Z Unpacking libelf-dev:amd64 (0.186-1ubuntu0.1) ...
+2025-08-09T00:51:41.3805453Z Selecting previously unselected package libgfxdr0:amd64.
+2025-08-09T00:51:41.3989399Z Preparing to unpack .../53-libgfxdr0_10.1-1ubuntu0.2_amd64.deb ...
+2025-08-09T00:51:41.3998119Z Unpacking libgfxdr0:amd64 (10.1-1ubuntu0.2) ...
+2025-08-09T00:51:41.4249468Z Selecting previously unselected package libglusterfs0:amd64.
+2025-08-09T00:51:41.4441119Z Preparing to unpack .../54-libglusterfs0_10.1-1ubuntu0.2_amd64.deb ...
+2025-08-09T00:51:41.4452038Z Unpacking libglusterfs0:amd64 (10.1-1ubuntu0.2) ...
+2025-08-09T00:51:41.4738230Z Selecting previously unselected package libgfrpc0:amd64.
+2025-08-09T00:51:41.4926595Z Preparing to unpack .../55-libgfrpc0_10.1-1ubuntu0.2_amd64.deb ...
+2025-08-09T00:51:41.4936365Z Unpacking libgfrpc0:amd64 (10.1-1ubuntu0.2) ...
+2025-08-09T00:51:41.5197902Z Selecting previously unselected package libgfapi0:amd64.
+2025-08-09T00:51:41.5383510Z Preparing to unpack .../56-libgfapi0_10.1-1ubuntu0.2_amd64.deb ...
+2025-08-09T00:51:41.5396991Z Unpacking libgfapi0:amd64 (10.1-1ubuntu0.2) ...
+2025-08-09T00:51:41.5662498Z Selecting previously unselected package librdmacm1:amd64.
+2025-08-09T00:51:41.5852507Z Preparing to unpack .../57-librdmacm1_39.0-1_amd64.deb ...
+2025-08-09T00:51:41.5861434Z Unpacking librdmacm1:amd64 (39.0-1) ...
+2025-08-09T00:51:41.6110204Z Selecting previously unselected package libiscsi7:amd64.
+2025-08-09T00:51:41.6296369Z Preparing to unpack .../58-libiscsi7_1.19.0-3build2_amd64.deb ...
+2025-08-09T00:51:41.6304564Z Unpacking libiscsi7:amd64 (1.19.0-3build2) ...
+2025-08-09T00:51:41.6545196Z Selecting previously unselected package liblinear4:amd64.
+2025-08-09T00:51:41.6728185Z Preparing to unpack .../59-liblinear4_2.3.0+dfsg-5_amd64.deb ...
+2025-08-09T00:51:41.6738530Z Unpacking liblinear4:amd64 (2.3.0+dfsg-5) ...
+2025-08-09T00:51:41.7020079Z Selecting previously unselected package libndctl6:amd64.
+2025-08-09T00:51:41.7210023Z Preparing to unpack .../60-libndctl6_72.1-1_amd64.deb ...
+2025-08-09T00:51:41.7219174Z Unpacking libndctl6:amd64 (72.1-1) ...
+2025-08-09T00:51:41.7481654Z Selecting previously unselected package libpmem1:amd64.
+2025-08-09T00:51:41.7668162Z Preparing to unpack .../61-libpmem1_1.11.1-3build1_amd64.deb ...
+2025-08-09T00:51:41.7678129Z Unpacking libpmem1:amd64 (1.11.1-3build1) ...
+2025-08-09T00:51:41.7945715Z Selecting previously unselected package libpmemobj1:amd64.
+2025-08-09T00:51:41.8129894Z Preparing to unpack .../62-libpmemobj1_1.11.1-3build1_amd64.deb ...
+2025-08-09T00:51:41.8140557Z Unpacking libpmemobj1:amd64 (1.11.1-3build1) ...
+2025-08-09T00:51:41.8459404Z Selecting previously unselected package librados2.
+2025-08-09T00:51:41.8643073Z Preparing to unpack .../63-librados2_17.2.7-0ubuntu0.22.04.2_amd64.deb ...
+2025-08-09T00:51:41.8652875Z Unpacking librados2 (17.2.7-0ubuntu0.22.04.2) ...
+2025-08-09T00:51:41.9410776Z Selecting previously unselected package librbd1.
+2025-08-09T00:51:41.9604885Z Preparing to unpack .../64-librbd1_17.2.7-0ubuntu0.22.04.2_amd64.deb ...
+2025-08-09T00:51:41.9615262Z Unpacking librbd1 (17.2.7-0ubuntu0.22.04.2) ...
+2025-08-09T00:51:42.0371202Z Selecting previously unselected package libsdl2-2.0-0:amd64.
+2025-08-09T00:51:42.0556944Z Preparing to unpack .../65-libsdl2-2.0-0_2.0.20+dfsg-2ubuntu1.22.04.1_amd64.deb ...
+2025-08-09T00:51:42.0568451Z Unpacking libsdl2-2.0-0:amd64 (2.0.20+dfsg-2ubuntu1.22.04.1) ...
+2025-08-09T00:51:42.0888558Z Selecting previously unselected package libspice-server1:amd64.
+2025-08-09T00:51:42.1074045Z Preparing to unpack .../66-libspice-server1_0.15.0-2ubuntu4_amd64.deb ...
+2025-08-09T00:51:42.1084994Z Unpacking libspice-server1:amd64 (0.15.0-2ubuntu4) ...
+2025-08-09T00:51:42.1381886Z Selecting previously unselected package liburing2:amd64.
+2025-08-09T00:51:42.1568390Z Preparing to unpack .../67-liburing2_2.1-2build1_amd64.deb ...
+2025-08-09T00:51:42.1578777Z Unpacking liburing2:amd64 (2.1-2build1) ...
+2025-08-09T00:51:42.1829306Z Selecting previously unselected package libusbredirparser1:amd64.
+2025-08-09T00:51:42.2013110Z Preparing to unpack .../68-libusbredirparser1_0.11.0-2build1_amd64.deb ...
+2025-08-09T00:51:42.2025741Z Unpacking libusbredirparser1:amd64 (0.11.0-2build1) ...
+2025-08-09T00:51:42.2268586Z Selecting previously unselected package libvirglrenderer1:amd64.
+2025-08-09T00:51:42.2454988Z Preparing to unpack .../69-libvirglrenderer1_0.9.1-1~exp1ubuntu2_amd64.deb ...
+2025-08-09T00:51:42.2464482Z Unpacking libvirglrenderer1:amd64 (0.9.1-1~exp1ubuntu2) ...
+2025-08-09T00:51:42.2745648Z Selecting previously unselected package libvte-2.91-common.
+2025-08-09T00:51:42.2932915Z Preparing to unpack .../70-libvte-2.91-common_0.68.0-1ubuntu0.1_amd64.deb ...
+2025-08-09T00:51:42.2942469Z Unpacking libvte-2.91-common (0.68.0-1ubuntu0.1) ...
+2025-08-09T00:51:42.3208753Z Selecting previously unselected package libvte-2.91-0:amd64.
+2025-08-09T00:51:42.3395234Z Preparing to unpack .../71-libvte-2.91-0_0.68.0-1ubuntu0.1_amd64.deb ...
+2025-08-09T00:51:42.3407510Z Unpacking libvte-2.91-0:amd64 (0.68.0-1ubuntu0.1) ...
+2025-08-09T00:51:42.3674196Z Selecting previously unselected package debootstrap.
+2025-08-09T00:51:42.3858903Z Preparing to unpack .../72-debootstrap_1.0.126+nmu1ubuntu0.8_all.deb ...
+2025-08-09T00:51:42.3868876Z Unpacking debootstrap (1.0.126+nmu1ubuntu0.8) ...
+2025-08-09T00:51:42.4299367Z Selecting previously unselected package live-build.
+2025-08-09T00:51:42.4489525Z Preparing to unpack .../73-live-build_3.0~a57-1ubuntu41.22.04.1_all.deb ...
+2025-08-09T00:51:42.4502359Z Unpacking live-build (3.0~a57-1ubuntu41.22.04.1) ...
+2025-08-09T00:51:42.6376455Z Selecting previously unselected package lua-lpeg:amd64.
+2025-08-09T00:51:42.6565926Z Preparing to unpack .../74-lua-lpeg_1.0.2-1_amd64.deb ...
+2025-08-09T00:51:42.6576572Z Unpacking lua-lpeg:amd64 (1.0.2-1) ...
+2025-08-09T00:51:42.6861945Z Selecting previously unselected package mtools.
+2025-08-09T00:51:42.7055491Z Preparing to unpack .../75-mtools_4.0.33-1+really4.0.32-1build1_amd64.deb ...
+2025-08-09T00:51:42.7066258Z Unpacking mtools (4.0.33-1+really4.0.32-1build1) ...
+2025-08-09T00:51:42.9000099Z Selecting previously unselected package nmap-common.
+2025-08-09T00:51:42.9193092Z Preparing to unpack .../76-nmap-common_7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1_all.deb ...
+2025-08-09T00:51:42.9201608Z Unpacking nmap-common (7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1) ...
+2025-08-09T00:51:43.1251634Z Selecting previously unselected package pv.
+2025-08-09T00:51:43.1445740Z Preparing to unpack .../77-pv_1.6.6-1build2_amd64.deb ...
+2025-08-09T00:51:43.1454677Z Unpacking pv (1.6.6-1build2) ...
+2025-08-09T00:51:43.1817661Z Selecting previously unselected package libfdt1:amd64.
+2025-08-09T00:51:43.2009296Z Preparing to unpack .../78-libfdt1_1.6.1-1_amd64.deb ...
+2025-08-09T00:51:43.2018766Z Unpacking libfdt1:amd64 (1.6.1-1) ...
+2025-08-09T00:51:43.2260088Z Selecting previously unselected package qemu-system-common.
+2025-08-09T00:51:43.2449480Z Preparing to unpack .../79-qemu-system-common_1%3a6.2+dfsg-2ubuntu6.26_amd64.deb ...
+2025-08-09T00:51:43.2458530Z Unpacking qemu-system-common (1:6.2+dfsg-2ubuntu6.26) ...
+2025-08-09T00:51:43.3695692Z Selecting previously unselected package qemu-system-data.
+2025-08-09T00:51:43.3883808Z Preparing to unpack .../80-qemu-system-data_1%3a6.2+dfsg-2ubuntu6.26_all.deb ...
+2025-08-09T00:51:43.3922998Z Unpacking qemu-system-data (1:6.2+dfsg-2ubuntu6.26) ...
+2025-08-09T00:51:43.4785759Z Selecting previously unselected package seabios.
+2025-08-09T00:51:43.4975511Z Preparing to unpack .../81-seabios_1.15.0-1_all.deb ...
+2025-08-09T00:51:43.4985526Z Unpacking seabios (1.15.0-1) ...
+2025-08-09T00:51:43.5286311Z Selecting previously unselected package qemu-system-x86.
+2025-08-09T00:51:43.5476128Z Preparing to unpack .../82-qemu-system-x86_1%3a6.2+dfsg-2ubuntu6.26_amd64.deb ...
+2025-08-09T00:51:43.5612738Z Unpacking qemu-system-x86 (1:6.2+dfsg-2ubuntu6.26) ...
+2025-08-09T00:51:43.7454743Z Selecting previously unselected package qemu-utils.
+2025-08-09T00:51:43.7646525Z Preparing to unpack .../83-qemu-utils_1%3a6.2+dfsg-2ubuntu6.26_amd64.deb ...
+2025-08-09T00:51:43.7656173Z Unpacking qemu-utils (1:6.2+dfsg-2ubuntu6.26) ...
+2025-08-09T00:51:43.8300048Z Selecting previously unselected package qemu-block-extra.
+2025-08-09T00:51:43.8486787Z Preparing to unpack .../84-qemu-block-extra_1%3a6.2+dfsg-2ubuntu6.26_amd64.deb ...
+2025-08-09T00:51:43.8501419Z Unpacking qemu-block-extra (1:6.2+dfsg-2ubuntu6.26) ...
+2025-08-09T00:51:43.8749358Z Selecting previously unselected package qemu-system-gui.
+2025-08-09T00:51:43.8936473Z Preparing to unpack .../85-qemu-system-gui_1%3a6.2+dfsg-2ubuntu6.26_amd64.deb ...
+2025-08-09T00:51:43.8955363Z Unpacking qemu-system-gui (1:6.2+dfsg-2ubuntu6.26) ...
+2025-08-09T00:51:43.9231451Z Selecting previously unselected package syslinux-common.
+2025-08-09T00:51:43.9420015Z Preparing to unpack .../86-syslinux-common_3%3a6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1_all.deb ...
+2025-08-09T00:51:43.9434556Z Unpacking syslinux-common (3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1) ...
+2025-08-09T00:51:44.0090243Z Selecting previously unselected package syslinux-utils.
+2025-08-09T00:51:44.0278712Z Preparing to unpack .../87-syslinux-utils_3%3a6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1_amd64.deb ...
+2025-08-09T00:51:44.0289145Z Unpacking syslinux-utils (3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1) ...
+2025-08-09T00:51:44.1015460Z Selecting previously unselected package nmap.
+2025-08-09T00:51:44.1202032Z Preparing to unpack .../88-nmap_7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1_amd64.deb ...
+2025-08-09T00:51:44.1212772Z Unpacking nmap (7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1) ...
+2025-08-09T00:51:44.2186586Z Selecting previously unselected package ovmf.
+2025-08-09T00:51:44.2373811Z Preparing to unpack .../89-ovmf_2022.02-3ubuntu0.22.04.3_all.deb ...
+2025-08-09T00:51:44.2383242Z Unpacking ovmf (2022.02-3ubuntu0.22.04.3) ...
+2025-08-09T00:51:44.3355396Z Setting up genisoimage (9:1.1.11-3.2ubuntu1) ...
+2025-08-09T00:51:44.3375373Z Setting up libcdparanoia0:amd64 (3.10.2+debian-14build2) ...
+2025-08-09T00:51:44.3401454Z Setting up lua-lpeg:amd64 (1.0.2-1) ...
+2025-08-09T00:51:44.3424474Z Setting up debootstrap (1.0.126+nmu1ubuntu0.8) ...
+2025-08-09T00:51:44.3444750Z Setting up libraw1394-11:amd64 (2.1.2-2build2) ...
+2025-08-09T00:51:44.3468227Z Setting up libtag1v5-vanilla:amd64 (1.11.1+dfsg.1-3ubuntu3) ...
+2025-08-09T00:51:44.3489848Z Setting up libmpg123-0:amd64 (1.29.3-1ubuntu0.1) ...
+2025-08-09T00:51:44.3510463Z Setting up isolinux (3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1) ...
+2025-08-09T00:51:44.3532514Z Setting up libspeex1:amd64 (1.2~rc1.2-1.1ubuntu3) ...
+2025-08-09T00:51:44.3555073Z Setting up libcaca0:amd64 (0.99.beta19-2.2ubuntu4) ...
+2025-08-09T00:51:44.3580244Z Setting up libtwolame0:amd64 (0.4.0-2build2) ...
+2025-08-09T00:51:44.3605298Z Setting up libvte-2.91-common (0.68.0-1ubuntu0.1) ...
+2025-08-09T00:51:44.3641450Z Setting up libvisual-0.4-0:amd64 (0.4.0-17build2) ...
+2025-08-09T00:51:44.3663247Z Setting up mtools (4.0.33-1+really4.0.32-1build1) ...
+2025-08-09T00:51:44.3691189Z Setting up libboost-iostreams1.74.0:amd64 (1.74.0-14ubuntu3) ...
+2025-08-09T00:51:44.3717124Z Setting up msr-tools (1.3-4) ...
+2025-08-09T00:51:44.3738073Z Setting up syslinux-common (3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1) ...
+2025-08-09T00:51:44.3758625Z Setting up live-build (3.0~a57-1ubuntu41.22.04.1) ...
+2025-08-09T00:51:44.3790831Z Setting up libfdt1:amd64 (1.6.1-1) ...
+2025-08-09T00:51:44.3825498Z Setting up libvte-2.91-0:amd64 (0.68.0-1ubuntu0.1) ...
+2025-08-09T00:51:44.3855990Z Setting up libusbredirparser1:amd64 (0.11.0-2build1) ...
+2025-08-09T00:51:44.3885114Z Setting up liblinear4:amd64 (2.3.0+dfsg-5) ...
+2025-08-09T00:51:44.3909534Z Setting up libflac8:amd64 (1.3.3-2ubuntu0.2) ...
+2025-08-09T00:51:44.3935197Z Setting up syslinux-utils (3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1) ...
+2025-08-09T00:51:44.3956390Z Setting up libnl-route-3-200:amd64 (3.5.0-0.1) ...
+2025-08-09T00:51:44.3977672Z Setting up ovmf (2022.02-3ubuntu0.22.04.3) ...
+2025-08-09T00:51:44.4008844Z Setting up libglusterfs0:amd64 (10.1-1ubuntu0.2) ...
+2025-08-09T00:51:44.4035145Z Setting up libvirglrenderer1:amd64 (0.9.1-1~exp1ubuntu2) ...
+2025-08-09T00:51:44.4067280Z Setting up libopus0:amd64 (1.3.1-0.1build2) ...
+2025-08-09T00:51:44.4090804Z Setting up libxv1:amd64 (2:1.0.11-1build2) ...
+2025-08-09T00:51:44.4111686Z Setting up liborc-0.4-0:amd64 (1:0.4.32-2ubuntu0.1) ...
+2025-08-09T00:51:44.4142320Z Setting up libelf-dev:amd64 (0.186-1ubuntu0.1) ...
+2025-08-09T00:51:44.4166680Z Setting up libpcsclite1:amd64 (1.9.5-3ubuntu1) ...
+2025-08-09T00:51:44.4197936Z Setting up libdaxctl1:amd64 (72.1-1) ...
+2025-08-09T00:51:44.4231808Z Setting up qemu-system-data (1:6.2+dfsg-2ubuntu6.26) ...
+2025-08-09T00:51:44.4260121Z Setting up seabios (1.15.0-1) ...
+2025-08-09T00:51:44.4285076Z Setting up nmap-common (7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1) ...
+2025-08-09T00:51:44.4680313Z Setting up libtag1v5:amd64 (1.11.1+dfsg.1-3ubuntu3) ...
+2025-08-09T00:51:44.4705410Z Setting up cpu-checker (0.7-1.3build1) ...
+2025-08-09T00:51:44.4736928Z Setting up libdv4:amd64 (1.0.0-14build1) ...
+2025-08-09T00:51:44.4774461Z Setting up libasyncns0:amd64 (0.8-6build2) ...
+2025-08-09T00:51:44.4802581Z Setting up pv (1.6.6-1build2) ...
+2025-08-09T00:51:44.4830713Z Setting up libwavpack1:amd64 (5.4.0-1build2) ...
+2025-08-09T00:51:44.4855287Z Setting up ipxe-qemu (1.21.1+git-20220113.fbbdc3926-0ubuntu1) ...
+2025-08-09T00:51:44.4890439Z Setting up libtheora0:amd64 (1.1.1+dfsg.1-15ubuntu4) ...
+2025-08-09T00:51:44.4924270Z Setting up libv4lconvert0:amd64 (1.22.1-2build1) ...
+2025-08-09T00:51:44.4952424Z Setting up libdecor-0-0:amd64 (0.1.0-3build1) ...
+2025-08-09T00:51:44.4975322Z Setting up libndctl6:amd64 (72.1-1) ...
+2025-08-09T00:51:44.5031669Z Setting up ipxe-qemu-256k-compat-efi-roms (1.0.0+git-20150424.a25a16d-0ubuntu4) ...
+2025-08-09T00:51:44.5057221Z Setting up libvpx7:amd64 (1.11.0-2ubuntu2.4) ...
+2025-08-09T00:51:44.5079873Z Setting up libbrlapi0.8:amd64 (6.4-4ubuntu3) ...
+2025-08-09T00:51:44.5102794Z Setting up liburing2:amd64 (2.1-2build1) ...
+2025-08-09T00:51:44.5126279Z Setting up libsamplerate0:amd64 (0.2.2-1build1) ...
+2025-08-09T00:51:44.5150735Z Setting up libpmem1:amd64 (1.11.1-3build1) ...
+2025-08-09T00:51:44.5184238Z Setting up libmp3lame0:amd64 (3.100-3build2) ...
+2025-08-09T00:51:44.5208450Z Setting up libvorbisenc2:amd64 (1.3.7-1build2) ...
+2025-08-09T00:51:44.5230497Z Setting up libgfxdr0:amd64 (10.1-1ubuntu0.2) ...
+2025-08-09T00:51:44.5252476Z Setting up libboost-thread1.74.0:amd64 (1.74.0-14ubuntu3) ...
+2025-08-09T00:51:44.5276134Z Setting up libaa1:amd64 (1.4p5-50build1) ...
+2025-08-09T00:51:44.5297469Z Setting up libiec61883-0:amd64 (1.2.0-4build3) ...
+2025-08-09T00:51:44.5323051Z Setting up libavc1394-0:amd64 (0.5.4-5build2) ...
+2025-08-09T00:51:44.5345807Z Setting up libibverbs1:amd64 (39.0-1) ...
+2025-08-09T00:51:44.6083333Z Setting up ibverbs-providers:amd64 (39.0-1) ...
+2025-08-09T00:51:44.6358785Z Setting up libgstreamer-plugins-base1.0-0:amd64 (1.20.1-1ubuntu0.4) ...
+2025-08-09T00:51:44.6385138Z Setting up nmap (7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1) ...
+2025-08-09T00:51:44.6411388Z Setting up libcacard0:amd64 (1:2.8.0-3build2) ...
+2025-08-09T00:51:44.6437197Z Setting up libv4l-0:amd64 (1.22.1-2build1) ...
+2025-08-09T00:51:44.6465820Z Setting up libgstreamer-plugins-good1.0-0:amd64 (1.20.3-0ubuntu1.3) ...
+2025-08-09T00:51:44.6498437Z Setting up gstreamer1.0-plugins-base:amd64 (1.20.1-1ubuntu0.4) ...
+2025-08-09T00:51:44.6534800Z Setting up libshout3:amd64 (2.4.5-1build3) ...
+2025-08-09T00:51:44.6567375Z Setting up libpmemobj1:amd64 (1.11.1-3build1) ...
+2025-08-09T00:51:44.6595614Z Setting up libdecor-0-plugin-1-cairo:amd64 (0.1.0-3build1) ...
+2025-08-09T00:51:44.6621664Z Setting up libjack-jackd2-0:amd64 (1.9.20~dfsg-1) ...
+2025-08-09T00:51:44.6650189Z Setting up libsndfile1:amd64 (1.0.31-2ubuntu0.2) ...
+2025-08-09T00:51:44.6676518Z Setting up qemu-utils (1:6.2+dfsg-2ubuntu6.26) ...
+2025-08-09T00:51:44.6700786Z Setting up libgfrpc0:amd64 (10.1-1ubuntu0.2) ...
+2025-08-09T00:51:44.6730104Z Setting up librdmacm1:amd64 (39.0-1) ...
+2025-08-09T00:51:44.6753997Z Setting up librados2 (17.2.7-0ubuntu0.22.04.2) ...
+2025-08-09T00:51:44.6930693Z Setting up gstreamer1.0-x:amd64 (1.20.1-1ubuntu0.4) ...
+2025-08-09T00:51:44.6965094Z Setting up libpulse0:amd64 (1:15.99.1+dfsg1-1ubuntu2.2) ...
+2025-08-09T00:51:44.7051680Z Setting up gstreamer1.0-plugins-good:amd64 (1.20.3-0ubuntu1.3) ...
+2025-08-09T00:51:44.7085962Z Setting up libspice-server1:amd64 (0.15.0-2ubuntu4) ...
+2025-08-09T00:51:44.7121598Z Setting up librbd1 (17.2.7-0ubuntu0.22.04.2) ...
+2025-08-09T00:51:44.7155703Z Setting up libgfapi0:amd64 (10.1-1ubuntu0.2) ...
+2025-08-09T00:51:44.7184451Z Setting up libiscsi7:amd64 (1.19.0-3build2) ...
+2025-08-09T00:51:44.7208741Z Setting up libsdl2-2.0-0:amd64 (2.0.20+dfsg-2ubuntu1.22.04.1) ...
+2025-08-09T00:51:44.7234230Z Setting up qemu-block-extra (1:6.2+dfsg-2ubuntu6.26) ...
+2025-08-09T00:51:45.0333334Z Created symlink /etc/systemd/system/multi-user.target.wants/run-qemu.mount → /lib/systemd/system/run-qemu.mount.
+2025-08-09T00:51:45.4973244Z Setting up qemu-system-common (1:6.2+dfsg-2ubuntu6.26) ...
+2025-08-09T00:51:45.6135458Z Created symlink /etc/systemd/system/multi-user.target.wants/qemu-kvm.service → /lib/systemd/system/qemu-kvm.service.
+2025-08-09T00:51:46.4661743Z Setting up qemu-system-x86 (1:6.2+dfsg-2ubuntu6.26) ...
+2025-08-09T00:51:46.4688614Z Setting up qemu-system-gui (1:6.2+dfsg-2ubuntu6.26) ...
+2025-08-09T00:51:46.4717079Z Processing triggers for man-db (2.10.2-1) ...
+2025-08-09T00:51:48.6897470Z Processing triggers for install-info (6.8-4build1) ...
+2025-08-09T00:51:49.3468051Z Processing triggers for hicolor-icon-theme (0.17-2) ...
+2025-08-09T00:51:50.2711233Z Processing triggers for libc-bin (2.35-0ubuntu3.10) ...
+2025-08-09T00:51:50.9020305Z NEEDRESTART-VER: 3.5
+2025-08-09T00:51:51.7170578Z NEEDRESTART-KCUR: 6.8.0-1031-azure
+2025-08-09T00:51:51.7171508Z NEEDRESTART-KEXP: 6.8.0-1031-azure
+2025-08-09T00:51:51.7171922Z NEEDRESTART-KSTA: 1
+2025-08-09T00:51:51.7172542Z NEEDRESTART-SVC: hosted-compute-agent.service
+2025-08-09T00:51:53.3973564Z ##[group]Run echo "CLUSTER_MODE=sub" >> $GITHUB_ENV
+2025-08-09T00:51:53.3974004Z [36;1mecho "CLUSTER_MODE=sub" >> $GITHUB_ENV[0m
+2025-08-09T00:51:53.3974340Z [36;1mecho "ENABLE_GUI=false" >> $GITHUB_ENV[0m
+2025-08-09T00:51:53.3974669Z [36;1mecho "SKIP_QEMU_TEST=true" >> $GITHUB_ENV[0m
+2025-08-09T00:51:53.3975040Z [36;1mecho "BUILD_THREADS=2" >> $GITHUB_ENV  # Limit for CI[0m
+2025-08-09T00:51:53.3975564Z [36;1mecho "SKIP_CONNECTIVITY_CHECK=true" >> $GITHUB_ENV  # Skip redundant check in CI[0m
+2025-08-09T00:51:53.4004190Z shell: /usr/bin/bash -e {0}
+2025-08-09T00:51:53.4004473Z ##[endgroup]
+2025-08-09T00:51:53.4091511Z ##[group]Run chmod +x ainux-builder.sh
+2025-08-09T00:51:53.4091891Z [36;1mchmod +x ainux-builder.sh[0m
+2025-08-09T00:51:53.4092611Z [36;1m[0m
+2025-08-09T00:51:53.4092834Z [36;1m# Add debug output[0m
+2025-08-09T00:51:53.4093101Z [36;1mset -x[0m
+2025-08-09T00:51:53.4093314Z [36;1m[0m
+2025-08-09T00:51:53.4093548Z [36;1m# Run build with timeout (2 hours max)[0m
+2025-08-09T00:51:53.4093912Z [36;1mtimeout 7200 ./ainux-builder.sh || {[0m
+2025-08-09T00:51:53.4094252Z [36;1m  echo "Build timed out or failed"[0m
+2025-08-09T00:51:53.4094630Z [36;1m  echo "=== Last 100 lines of any available logs ==="[0m
+2025-08-09T00:51:53.4095207Z [36;1m  find ~/ainux-build/logs -name "*.log" -exec tail -50 {} \; 2>/dev/null || echo "No log files found"[0m
+2025-08-09T00:51:53.4095714Z [36;1m  [0m
+2025-08-09T00:51:53.4095956Z [36;1m  echo "=== Environment Variables ==="[0m
+2025-08-09T00:51:53.4096374Z [36;1m  env | grep -E "(CLUSTER_MODE|ENABLE_GUI|SKIP_|BUILD_)" || true[0m
+2025-08-09T00:51:53.4096795Z [36;1m  [0m
+2025-08-09T00:51:53.4097006Z [36;1m  echo "=== Disk Usage ==="[0m
+2025-08-09T00:51:53.4097275Z [36;1m  df -h || true[0m
+2025-08-09T00:51:53.4097485Z [36;1m  [0m
+2025-08-09T00:51:53.4097683Z [36;1m  echo "=== Memory Usage ==="[0m
+2025-08-09T00:51:53.4097944Z [36;1m  free -h || true[0m
+2025-08-09T00:51:53.4098165Z [36;1m  [0m
+2025-08-09T00:51:53.4098339Z [36;1m  exit 1[0m
+2025-08-09T00:51:53.4098528Z [36;1m}[0m
+2025-08-09T00:51:53.4125183Z shell: /usr/bin/bash -e {0}
+2025-08-09T00:51:53.4125427Z env:
+2025-08-09T00:51:53.4125614Z   CLUSTER_MODE: sub
+2025-08-09T00:51:53.4125818Z   ENABLE_GUI: false
+2025-08-09T00:51:53.4126036Z   SKIP_QEMU_TEST: true
+2025-08-09T00:51:53.4126260Z   BUILD_THREADS: 2
+2025-08-09T00:51:53.4126491Z   SKIP_CONNECTIVITY_CHECK: true
+2025-08-09T00:51:53.4126748Z ##[endgroup]
+2025-08-09T00:51:53.4186040Z + timeout 7200 ./ainux-builder.sh
+2025-08-09T00:51:53.4266530Z 
+2025-08-09T00:51:53.4267487Z [0;35m[PHASE][0m Starting Ainux OS AI Cluster Builder Process
+2025-08-09T00:51:53.4267977Z 
+2025-08-09T00:51:53.4267982Z 
+2025-08-09T00:51:53.4268174Z [0;35m[PHASE][0m Checking Prerequisites
+2025-08-09T00:51:53.4268429Z 
+2025-08-09T00:51:53.4316764Z [0;34m[INFO][0m Detected Ubuntu 22.04 LTS - supported
+2025-08-09T00:51:53.4346712Z [0;34m[INFO][0m Disk space check passed: 36GB available
+2025-08-09T00:51:53.4347612Z [0;34m[INFO][0m Checking internet connectivity...
+2025-08-09T00:51:53.4348684Z [1;33m[WARNING][0m Skipping connectivity check (SKIP_CONNECTIVITY_CHECK=true)
+2025-08-09T00:51:53.4349633Z [0;32m[SUCCESS][0m Prerequisites check passed
+2025-08-09T00:51:53.4350087Z 
+2025-08-09T00:51:53.4350567Z [0;35m[PHASE][0m Initializing Ainux OS AI Cluster Build Environment
+2025-08-09T00:51:53.4351110Z 
+2025-08-09T00:51:53.4351395Z [0;34m[INFO][0m Build Configuration:
+2025-08-09T00:51:53.4351857Z [0;34m[INFO][0m   Kernel Version: 6.6.58
+2025-08-09T00:51:53.4352533Z [0;34m[INFO][0m   Cluster Mode: sub
+2025-08-09T00:51:53.4352934Z [0;34m[INFO][0m   Build Threads: 2
+2025-08-09T00:51:53.4353717Z [0;34m[INFO][0m   GUI Enabled: false
+2025-08-09T00:51:53.4354161Z [0;34m[INFO][0m   Build Directory: /home/runner/ainux-build
+2025-08-09T00:51:53.4354651Z [0;34m[INFO][0m Installing build dependencies...
+2025-08-09T00:51:53.4457359Z 
+2025-08-09T00:51:53.4457935Z WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+2025-08-09T00:51:53.4458519Z 
+2025-08-09T00:51:55.2760462Z 16 packages can be upgraded. Run 'apt list --upgradable' to see them.
+2025-08-09T00:51:55.2882844Z 
+2025-08-09T00:51:55.2883375Z WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+2025-08-09T00:51:55.2883835Z 
+2025-08-09T00:51:55.3283260Z Reading package lists...
+2025-08-09T00:51:55.5580820Z Building dependency tree...
+2025-08-09T00:51:55.5593669Z Reading state information...
+2025-08-09T00:51:55.7287020Z bc is already the newest version (1.07.1-3build1).
+2025-08-09T00:51:55.7291367Z bison is already the newest version (2:3.8.2+dfsg-1build1).
+2025-08-09T00:51:55.7292758Z build-essential is already the newest version (12.9ubuntu3).
+2025-08-09T00:51:55.7293692Z dosfstools is already the newest version (4.2-1build3).
+2025-08-09T00:51:55.7294504Z flex is already the newest version (2.6.4-8build2).
+2025-08-09T00:51:55.7295361Z gcc is already the newest version (4:11.2.0-1ubuntu1).
+2025-08-09T00:51:55.7295971Z genisoimage is already the newest version (9:1.1.11-3.2ubuntu1).
+2025-08-09T00:51:55.7296553Z make is already the newest version (4.3-4.1build1).
+2025-08-09T00:51:55.7297164Z mtools is already the newest version (4.0.33-1+really4.0.32-1build1).
+2025-08-09T00:51:55.7297767Z pv is already the newest version (1.6.6-1build2).
+2025-08-09T00:51:55.7298336Z squashfs-tools is already the newest version (1:4.5-3build1).
+2025-08-09T00:51:55.7299087Z isolinux is already the newest version (3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1).
+2025-08-09T00:51:55.7299985Z syslinux-utils is already the newest version (3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1).
+2025-08-09T00:51:55.7300697Z xorriso is already the newest version (1.5.4-2).
+2025-08-09T00:51:55.7301164Z curl is already the newest version (7.81.0-1ubuntu1.20).
+2025-08-09T00:51:55.7301715Z debootstrap is already the newest version (1.0.126+nmu1ubuntu0.8).
+2025-08-09T00:51:55.7302514Z grub-efi-amd64-bin is already the newest version (2.06-2ubuntu14.8).
+2025-08-09T00:51:55.7303095Z grub-pc-bin is already the newest version (2.06-2ubuntu7.2).
+2025-08-09T00:51:55.7303630Z libelf-dev is already the newest version (0.186-1ubuntu0.1).
+2025-08-09T00:51:55.7304178Z libncurses-dev is already the newest version (6.3-2ubuntu0.1).
+2025-08-09T00:51:55.7304735Z libssl-dev is already the newest version (3.0.2-0ubuntu1.19).
+2025-08-09T00:51:55.7305311Z live-build is already the newest version (3.0~a57-1ubuntu41.22.04.1).
+2025-08-09T00:51:55.7305945Z qemu-system-x86 is already the newest version (1:6.2+dfsg-2ubuntu6.26).
+2025-08-09T00:51:55.7306532Z rsync is already the newest version (3.2.7-0ubuntu0.22.04.4).
+2025-08-09T00:51:55.7307044Z wget is already the newest version (1.21.2-2ubuntu1.1).
+2025-08-09T00:51:55.7307632Z nmap is already the newest version (7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1).
+2025-08-09T00:51:55.7308281Z python3-pip is already the newest version (22.0.2+dfsg-1ubuntu0.6).
+2025-08-09T00:51:55.7308891Z git is already the newest version (1:2.50.1-0ppa1~ubuntu22.04.1).
+2025-08-09T00:51:55.7755858Z The following NEW packages will be installed:
+2025-08-09T00:51:55.7766328Z   dialog
+2025-08-09T00:51:55.8109141Z 0 upgraded, 1 newly installed, 0 to remove and 16 not upgraded.
+2025-08-09T00:51:55.8484222Z Need to get 303 kB of archives.
+2025-08-09T00:51:55.8484885Z After this operation, 1258 kB of additional disk space will be used.
+2025-08-09T00:51:55.8485675Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T00:51:55.9687424Z Get:2 http://azure.archive.ubuntu.com/ubuntu jammy/universe amd64 dialog amd64 1.3-20211214-1 [303 kB]
+2025-08-09T00:51:56.2909258Z Fetched 303 kB in 0s (2238 kB/s)
+2025-08-09T00:51:56.3142043Z Selecting previously unselected package dialog.
+2025-08-09T00:51:56.3216201Z (Reading database ... 
+2025-08-09T00:51:56.3216885Z (Reading database ... 5%
+2025-08-09T00:51:56.3217393Z (Reading database ... 10%
+2025-08-09T00:51:56.3217980Z (Reading database ... 15%
+2025-08-09T00:51:56.3218556Z (Reading database ... 20%
+2025-08-09T00:51:56.3219051Z (Reading database ... 25%
+2025-08-09T00:51:56.3219383Z (Reading database ... 30%
+2025-08-09T00:51:56.3219717Z (Reading database ... 35%
+2025-08-09T00:51:56.3220043Z (Reading database ... 40%
+2025-08-09T00:51:56.3220381Z (Reading database ... 45%
+2025-08-09T00:51:56.3220706Z (Reading database ... 50%
+2025-08-09T00:51:56.3287137Z (Reading database ... 55%
+2025-08-09T00:51:56.3326737Z (Reading database ... 60%
+2025-08-09T00:51:56.3347327Z (Reading database ... 65%
+2025-08-09T00:51:56.3445300Z (Reading database ... 70%
+2025-08-09T00:51:56.3649825Z (Reading database ... 75%
+2025-08-09T00:51:56.3681226Z (Reading database ... 80%
+2025-08-09T00:51:56.4041180Z (Reading database ... 85%
+2025-08-09T00:51:56.4171600Z (Reading database ... 90%
+2025-08-09T00:51:56.4356931Z (Reading database ... 95%
+2025-08-09T00:51:56.4357680Z (Reading database ... 100%
+2025-08-09T00:51:56.4358353Z (Reading database ... 270634 files and directories currently installed.)
+2025-08-09T00:51:56.4429731Z Preparing to unpack .../dialog_1.3-20211214-1_amd64.deb ...
+2025-08-09T00:51:56.4441370Z Unpacking dialog (1.3-20211214-1) ...
+2025-08-09T00:51:56.6778260Z Setting up dialog (1.3-20211214-1) ...
+2025-08-09T00:51:56.6804323Z Processing triggers for man-db (2.10.2-1) ...
+2025-08-09T00:51:57.2708423Z NEEDRESTART-VER: 3.5
+2025-08-09T00:51:57.5177185Z NEEDRESTART-KCUR: 6.8.0-1031-azure
+2025-08-09T00:51:57.5177713Z NEEDRESTART-KEXP: 6.8.0-1031-azure
+2025-08-09T00:51:57.5178072Z NEEDRESTART-KSTA: 1
+2025-08-09T00:51:57.5178432Z NEEDRESTART-SVC: hosted-compute-agent.service
+2025-08-09T00:51:59.0816877Z [0;32m[SUCCESS][0m Build environment initialized
+2025-08-09T00:51:59.0817305Z 
+2025-08-09T00:51:59.0817659Z [0;35m[PHASE][0m Building Custom Kernel 6.6.58 with AI Optimizations
+2025-08-09T00:51:59.0818080Z 
+2025-08-09T00:51:59.0818273Z [0;34m[INFO][0m Downloading Linux kernel 6.6.58...
+2025-08-09T00:51:59.0835366Z Cloning into 'linux'...
+2025-08-09T00:52:44.0608550Z warning: refs/tags/v6.6.58 19f281632b8e2bc9105e5fbc5e1bbe98a30367ee is not a commit!
+2025-08-09T00:52:44.0620149Z Note: switching to '18916a684a8b836957df88438f9bca590799d04c'.
+2025-08-09T00:52:44.0620722Z 
+2025-08-09T00:52:44.0621037Z You are in 'detached HEAD' state. You can look around, make experimental
+2025-08-09T00:52:44.0622299Z changes and commit them, and you can discard any commits you make in this
+2025-08-09T00:52:44.0623565Z state without impacting any branches by switching back to a branch.
+2025-08-09T00:52:44.0624067Z 
+2025-08-09T00:52:44.0624355Z If you want to create a new branch to retain commits you create, you may
+2025-08-09T00:52:44.0625086Z do so (now or later) by using -c with the switch command. Example:
+2025-08-09T00:52:44.0625501Z 
+2025-08-09T00:52:44.0625653Z   git switch -c <new-branch-name>
+2025-08-09T00:52:44.0625929Z 
+2025-08-09T00:52:44.0626082Z Or undo this operation with:
+2025-08-09T00:52:44.0626328Z 
+2025-08-09T00:52:44.0626446Z   git switch -
+2025-08-09T00:52:44.0626634Z 
+2025-08-09T00:52:44.0626956Z Turn off this advice by setting config variable advice.detachedHead to false
+2025-08-09T00:52:44.0627437Z 
+2025-08-09T00:52:45.1509060Z Updating files:  22% (18095/81804)
+2025-08-09T00:52:45.2003079Z Updating files:  23% (18815/81804)
+2025-08-09T00:52:45.2433311Z Updating files:  24% (19633/81804)
+2025-08-09T00:52:45.2841669Z Updating files:  25% (20451/81804)
+2025-08-09T00:52:45.3380610Z Updating files:  26% (21270/81804)
+2025-08-09T00:52:45.3840980Z Updating files:  27% (22088/81804)
+2025-08-09T00:52:45.4267820Z Updating files:  28% (22906/81804)
+2025-08-09T00:52:45.4756976Z Updating files:  29% (23724/81804)
+2025-08-09T00:52:45.5270786Z Updating files:  30% (24542/81804)
+2025-08-09T00:52:45.5870616Z Updating files:  31% (25360/81804)
+2025-08-09T00:52:45.6592918Z Updating files:  32% (26178/81804)
+2025-08-09T00:52:45.7356277Z Updating files:  33% (26996/81804)
+2025-08-09T00:52:45.8213853Z Updating files:  34% (27814/81804)
+2025-08-09T00:52:45.8916527Z Updating files:  35% (28632/81804)
+2025-08-09T00:52:45.9532873Z Updating files:  36% (29450/81804)
+2025-08-09T00:52:46.0222394Z Updating files:  37% (30268/81804)
+2025-08-09T00:52:46.0980977Z Updating files:  38% (31086/81804)
+2025-08-09T00:52:46.1162466Z Updating files:  39% (31904/81804)
+2025-08-09T00:52:46.1752600Z Updating files:  39% (32093/81804)
+2025-08-09T00:52:47.1171515Z Updating files:  40% (32722/81804)
+2025-08-09T00:52:47.1326404Z Updating files:  40% (33466/81804)
+2025-08-09T00:52:47.2069233Z Updating files:  41% (33540/81804)
+2025-08-09T00:52:47.2729518Z Updating files:  42% (34358/81804)
+2025-08-09T00:52:47.3265774Z Updating files:  43% (35176/81804)
+2025-08-09T00:52:47.3726472Z Updating files:  44% (35994/81804)
+2025-08-09T00:52:47.4467687Z Updating files:  45% (36812/81804)
+2025-08-09T00:52:47.5163441Z Updating files:  46% (37630/81804)
+2025-08-09T00:52:47.5818121Z Updating files:  47% (38448/81804)
+2025-08-09T00:52:47.6610764Z Updating files:  48% (39266/81804)
+2025-08-09T00:52:47.7298295Z Updating files:  49% (40084/81804)
+2025-08-09T00:52:47.8048587Z Updating files:  50% (40902/81804)
+2025-08-09T00:52:47.8755549Z Updating files:  51% (41721/81804)
+2025-08-09T00:52:47.9350999Z Updating files:  52% (42539/81804)
+2025-08-09T00:52:48.0074279Z Updating files:  53% (43357/81804)
+2025-08-09T00:52:48.0758230Z Updating files:  54% (44175/81804)
+2025-08-09T00:52:48.1160234Z Updating files:  55% (44993/81804)
+2025-08-09T00:52:48.1541175Z Updating files:  55% (45424/81804)
+2025-08-09T00:52:48.2581372Z Updating files:  56% (45811/81804)
+2025-08-09T00:52:48.3452038Z Updating files:  57% (46629/81804)
+2025-08-09T00:52:48.4428765Z Updating files:  58% (47447/81804)
+2025-08-09T00:52:48.5288946Z Updating files:  59% (48265/81804)
+2025-08-09T00:52:48.6285196Z Updating files:  60% (49083/81804)
+2025-08-09T00:52:48.7053677Z Updating files:  61% (49901/81804)
+2025-08-09T00:52:48.7875332Z Updating files:  62% (50719/81804)
+2025-08-09T00:52:48.8584107Z Updating files:  63% (51537/81804)
+2025-08-09T00:52:48.9389174Z Updating files:  64% (52355/81804)
+2025-08-09T00:52:49.0041155Z Updating files:  65% (53173/81804)
+2025-08-09T00:52:49.1138301Z Updating files:  66% (53991/81804)
+2025-08-09T00:52:49.1159723Z Updating files:  67% (54809/81804)
+2025-08-09T00:52:49.1987324Z Updating files:  67% (54824/81804)
+2025-08-09T00:52:49.2492744Z Updating files:  68% (55627/81804)
+2025-08-09T00:52:49.3111837Z Updating files:  69% (56445/81804)
+2025-08-09T00:52:49.3924952Z Updating files:  70% (57263/81804)
+2025-08-09T00:52:49.4671280Z Updating files:  71% (58081/81804)
+2025-08-09T00:52:49.5381626Z Updating files:  72% (58899/81804)
+2025-08-09T00:52:49.6226115Z Updating files:  73% (59717/81804)
+2025-08-09T00:52:49.7091572Z Updating files:  74% (60535/81804)
+2025-08-09T00:52:49.7781527Z Updating files:  75% (61353/81804)
+2025-08-09T00:52:49.8223277Z Updating files:  76% (62172/81804)
+2025-08-09T00:52:49.8674939Z Updating files:  77% (62990/81804)
+2025-08-09T00:52:49.9227948Z Updating files:  78% (63808/81804)
+2025-08-09T00:52:49.9711470Z Updating files:  79% (64626/81804)
+2025-08-09T00:52:50.0234543Z Updating files:  80% (65444/81804)
+2025-08-09T00:52:50.0755987Z Updating files:  81% (66262/81804)
+2025-08-09T00:52:50.1160635Z Updating files:  82% (67080/81804)
+2025-08-09T00:52:50.1255009Z Updating files:  82% (67753/81804)
+2025-08-09T00:52:50.2094996Z Updating files:  83% (67898/81804)
+2025-08-09T00:52:50.2859899Z Updating files:  84% (68716/81804)
+2025-08-09T00:52:50.3655475Z Updating files:  85% (69534/81804)
+2025-08-09T00:52:50.4390573Z Updating files:  86% (70352/81804)
+2025-08-09T00:52:50.4892693Z Updating files:  87% (71170/81804)
+2025-08-09T00:52:50.5476644Z Updating files:  88% (71988/81804)
+2025-08-09T00:52:50.6279280Z Updating files:  89% (72806/81804)
+2025-08-09T00:52:50.7124491Z Updating files:  90% (73624/81804)
+2025-08-09T00:52:50.7710023Z Updating files:  91% (74442/81804)
+2025-08-09T00:52:50.8207987Z Updating files:  92% (75260/81804)
+2025-08-09T00:52:50.8857434Z Updating files:  93% (76078/81804)
+2025-08-09T00:52:50.9576651Z Updating files:  94% (76896/81804)
+2025-08-09T00:52:51.0170759Z Updating files:  95% (77714/81804)
+2025-08-09T00:52:51.0553196Z Updating files:  96% (78532/81804)
+2025-08-09T00:52:51.0994676Z Updating files:  97% (79350/81804)
+2025-08-09T00:52:51.1159392Z Updating files:  98% (80168/81804)
+2025-08-09T00:52:51.1440083Z Updating files:  98% (80453/81804)
+2025-08-09T00:52:51.1846633Z Updating files:  99% (80986/81804)
+2025-08-09T00:52:51.1847349Z Updating files: 100% (81804/81804)
+2025-08-09T00:52:51.1848058Z Updating files: 100% (81804/81804), done.
+2025-08-09T00:52:51.2751770Z [0;34m[INFO][0m Applying AI/NPU optimization patches...
+2025-08-09T00:52:51.2787210Z [1;33m[WARNING][0m Local patches not found, using fallback patches...
+2025-08-09T00:52:51.2788511Z [1;33m[WARNING][0m Using fallback patch configuration...
+2025-08-09T00:52:51.3467691Z patching file drivers/Kconfig
+2025-08-09T00:52:51.3468907Z Hunk #1 succeeded at 243 with fuzz 2 (offset 3 lines).
+2025-08-09T00:52:51.3473982Z patching file drivers/npu/Kconfig
+2025-08-09T00:52:51.3474742Z patch: **** malformed patch at line 31:  
+2025-08-09T00:52:51.3475831Z 
+2025-08-09T00:52:51.3476575Z [1;33m[WARNING][0m Fallback NPU patch failed
+2025-08-09T00:52:51.3497056Z patching file drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
+2025-08-09T00:52:51.3499894Z Hunk #1 FAILED at 190.
+2025-08-09T00:52:51.3506456Z 1 out of 1 hunk FAILED -- saving rejects to file drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c.rej
+2025-08-09T00:52:51.3510843Z [1;33m[WARNING][0m Fallback ROCm patch failed
+2025-08-09T00:52:51.3533462Z patching file net/core/dev.c
+2025-08-09T00:52:51.3540782Z Hunk #1 succeeded at 5354 with fuzz 2 (offset -166 lines).
+2025-08-09T00:52:51.3549456Z [0;34m[INFO][0m Configuring kernel for AI workloads...
+2025-08-09T00:52:51.4290844Z [0;34m[INFO][0m Applying AI hardware optimizations to kernel config...
+2025-08-09T00:52:51.9724109Z   HOSTCC  scripts/basic/fixdep
+2025-08-09T00:52:52.3688174Z   HOSTCC  scripts/kconfig/conf.o
+2025-08-09T00:52:52.5978037Z   HOSTCC  scripts/kconfig/confdata.o
+2025-08-09T00:52:52.6989891Z ##[error]The operation was canceled.
+2025-08-09T00:52:52.7084246Z Post job cleanup.
+2025-08-09T00:52:52.8140362Z [command]/usr/bin/git version
+2025-08-09T00:52:52.8195896Z git version 2.50.1
+2025-08-09T00:52:52.8266422Z Temporarily overriding HOME='/home/runner/work/_temp/b00a7bfc-b908-4e75-b0d1-2987c9214365' before making global git config changes
+2025-08-09T00:52:52.8267840Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-09T00:52:52.8287529Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ainux/ainux
+2025-08-09T00:52:52.8340698Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-09T00:52:52.8389739Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-09T00:52:52.8658024Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-09T00:52:52.8687171Z http.https://github.com/.extraheader
+2025-08-09T00:52:52.8706519Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-08-09T00:52:52.8749605Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-09T00:52:52.9148344Z Cleaning up orphan processes
+2025-08-09T00:52:52.9425084Z Terminate orphan process: pid (3864) (timeout)
+2025-08-09T00:52:52.9442978Z Terminate orphan process: pid (3865) (ainux-builder.sh)
+2025-08-09T00:52:52.9572991Z Terminate orphan process: pid (4740) (make)
+2025-08-09T00:52:52.9723854Z Terminate orphan process: pid (4741) (make)
+2025-08-09T00:52:52.9871463Z Terminate orphan process: pid (4833) (make)
+2025-08-09T00:52:53.0020201Z Terminate orphan process: pid (4912) (sh)
+2025-08-09T00:52:53.0054773Z Terminate orphan process: pid (4914) (gcc)
+2025-08-09T00:52:53.0089929Z Terminate orphan process: pid (4915) (cc1)

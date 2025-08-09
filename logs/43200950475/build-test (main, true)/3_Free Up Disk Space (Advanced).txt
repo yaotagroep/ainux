@@ -1,0 +1,22 @@
+﻿2025-08-09T00:48:41.3275836Z ##[group]Run echo "⏳ Reclaiming space..."
+2025-08-09T00:48:41.3277241Z [36;1mecho "⏳ Reclaiming space..."[0m
+2025-08-09T00:48:41.3278826Z [36;1msudo rm -rf /usr/local/lib/android[0m
+2025-08-09T00:48:41.3280187Z [36;1msudo rm -rf /usr/local/share/boost[0m
+2025-08-09T00:48:41.3281493Z [36;1msudo rm -rf /usr/share/dotnet[0m
+2025-08-09T00:48:41.3282692Z [36;1msudo rm -rf /opt/ghc[0m
+2025-08-09T00:48:41.3283836Z [36;1msudo rm -rf /opt/hostedtoolcache[0m
+2025-08-09T00:48:41.3285172Z [36;1msudo apt-get clean[0m
+2025-08-09T00:48:41.3286296Z [36;1msudo rm -rf "$AGENT_TOOLSDIRECTORY"[0m
+2025-08-09T00:48:41.3287511Z [36;1mdf -h[0m
+2025-08-09T00:48:41.3288333Z [36;1m [0m
+2025-08-09T00:48:41.3319928Z shell: /usr/bin/bash -e {0}
+2025-08-09T00:48:41.3320986Z ##[endgroup]
+2025-08-09T00:48:41.3393381Z ⏳ Reclaiming space...
+2025-08-09T00:51:37.0048264Z Filesystem      Size  Used Avail Use% Mounted on
+2025-08-09T00:51:37.0049043Z /dev/root        73G   36G   37G  50% /
+2025-08-09T00:51:37.0049483Z tmpfs           7.9G  172K  7.9G   1% /dev/shm
+2025-08-09T00:51:37.0050017Z tmpfs           3.2G  1.1M  3.2G   1% /run
+2025-08-09T00:51:37.0050501Z tmpfs           5.0M     0  5.0M   0% /run/lock
+2025-08-09T00:51:37.0050935Z /dev/sda15      105M  6.1M   99M   6% /boot/efi
+2025-08-09T00:51:37.0051382Z /dev/sdb1        74G  4.1G   66G   6% /mnt
+2025-08-09T00:51:37.0051806Z tmpfs           1.6G   12K  1.6G   1% /run/user/1001
