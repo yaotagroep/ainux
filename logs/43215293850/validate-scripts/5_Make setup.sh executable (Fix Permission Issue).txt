@@ -1,0 +1,8 @@
+﻿2025-08-09T13:25:10.7546631Z ##[group]Run # This addresses the rootfs/setup.sh permission denied issue
+2025-08-09T13:25:10.7547176Z [36;1m# This addresses the rootfs/setup.sh permission denied issue[0m
+2025-08-09T13:25:10.7547889Z [36;1m# Note: The rootfs/setup.sh is created during build, but we ensure[0m
+2025-08-09T13:25:10.7548430Z [36;1m# the build script handles permissions correctly[0m
+2025-08-09T13:25:10.7548963Z [36;1mecho "🔧 Build script will handle rootfs/setup.sh permissions during execution"[0m
+2025-08-09T13:25:10.7578260Z shell: /usr/bin/bash -e {0}
+2025-08-09T13:25:10.7578507Z ##[endgroup]
+2025-08-09T13:25:10.7628478Z 🔧 Build script will handle rootfs/setup.sh permissions during execution

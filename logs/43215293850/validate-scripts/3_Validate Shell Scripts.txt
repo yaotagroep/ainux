@@ -1,0 +1,79 @@
+﻿2025-08-09T13:24:58.9219753Z ##[group]Run sudo apt-get update
+2025-08-09T13:24:58.9221482Z [36;1msudo apt-get update[0m
+2025-08-09T13:24:58.9222686Z [36;1msudo apt-get install -y shellcheck[0m
+2025-08-09T13:24:58.9224030Z [36;1m[0m
+2025-08-09T13:24:58.9225264Z [36;1m# Check all shell scripts (warnings allowed, only errors fail)[0m
+2025-08-09T13:24:58.9227835Z [36;1mfind . -name "*.sh" -type f | xargs shellcheck -e SC2155,SC2002,SC2046,SC2116,SC2024 || true[0m
+2025-08-09T13:24:58.9229714Z [36;1m[0m
+2025-08-09T13:24:58.9230747Z [36;1m# Check for critical errors only[0m
+2025-08-09T13:24:58.9232190Z [36;1mecho "Checking for critical shellcheck errors..."[0m
+2025-08-09T13:24:58.9233953Z [36;1mif find . -name "*.sh" -type f | xargs shellcheck -S error; then[0m
+2025-08-09T13:24:58.9235628Z [36;1m    echo "✅ No critical shellcheck errors found"[0m
+2025-08-09T13:24:58.9236928Z [36;1melse[0m
+2025-08-09T13:24:58.9237944Z [36;1m    echo "❌ Critical shellcheck errors detected"[0m
+2025-08-09T13:24:58.9239267Z [36;1m    exit 1[0m
+2025-08-09T13:24:58.9240301Z [36;1mfi[0m
+2025-08-09T13:24:58.9274152Z shell: /usr/bin/bash -e {0}
+2025-08-09T13:24:58.9275291Z ##[endgroup]
+2025-08-09T13:24:59.0402847Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T13:24:59.0809669Z Hit:2 http://azure.archive.ubuntu.com/ubuntu jammy InRelease
+2025-08-09T13:24:59.0814195Z Get:6 https://packages.microsoft.com/repos/azure-cli jammy InRelease [3596 B]
+2025-08-09T13:24:59.0833759Z Get:7 https://packages.microsoft.com/ubuntu/22.04/prod jammy InRelease [3632 B]
+2025-08-09T13:24:59.0837471Z Get:3 http://azure.archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+2025-08-09T13:24:59.0890162Z Get:4 http://azure.archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+2025-08-09T13:24:59.0923663Z Get:5 http://azure.archive.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+2025-08-09T13:24:59.2934774Z Get:8 https://packages.microsoft.com/repos/azure-cli jammy/main amd64 Packages [2575 B]
+2025-08-09T13:24:59.3396803Z Get:9 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main amd64 Packages [239 kB]
+2025-08-09T13:24:59.3814616Z Get:10 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main arm64 Packages [75.0 kB]
+2025-08-09T13:24:59.5948834Z Get:11 http://azure.archive.ubuntu.com/ubuntu jammy-security/main Translation-en [379 kB]
+2025-08-09T13:25:07.1913576Z Fetched 1087 kB in 1s (1660 kB/s)
+2025-08-09T13:25:08.1434021Z Reading package lists...
+2025-08-09T13:25:08.2043807Z Reading package lists...
+2025-08-09T13:25:08.4604359Z Building dependency tree...
+2025-08-09T13:25:08.4617545Z Reading state information...
+2025-08-09T13:25:08.7016085Z shellcheck is already the newest version (0.8.0-2).
+2025-08-09T13:25:08.7017441Z 0 upgraded, 0 newly installed, 0 to remove and 16 not upgraded.
+2025-08-09T13:25:09.9148500Z 
+2025-08-09T13:25:09.9149339Z In ./build-server.sh line 14:
+2025-08-09T13:25:09.9149957Z PURPLE='\033[0;35m'
+2025-08-09T13:25:09.9150937Z ^----^ SC2034 (warning): PURPLE appears unused. Verify use (or export if used externally).
+2025-08-09T13:25:09.9151532Z 
+2025-08-09T13:25:09.9151550Z 
+2025-08-09T13:25:09.9151733Z In ./ainux-builder.sh line 50:
+2025-08-09T13:25:09.9152210Z         DEFAULT_HOSTNAME="ainux-ai"
+2025-08-09T13:25:09.9152951Z         ^--------------^ SC2034 (warning): DEFAULT_HOSTNAME appears unused. Verify use (or export if used externally).
+2025-08-09T13:25:09.9153582Z 
+2025-08-09T13:25:09.9153596Z 
+2025-08-09T13:25:09.9153814Z In ./ainux-builder.sh line 1334:
+2025-08-09T13:25:09.9154660Z         log_info "Available patches: $(ls -1 "$PATCH_DIR"/*.patch 2>/dev/null | xargs -r basename -s .patch | tr '\n' ' ')"
+2025-08-09T13:25:09.9155786Z                                        ^-- SC2011 (warning): Use 'find .. -print0 | xargs -0 ..' or 'find .. -exec .. +' to allow non-alphanumeric filenames.
+2025-08-09T13:25:09.9156389Z 
+2025-08-09T13:25:09.9156401Z 
+2025-08-09T13:25:09.9156602Z In ./build-desktop.sh line 14:
+2025-08-09T13:25:09.9157022Z PURPLE='\033[0;35m'
+2025-08-09T13:25:09.9157621Z ^----^ SC2034 (warning): PURPLE appears unused. Verify use (or export if used externally).
+2025-08-09T13:25:09.9158872Z 
+2025-08-09T13:25:09.9158892Z 
+2025-08-09T13:25:09.9159079Z In ./build-arm.sh line 14:
+2025-08-09T13:25:09.9159526Z PURPLE='\033[0;35m'
+2025-08-09T13:25:09.9160302Z ^----^ SC2034 (warning): PURPLE appears unused. Verify use (or export if used externally).
+2025-08-09T13:25:09.9161130Z 
+2025-08-09T13:25:09.9161144Z 
+2025-08-09T13:25:09.9161307Z In ./build-arm.sh line 75:
+2025-08-09T13:25:09.9161874Z         sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu || {
+2025-08-09T13:25:09.9162640Z                             ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+2025-08-09T13:25:09.9163100Z 
+2025-08-09T13:25:09.9163120Z 
+2025-08-09T13:25:09.9163338Z In ./scripts/verify-logger-integrity.sh line 101:
+2025-08-09T13:25:09.9163962Z         find "$backup_dir" -name "*.backup" -type f -mtime +$keep_days -delete
+2025-08-09T13:25:09.9164711Z                                                             ^--------^ SC2086 (info): Double quote to prevent globbing and word splitting.
+2025-08-09T13:25:09.9165249Z 
+2025-08-09T13:25:09.9165387Z Did you mean: 
+2025-08-09T13:25:09.9165882Z         find "$backup_dir" -name "*.backup" -type f -mtime +"$keep_days" -delete
+2025-08-09T13:25:09.9166400Z 
+2025-08-09T13:25:09.9166560Z For more information:
+2025-08-09T13:25:09.9167138Z   https://www.shellcheck.net/wiki/SC2011 -- Use 'find .. -print0 | xargs -0 ....
+2025-08-09T13:25:09.9168047Z   https://www.shellcheck.net/wiki/SC2034 -- DEFAULT_HOSTNAME appears unused. ...
+2025-08-09T13:25:09.9168927Z   https://www.shellcheck.net/wiki/SC2015 -- Note that A && B || C is not if-t...
+2025-08-09T13:25:09.9183716Z Checking for critical shellcheck errors...
+2025-08-09T13:25:10.7382923Z ✅ No critical shellcheck errors found

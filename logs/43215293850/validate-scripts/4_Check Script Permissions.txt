@@ -1,0 +1,13 @@
+﻿2025-08-09T13:25:10.7422869Z ##[group]Run # Make build scripts executable if they aren't already
+2025-08-09T13:25:10.7423344Z [36;1m# Make build scripts executable if they aren't already[0m
+2025-08-09T13:25:10.7423771Z [36;1mchmod +x ainux-builder.sh build-desktop.sh build-server.sh build-arm.sh[0m
+2025-08-09T13:25:10.7424114Z [36;1m[0m
+2025-08-09T13:25:10.7424305Z [36;1m# Verify all scripts are now executable[0m
+2025-08-09T13:25:10.7424716Z [36;1mfor script in ainux-builder.sh build-desktop.sh build-server.sh build-arm.sh; do[0m
+2025-08-09T13:25:10.7425212Z [36;1m  test -x "$script" || (echo "Failed to make $script executable" && exit 1)[0m
+2025-08-09T13:25:10.7425553Z [36;1mdone[0m
+2025-08-09T13:25:10.7425712Z [36;1m[0m
+2025-08-09T13:25:10.7425926Z [36;1mecho "✅ All build scripts are now executable"[0m
+2025-08-09T13:25:10.7455521Z shell: /usr/bin/bash -e {0}
+2025-08-09T13:25:10.7455749Z ##[endgroup]
+2025-08-09T13:25:10.7517812Z ✅ All build scripts are now executable
