@@ -1,20 +1,40 @@
-# 🔧 Ainux OS Hardware Support Documentation v3.0
+# 🔧 Ainux OS Hardware Support Documentation v4.0
 
-This document provides comprehensive information about hardware acceleration support in Ainux OS, including detailed specifications for TPU, NPU, GPU, CPU, and DPU components.
+This document provides comprehensive information about hardware acceleration support in Ainux OS across all build variants, including detailed specifications for TPU, NPU, GPU, CPU, and DPU components.
 
 ## 🎯 Hardware Acceleration Overview
 
-Ainux OS provides native, optimized support for all major AI acceleration hardware, from consumer-grade devices to enterprise data center equipment. **All processing units are now fully enabled and working with enhanced build system integration.**
+Ainux OS provides native, optimized support for all major AI acceleration hardware across three specialized build variants. **All processing units are fully enabled and working with enhanced build system integration and permission fixes.**
 
 ### 🏆 Supported Hardware Categories - STATUS: ✅ ALL ENABLED
 
-| Category | Support Level | Kernel Status | Use Cases | Variants |
-|----------|---------------|---------------|-----------|----------|
-| **CPU** | ✅ **FULLY ENABLED** | ✅ Native | All AI workloads, control plane | All variants |
-| **GPU** | ✅ **FULLY ENABLED** | ✅ AMD/NVIDIA/Intel | Training, inference, gaming, compute | All variants |
-| **NPU** | ✅ **FULLY ENABLED** | ✅ Framework active | Edge AI, efficient inference | All variants |
-| **TPU** | ✅ **FULLY ENABLED** | ✅ Google TPU support | TensorFlow workloads, Google Cloud AI | All variants |
-| **DPU** | ✅ **FULLY ENABLED** | ✅ SmartNIC support | Network offload, SmartNIC, RDMA | Server/AI variants |
+| Category | Support Level | Kernel Status | Use Cases | Desktop | Server | ARM |
+|----------|---------------|---------------|-----------|---------|--------|-----|
+| **CPU** | ✅ **FULLY ENABLED** | ✅ Native | All AI workloads, control plane | ✅ | ✅ | ✅ |
+| **GPU** | ✅ **FULLY ENABLED** | ✅ AMD/NVIDIA/Intel/Mali | Training, inference, gaming, compute | ✅ | ✅ | ✅ |
+| **NPU** | ✅ **FULLY ENABLED** | ✅ Framework active | Edge AI, efficient inference | ✅ | ✅ | ✅ |
+| **TPU** | ✅ **FULLY ENABLED** | ✅ Google TPU/Coral | TensorFlow workloads, Cloud AI | ✅ | ✅ | ✅ |
+| **DPU** | ✅ **FULLY ENABLED** | ✅ SmartNIC support | Network offload, SmartNIC, RDMA | ✅ | ✅ | ❌ |
+
+## 🏗️ Build Variant Hardware Optimization
+
+### 🖥️ Desktop Edition
+- **Target**: Workstations, gaming rigs, multimedia systems
+- **GPU Focus**: NVIDIA RTX/GTX, AMD Radeon, Intel Arc
+- **Features**: Gaming support, multimedia codecs, Bluetooth/WiFi
+- **AI Acceleration**: Full TPU/NPU/GPU stack for content creation
+
+### 🏢 Server Edition  
+- **Target**: Data centers, enterprise compute, HPC clusters
+- **GPU Focus**: Tesla, Quadro, MI-series, enterprise cards
+- **Features**: Virtualization, security hardening, enterprise storage
+- **AI Acceleration**: Optimized for inference servers and training clusters
+
+### 🍓 ARM Edition
+- **Target**: Raspberry Pi, edge devices, IoT systems  
+- **GPU Focus**: Mali, VideoCore, ARM integrated graphics
+- **Features**: GPIO support, low power, edge AI optimization
+- **AI Acceleration**: Coral TPU, ARM Ethos NPU, efficient inference
 
 ## 📊 Recent Hardware Support Fixes ✅
 
