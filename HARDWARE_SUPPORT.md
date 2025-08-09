@@ -1,10 +1,10 @@
-# 🔧 Ainux OS Hardware Support Documentation v2.1
+# 🔧 Ainux OS Hardware Support Documentation v3.0
 
 This document provides comprehensive information about hardware acceleration support in Ainux OS, including detailed specifications for TPU, NPU, GPU, CPU, and DPU components.
 
 ## 🎯 Hardware Acceleration Overview
 
-Ainux OS provides native, optimized support for all major AI acceleration hardware, from consumer-grade devices to enterprise data center equipment. **All processing units are now fully enabled and working.**
+Ainux OS provides native, optimized support for all major AI acceleration hardware, from consumer-grade devices to enterprise data center equipment. **All processing units are now fully enabled and working with enhanced build system integration.**
 
 ### 🏆 Supported Hardware Categories - STATUS: ✅ ALL ENABLED
 
@@ -404,10 +404,89 @@ cat /sys/class/infiniband/*/ports/*/counters/*
 
 ## 🔧 Integration and Configuration
 
+### Automated Hardware Detection and Configuration
+
+Ainux OS v3.0 includes an enhanced build system that automatically configures hardware support based on the selected variant and detected hardware.
+
+### Build-Time Hardware Configuration
+
+#### Desktop Edition
+```bash
+# Automatically detects and optimizes for:
+./build-desktop.sh
+
+# Hardware-specific optimizations:
+NVIDIA_SUPPORT=true ./build-desktop.sh    # NVIDIA RTX/Tesla optimization
+AMD_SUPPORT=true ./build-desktop.sh       # AMD Radeon/Instinct optimization  
+INTEL_GPU_SUPPORT=true ./build-desktop.sh # Intel Arc/Xe optimization
+INTEGRATED_ONLY=true ./build-desktop.sh   # Integrated graphics only
+```
+
+#### Server Edition  
+```bash
+# Enterprise profiles with hardware acceleration:
+SERVER_PROFILE=datacenter ./build-server.sh  # Full enterprise stack
+SERVER_PROFILE=cloud ./build-server.sh       # Cloud-native optimizations
+SERVER_PROFILE=edge ./build-server.sh        # Edge computing focus
+SERVER_PROFILE=hpc ./build-server.sh         # HPC scientific computing
+```
+
+#### ARM Edition
+```bash
+# Device-specific ARM optimizations:
+ARM_TARGET=rpi4 ./build-arm.sh        # Raspberry Pi 4 optimization
+ARM_TARGET=rpi5 ./build-arm.sh        # Raspberry Pi 5 optimization  
+ARM_TARGET=generic ./build-arm.sh     # Generic ARM64 devices
+ARM_TARGET=industrial ./build-arm.sh  # Industrial real-time systems
+```
+
+### Universal Hardware Support Environment Variables
+
+All build variants now support comprehensive hardware acceleration flags:
+
+```bash
+# AI Acceleration Hardware Support (enabled by default)
+export TPU_SUPPORT="true"      # Tensor Processing Units
+export NPU_SUPPORT="true"      # Neural Processing Units  
+export GPU_SUPPORT="true"      # Graphics Processing Units
+export CPU_ACCELERATION="true" # CPU AI extensions
+export DPU_SUPPORT="true"      # Data Processing Units (server/desktop)
+
+# Framework Support
+export CUDA_SUPPORT="true"         # NVIDIA CUDA
+export ROCM_SUPPORT="true"         # AMD ROCm
+export OPENVINO_SUPPORT="true"     # Intel OpenVINO
+export CORAL_TPU_SUPPORT="true"    # Google Coral TPU
+export TENSORRT_SUPPORT="true"     # NVIDIA TensorRT
+export TRITON_SUPPORT="true"       # NVIDIA Triton (server edition)
+```
+
+### CI/CD Pipeline Hardware Support
+
+The new GitHub workflows automatically build hardware-optimized variants:
+
+#### Desktop Workflow Matrix
+- **NVIDIA variant**: RTX/Tesla optimized builds
+- **AMD variant**: Radeon/Instinct optimized builds  
+- **Intel variant**: Arc/Xe optimized builds
+- **Integrated variant**: CPU-only with integrated graphics
+
+#### Server Workflow Matrix
+- **Datacenter profile**: Enterprise HA with full hardware support
+- **Cloud profile**: Container-optimized with GPU acceleration
+- **Edge profile**: Low-latency edge computing with NPU support
+- **HPC profile**: Scientific computing with multi-GPU support
+
+#### ARM Workflow Matrix  
+- **RPi4 variants**: With and without GUI, Cortex-A72 optimized
+- **RPi5 variants**: Latest RPi hardware, Cortex-A76 optimized
+- **Generic ARM**: Universal ARM64 compatibility
+- **Industrial**: Real-time control systems with GPIO support
+
 ### Hardware Detection Script
 ```bash
 #!/bin/bash
-# Ainux Hardware Detection Script
+# Ainux Hardware Detection Script v3.0
 
 echo "🔍 Detecting AI Hardware..."
 
@@ -541,4 +620,4 @@ sudo dpdk-devbind --status
 
 ---
 
-*Last Updated: August 2025 | Ainux OS v2.1 | For support: [GitHub Issues](https://github.com/yaotagroep/ainux/issues)*
+*Last Updated: January 2025 | Ainux OS v3.0 | For support: [GitHub Issues](https://github.com/yaotagroep/ainux/issues)*
