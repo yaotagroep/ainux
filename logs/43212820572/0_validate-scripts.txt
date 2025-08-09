@@ -1,0 +1,182 @@
+﻿2025-08-09T11:14:09.3926521Z Current runner version: '2.327.1'
+2025-08-09T11:14:09.3950133Z ##[group]Runner Image Provisioner
+2025-08-09T11:14:09.3950919Z Hosted Compute Agent
+2025-08-09T11:14:09.3951808Z Version: 20250711.363
+2025-08-09T11:14:09.3952479Z Commit: 6785254374ce925a23743850c1cb91912ce5c14c
+2025-08-09T11:14:09.3953171Z Build Date: 2025-07-11T20:04:25Z
+2025-08-09T11:14:09.3953703Z ##[endgroup]
+2025-08-09T11:14:09.3954318Z ##[group]Operating System
+2025-08-09T11:14:09.3954883Z Ubuntu
+2025-08-09T11:14:09.3955316Z 22.04.5
+2025-08-09T11:14:09.3955856Z LTS
+2025-08-09T11:14:09.3956279Z ##[endgroup]
+2025-08-09T11:14:09.3956756Z ##[group]Runner Image
+2025-08-09T11:14:09.3957348Z Image: ubuntu-22.04
+2025-08-09T11:14:09.3957845Z Version: 20250804.2.0
+2025-08-09T11:14:09.3958814Z Included Software: https://github.com/actions/runner-images/blob/ubuntu22/20250804.2/images/ubuntu/Ubuntu2204-Readme.md
+2025-08-09T11:14:09.3960423Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu22%2F20250804.2
+2025-08-09T11:14:09.3961596Z ##[endgroup]
+2025-08-09T11:14:09.3964119Z ##[group]GITHUB_TOKEN Permissions
+2025-08-09T11:14:09.3966297Z Actions: write
+2025-08-09T11:14:09.3966940Z Attestations: write
+2025-08-09T11:14:09.3967424Z Checks: write
+2025-08-09T11:14:09.3967926Z Contents: write
+2025-08-09T11:14:09.3968426Z Deployments: write
+2025-08-09T11:14:09.3968958Z Discussions: write
+2025-08-09T11:14:09.3969435Z Issues: write
+2025-08-09T11:14:09.3969947Z Metadata: read
+2025-08-09T11:14:09.3970443Z Models: read
+2025-08-09T11:14:09.3970907Z Packages: write
+2025-08-09T11:14:09.3971686Z Pages: write
+2025-08-09T11:14:09.3972229Z PullRequests: write
+2025-08-09T11:14:09.3972783Z RepositoryProjects: write
+2025-08-09T11:14:09.3973297Z SecurityEvents: write
+2025-08-09T11:14:09.3973992Z Statuses: write
+2025-08-09T11:14:09.3974520Z ##[endgroup]
+2025-08-09T11:14:09.3976468Z Secret source: Actions
+2025-08-09T11:14:09.3977284Z Prepare workflow directory
+2025-08-09T11:14:09.4360218Z Prepare all required actions
+2025-08-09T11:14:09.4398306Z Getting action download info
+2025-08-09T11:14:09.8352915Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-08-09T11:14:09.8353966Z Version: 4.2.2
+2025-08-09T11:14:09.8355079Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-08-09T11:14:09.8356336Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-08-09T11:14:09.8357118Z ##[endgroup]
+2025-08-09T11:14:10.0217821Z Complete job name: validate-scripts
+2025-08-09T11:14:10.0997652Z ##[group]Run actions/checkout@v4
+2025-08-09T11:14:10.0998574Z with:
+2025-08-09T11:14:10.0999002Z   repository: yaotagroep/ainux
+2025-08-09T11:14:10.0999690Z   token: ***
+2025-08-09T11:14:10.1000115Z   ssh-strict: true
+2025-08-09T11:14:10.1000536Z   ssh-user: git
+2025-08-09T11:14:10.1000975Z   persist-credentials: true
+2025-08-09T11:14:10.1001673Z   clean: true
+2025-08-09T11:14:10.1002128Z   sparse-checkout-cone-mode: true
+2025-08-09T11:14:10.1002663Z   fetch-depth: 1
+2025-08-09T11:14:10.1003082Z   fetch-tags: false
+2025-08-09T11:14:10.1003542Z   show-progress: true
+2025-08-09T11:14:10.1003978Z   lfs: false
+2025-08-09T11:14:10.1004378Z   submodules: false
+2025-08-09T11:14:10.1004821Z   set-safe-directory: true
+2025-08-09T11:14:10.1005581Z ##[endgroup]
+2025-08-09T11:14:10.2077078Z Syncing repository: yaotagroep/ainux
+2025-08-09T11:14:10.2079121Z ##[group]Getting Git version info
+2025-08-09T11:14:10.2079875Z Working directory is '/home/runner/work/ainux/ainux'
+2025-08-09T11:14:10.2080930Z [command]/usr/bin/git version
+2025-08-09T11:14:10.2167246Z git version 2.50.1
+2025-08-09T11:14:10.2192857Z ##[endgroup]
+2025-08-09T11:14:10.2207351Z Temporarily overriding HOME='/home/runner/work/_temp/7c3c5022-6561-4bff-8e49-c8c71034cbff' before making global git config changes
+2025-08-09T11:14:10.2209720Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-09T11:14:10.2219049Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ainux/ainux
+2025-08-09T11:14:10.2253341Z Deleting the contents of '/home/runner/work/ainux/ainux'
+2025-08-09T11:14:10.2256986Z ##[group]Initializing the repository
+2025-08-09T11:14:10.2260354Z [command]/usr/bin/git init /home/runner/work/ainux/ainux
+2025-08-09T11:14:10.2342157Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-09T11:14:10.2344041Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-09T11:14:10.2345861Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-09T11:14:10.2347126Z hint:
+2025-08-09T11:14:10.2347787Z hint: 	git config --global init.defaultBranch <name>
+2025-08-09T11:14:10.2348408Z hint:
+2025-08-09T11:14:10.2349024Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-09T11:14:10.2349992Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-09T11:14:10.2350751Z hint:
+2025-08-09T11:14:10.2351215Z hint: 	git branch -m <name>
+2025-08-09T11:14:10.2352202Z hint:
+2025-08-09T11:14:10.2353020Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-09T11:14:10.2354062Z Initialized empty Git repository in /home/runner/work/ainux/ainux/.git/
+2025-08-09T11:14:10.2357306Z [command]/usr/bin/git remote add origin https://github.com/yaotagroep/ainux
+2025-08-09T11:14:10.2393099Z ##[endgroup]
+2025-08-09T11:14:10.2394338Z ##[group]Disabling automatic garbage collection
+2025-08-09T11:14:10.2396523Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-09T11:14:10.2424124Z ##[endgroup]
+2025-08-09T11:14:10.2425248Z ##[group]Setting up auth
+2025-08-09T11:14:10.2430188Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-09T11:14:10.2459241Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-09T11:14:10.2790615Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-09T11:14:10.2818309Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-09T11:14:10.3036115Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-09T11:14:10.3070153Z ##[endgroup]
+2025-08-09T11:14:10.3072189Z ##[group]Fetching the repository
+2025-08-09T11:14:10.3088711Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +70bd9e60d085574aa4b8d03eba982bc5611a143f:refs/remotes/origin/main
+2025-08-09T11:14:11.4281998Z From https://github.com/yaotagroep/ainux
+2025-08-09T11:14:11.4284390Z  * [new ref]         70bd9e60d085574aa4b8d03eba982bc5611a143f -> origin/main
+2025-08-09T11:14:11.4310122Z ##[endgroup]
+2025-08-09T11:14:11.4311902Z ##[group]Determining the checkout info
+2025-08-09T11:14:11.4313683Z ##[endgroup]
+2025-08-09T11:14:11.4316449Z [command]/usr/bin/git sparse-checkout disable
+2025-08-09T11:14:11.4354156Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-09T11:14:11.4383234Z ##[group]Checking out the ref
+2025-08-09T11:14:11.4386364Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-09T11:14:11.5108431Z Switched to a new branch 'main'
+2025-08-09T11:14:11.5110058Z branch 'main' set up to track 'origin/main'.
+2025-08-09T11:14:11.5122503Z ##[endgroup]
+2025-08-09T11:14:11.5158853Z [command]/usr/bin/git log -1 --format=%H
+2025-08-09T11:14:11.5180421Z 70bd9e60d085574aa4b8d03eba982bc5611a143f
+2025-08-09T11:14:11.5398183Z ##[group]Run sudo apt-get update
+2025-08-09T11:14:11.5399569Z [36;1msudo apt-get update[0m
+2025-08-09T11:14:11.5400802Z [36;1msudo apt-get install -y shellcheck[0m
+2025-08-09T11:14:11.5402221Z [36;1m[0m
+2025-08-09T11:14:11.5403467Z [36;1m# Check all shell scripts (warnings allowed, only errors fail)[0m
+2025-08-09T11:14:11.5406096Z [36;1mfind . -name "*.sh" -type f | xargs shellcheck -e SC2155,SC2002,SC2046,SC2116,SC2024 || true[0m
+2025-08-09T11:14:11.5408049Z [36;1m[0m
+2025-08-09T11:14:11.5408961Z [36;1m# Check for critical errors only[0m
+2025-08-09T11:14:11.5410458Z [36;1mecho "Checking for critical shellcheck errors..."[0m
+2025-08-09T11:14:11.5412520Z [36;1mif find . -name "*.sh" -type f | xargs shellcheck -S error; then[0m
+2025-08-09T11:14:11.5414207Z [36;1m    echo "✅ No critical shellcheck errors found"[0m
+2025-08-09T11:14:11.5415499Z [36;1melse[0m
+2025-08-09T11:14:11.5416518Z [36;1m    echo "❌ Critical shellcheck errors detected"[0m
+2025-08-09T11:14:11.5417869Z [36;1m    exit 1[0m
+2025-08-09T11:14:11.5418746Z [36;1mfi[0m
+2025-08-09T11:14:11.5452309Z shell: /usr/bin/bash -e {0}
+2025-08-09T11:14:11.5453369Z ##[endgroup]
+2025-08-09T11:14:11.6483481Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T11:14:11.6837766Z Hit:2 http://azure.archive.ubuntu.com/ubuntu jammy InRelease
+2025-08-09T11:14:11.6866794Z Get:3 http://azure.archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+2025-08-09T11:14:11.6899049Z Get:6 https://packages.microsoft.com/repos/azure-cli jammy InRelease [3596 B]
+2025-08-09T11:14:11.6939363Z Get:7 https://packages.microsoft.com/ubuntu/22.04/prod jammy InRelease [3632 B]
+2025-08-09T11:14:11.6964629Z Get:4 http://azure.archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+2025-08-09T11:14:11.6983168Z Get:5 http://azure.archive.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+2025-08-09T11:14:11.8411294Z Get:8 https://packages.microsoft.com/repos/azure-cli jammy/main amd64 Packages [2575 B]
+2025-08-09T11:14:11.9866032Z Get:9 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main amd64 Packages [239 kB]
+2025-08-09T11:14:12.0152580Z Get:10 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main arm64 Packages [75.0 kB]
+2025-08-09T11:14:12.1207132Z Get:11 http://azure.archive.ubuntu.com/ubuntu jammy-security/main Translation-en [379 kB]
+2025-08-09T11:14:19.2199994Z Fetched 1087 kB in 1s (1909 kB/s)
+2025-08-09T11:14:20.0349747Z Reading package lists...
+2025-08-09T11:14:20.0935922Z Reading package lists...
+2025-08-09T11:14:20.2623616Z Building dependency tree...
+2025-08-09T11:14:20.2635235Z Reading state information...
+2025-08-09T11:14:20.4159362Z shellcheck is already the newest version (0.8.0-2).
+2025-08-09T11:14:22.2088026Z 0 upgraded, 0 newly installed, 0 to remove and 16 not upgraded.
+2025-08-09T11:14:22.2088622Z 
+2025-08-09T11:14:22.2088979Z In ./ainux-builder.sh line 1030:
+2025-08-09T11:14:22.2090024Z         log_info "Available patches: $(ls -1 "$PATCH_DIR"/*.patch 2>/dev/null | xargs -r basename -s .patch | tr '\n' ' ')"
+2025-08-09T11:14:22.2091684Z                                        ^-- SC2011 (warning): Use 'find .. -print0 | xargs -0 ..' or 'find .. -exec .. +' to allow non-alphanumeric filenames.
+2025-08-09T11:14:22.2092327Z 
+2025-08-09T11:14:22.2092467Z For more information:
+2025-08-09T11:14:22.2093179Z   https://www.shellcheck.net/wiki/SC2011 -- Use 'find .. -print0 | xargs -0 ....
+2025-08-09T11:14:22.2113385Z Checking for critical shellcheck errors...
+2025-08-09T11:14:22.7841600Z ✅ No critical shellcheck errors found
+2025-08-09T11:14:22.7875599Z ##[group]Run # Make build script executable if it isn't already
+2025-08-09T11:14:22.7876048Z [36;1m# Make build script executable if it isn't already[0m
+2025-08-09T11:14:22.7876360Z [36;1mchmod +x ainux-builder.sh[0m
+2025-08-09T11:14:22.7876586Z [36;1m[0m
+2025-08-09T11:14:22.7876767Z [36;1m# Verify it's now executable[0m
+2025-08-09T11:14:22.7877178Z [36;1mtest -x ainux-builder.sh || (echo "Failed to make ainux-builder.sh executable" && exit 1)[0m
+2025-08-09T11:14:22.7877586Z [36;1m[0m
+2025-08-09T11:14:22.7877799Z [36;1mecho "✅ ainux-builder.sh is now executable"[0m
+2025-08-09T11:14:22.7904565Z shell: /usr/bin/bash -e {0}
+2025-08-09T11:14:22.7904801Z ##[endgroup]
+2025-08-09T11:14:22.7958440Z ✅ ainux-builder.sh is now executable
+2025-08-09T11:14:22.8027003Z Post job cleanup.
+2025-08-09T11:14:22.8944572Z [command]/usr/bin/git version
+2025-08-09T11:14:22.8978309Z git version 2.50.1
+2025-08-09T11:14:22.9019665Z Temporarily overriding HOME='/home/runner/work/_temp/10bc168f-73e8-4b1a-9051-b560ee53bdd5' before making global git config changes
+2025-08-09T11:14:22.9020565Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-09T11:14:22.9025132Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ainux/ainux
+2025-08-09T11:14:22.9063846Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-09T11:14:22.9094978Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-09T11:14:22.9314826Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-09T11:14:22.9334307Z http.https://github.com/.extraheader
+2025-08-09T11:14:22.9346830Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-08-09T11:14:22.9378904Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-09T11:14:22.9699401Z Cleaning up orphan processes
