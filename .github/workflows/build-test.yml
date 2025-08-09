@@ -81,46 +81,6 @@ jobs:
           qemu-system-x86 python3-pip nmap curl wget rsync pv \
           grub-pc-bin grub-efi-amd64-bin mtools
           
-    - name: Fix PV Command Issues
-      run: |
-        echo "=== Fixing PV Command Issues ==="
-        
-        # Create backup
-        cp ainux-builder.sh ainux-builder.sh.backup
-        
-        # Fix all problematic pv usage patterns
-        # Fix 1: Remove invalid pv -s with echo
-        sed -i 's|pv -l -s $(echo "Cloning kernel source...")|pv -l|g' ainux-builder.sh
-        
-        # Fix 2: Fix debootstrap pv usage
-        sed -i 's|pv -l -s 1000 > /dev/null &|pv -l > /dev/null \&|g' ainux-builder.sh
-        
-        # Fix 3: Fix kernel compilation pv usage
-        sed -i 's|grep -E "(CC|LD|AR)" | pv -l -s 5000 > /dev/null &|tee /dev/null \&|g' ainux-builder.sh
-        
-        # Fix 4: Fix chroot setup pv usage
-        sed -i 's|grep -E "(Installing|Setting up|Processing)" | pv -l -s 500 > /dev/null &|tee /dev/null \&|g' ainux-builder.sh
-        
-        # Fix 5: General cleanup of problematic pv patterns
-        sed -i 's/pv -l -s [^|]*|/pv -l |/g' ainux-builder.sh
-        sed -i 's/pv -s [^|]*|/pv |/g' ainux-builder.sh
-        sed -i 's/pv -s \$([^)]*)/pv/g' ainux-builder.sh
-        
-        echo "✅ Applied PV command fixes"
-        
-        # Verify fixes
-        echo "=== Verification ==="
-        if grep -n "pv -s.*echo" ainux-builder.sh; then
-            echo "❌ Still found problematic pv usage"
-            exit 1
-        else
-            echo "✅ No problematic pv usage found"
-        fi
-        
-        # Show what changed
-        echo "=== Changes Made ==="
-        diff -u ainux-builder.sh.backup ainux-builder.sh || true
-        
     - name: Set Build Parameters
       run: |
         echo "CLUSTER_MODE=${{ matrix.mode }}" >> $GITHUB_ENV
