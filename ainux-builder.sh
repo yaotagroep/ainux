@@ -452,13 +452,35 @@ init_build() {
     
     # Install dependencies with progress
     log_info "Installing build dependencies..."
-    sudo apt update -qq
+    
+    # CI-specific optimizations 
+    if [[ "${CI:-false}" == "true" ]] || [[ "${GITHUB_ACTIONS:-false}" == "true" ]]; then
+        log_info "Detected CI environment - applying optimizations..."
+        # Use non-interactive mode and minimal installations for CI
+        export DEBIAN_FRONTEND=noninteractive
+        # Reduce apt cache to save space
+        sudo apt-get clean
+        sudo apt-get update -qq --no-install-recommends
+    else
+        sudo apt update -qq
+    fi
+    
     sudo DEBIAN_FRONTEND=noninteractive apt install -y \
         git build-essential libncurses-dev bison flex libssl-dev \
         libelf-dev bc gcc make debootstrap live-build squashfs-tools \
         dosfstools xorriso isolinux syslinux-utils genisoimage qemu-system-x86 \
         python3-pip nmap curl wget rsync pv dialog \
         grub-pc-bin grub-efi-amd64-bin mtools xorriso
+    
+    # CI-specific space optimization
+    if [[ "${CI:-false}" == "true" ]] || [[ "${GITHUB_ACTIONS:-false}" == "true" ]]; then
+        log_info "Applying CI space optimizations..."
+        # Clean up package cache to save space
+        sudo apt-get clean
+        sudo apt-get autoremove -y
+        # Remove unnecessary docs in CI
+        sudo rm -rf /usr/share/doc/* /usr/share/man/* /usr/share/info/* 2>/dev/null || true
+    fi
     
     # Create build structure
     mkdir -p "$BUILD_DIR"/{kernel,rootfs,iso,logs}
@@ -483,11 +505,78 @@ build_kernel() {
     log_phase "Building Custom Kernel $KERNEL_VERSION with AI Optimizations"
     cd "$BUILD_DIR/kernel"
     
-    # Download kernel with progress - FIXED
+    # Download kernel with progress - OPTIMIZED for CI
     log_info "Downloading Linux kernel $KERNEL_VERSION..."
     if [[ ! -d "linux" ]]; then
-        git clone --depth 1 --branch "v$KERNEL_VERSION" \
-            https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+        # Detect CI environment for optimal download strategy
+        if [[ "${CI:-false}" == "true" ]] || [[ "${GITHUB_ACTIONS:-false}" == "true" ]]; then
+            log_info "CI environment detected - using optimized download strategy"
+        fi
+        
+        # Use tarball download instead of git clone for much faster CI builds
+        local kernel_url="https://www.kernel.org/pub/linux/kernel/v6.x/linux-${KERNEL_VERSION}.tar.xz"
+        local kernel_tarball="linux-${KERNEL_VERSION}.tar.xz"
+        
+        log_info "Downloading kernel tarball (faster than git clone)..."
+        download_success=false
+        
+        # Try kernel.org first (fastest and most reliable)
+        if wget --timeout=600 --tries=2 --progress=dot:mega \
+            -O "${kernel_tarball}" "${kernel_url}" 2>&1; then
+            download_success=true
+            log_info "✓ Kernel tarball downloaded successfully from kernel.org"
+        else
+            log_warning "kernel.org download failed, trying alternative sources..."
+            
+            # Try GitHub mirror as fallback  
+            local github_url="https://github.com/torvalds/linux/archive/refs/tags/v${KERNEL_VERSION}.tar.gz"
+            if wget --timeout=600 --tries=2 --progress=dot:mega \
+                -O "linux-${KERNEL_VERSION}.tar.gz" "${github_url}" 2>&1; then
+                kernel_tarball="linux-${KERNEL_VERSION}.tar.gz"
+                download_success=true
+                log_info "✓ Kernel downloaded from GitHub mirror"
+            else
+                # Try GitLab mirror as second fallback
+                local gitlab_url="https://gitlab.com/linux-kernel/linux/-/archive/v${KERNEL_VERSION}/linux-v${KERNEL_VERSION}.tar.gz"
+                if wget --timeout=600 --tries=2 --progress=dot:mega \
+                    -O "linux-v${KERNEL_VERSION}.tar.gz" "${gitlab_url}" 2>&1; then
+                    kernel_tarball="linux-v${KERNEL_VERSION}.tar.gz"
+                    download_success=true
+                    log_info "✓ Kernel downloaded from GitLab mirror"
+                fi
+            fi
+        fi
+        
+        if [[ "$download_success" == "true" ]]; then
+            log_info "Extracting kernel source..."
+            if [[ "$kernel_tarball" == *.tar.xz ]]; then
+                tar -xJf "${kernel_tarball}" --transform 's/^linux-[0-9.]*\//linux\//' 2>/dev/null || \
+                    tar -xJf "${kernel_tarball}" --strip-components=1 --one-top-level=linux
+            elif [[ "$kernel_tarball" == *.tar.gz ]]; then
+                tar -xzf "${kernel_tarball}" --transform 's/^linux-[0-9.]*\//linux\//' 2>/dev/null || \
+                    tar -xzf "${kernel_tarball}" --strip-components=1 --one-top-level=linux
+            fi
+            rm -f "${kernel_tarball}"
+            
+            # Verify extraction worked
+            if [[ -d "linux" ]] && [[ -f "linux/Makefile" ]]; then
+                log_success "Kernel source extracted successfully"
+            else
+                log_error "Kernel extraction failed - directory structure incorrect"
+                download_success=false
+            fi
+        fi
+        
+        if [[ "$download_success" == "false" ]]; then
+            log_error "All download methods failed, falling back to git clone..."
+            # Fallback to optimized git clone
+            git clone --depth 1 --single-branch --branch "v$KERNEL_VERSION" \
+                --filter=blob:none --quiet \
+                https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git || {
+                log_error "Git clone also failed. Please check your internet connection."
+                exit 1
+            }
+        fi
     fi
     cd linux
     
@@ -675,6 +764,35 @@ NET_EOF
     
     make oldconfig < /dev/null
     
+    # CI-specific optimizations 
+    if [[ "${CI:-false}" == "true" ]] || [[ "${GITHUB_ACTIONS:-false}" == "true" ]]; then
+        log_info "Applying CI-specific kernel optimizations..."
+        # Disable debug options to speed up compilation in CI
+        scripts/config --disable CONFIG_DEBUG_KERNEL
+        scripts/config --disable CONFIG_DEBUG_INFO
+        scripts/config --disable CONFIG_DEBUG_INFO_BTF
+        scripts/config --disable CONFIG_DEBUG_INFO_DWARF4
+        scripts/config --disable CONFIG_DEBUG_INFO_DWARF5
+        scripts/config --disable CONFIG_DEBUG_KERNEL_DATA_STRUCTURES
+        scripts/config --disable CONFIG_DEBUG_VM
+        scripts/config --disable CONFIG_DEBUG_MEMORY_INIT
+        # Disable unnecessary drivers for CI builds
+        scripts/config --disable CONFIG_SOUND
+        scripts/config --disable CONFIG_SND
+        scripts/config --disable CONFIG_MEDIA_SUPPORT
+        scripts/config --disable CONFIG_DVB_CORE
+        scripts/config --disable CONFIG_VIDEO_DEV
+        # Use smaller configs for CI
+        scripts/config --set-val CONFIG_NR_CPUS 4
+        scripts/config --set-val CONFIG_LOG_BUF_SHIFT 17
+        
+        # Reduce build threads for CI memory constraints
+        if [[ $BUILD_THREADS -gt 2 ]]; then
+            BUILD_THREADS=2
+            log_info "Reduced build threads to $BUILD_THREADS for CI environment"
+        fi
+    fi
+    
     # Show configuration summary
     log_info "Kernel configuration summary:"
     log_info "  AMD GPU Support: $(grep -q "CONFIG_HSA_AMD=y" .config && echo "Enabled" || echo "Disabled")"
@@ -682,13 +800,32 @@ NET_EOF
     log_info "  Container Support: $(grep -q "CONFIG_CGROUPS=y" .config && echo "Enabled" || echo "Disabled")"
     log_info "  Performance Events: $(grep -q "CONFIG_PERF_EVENTS=y" .config && echo "Enabled" || echo "Disabled")"
     
-    # Build kernel with progress indication - FIXED
-    log_info "Compiling kernel... This will take 30-90 minutes depending on hardware"
+    # Build kernel with progress indication - OPTIMIZED for CI
+    if [[ "${CI:-false}" == "true" ]] || [[ "${GITHUB_ACTIONS:-false}" == "true" ]]; then
+        log_info "Compiling kernel... This will take 15-45 minutes in CI environment"
+    else
+        log_info "Compiling kernel... This will take 30-90 minutes depending on hardware"
+    fi
     log_info "Using $BUILD_THREADS parallel build jobs"
     
-    # Kernel compilation
-    make -j"$BUILD_THREADS" LOCALVERSION=-ainux 2>&1 | tee "$BUILD_DIR/logs/kernel-build.log"
-    make modules -j"$BUILD_THREADS" 2>&1 | tee "$BUILD_DIR/logs/modules-build.log"
+    # Kernel compilation with timeout protection
+    log_info "Starting kernel compilation..."
+    if timeout 3600 make -j"$BUILD_THREADS" LOCALVERSION=-ainux 2>&1 | tee "$BUILD_DIR/logs/kernel-build.log"; then
+        log_success "Kernel compilation completed successfully"
+    else
+        log_error "Kernel compilation failed or timed out"
+        log_info "Check $BUILD_DIR/logs/kernel-build.log for details"
+        exit 1
+    fi
+    
+    log_info "Building kernel modules..."
+    if timeout 1800 make modules -j"$BUILD_THREADS" 2>&1 | tee "$BUILD_DIR/logs/modules-build.log"; then
+        log_success "Kernel modules compiled successfully" 
+    else
+        log_error "Kernel modules compilation failed or timed out"
+        log_info "Check $BUILD_DIR/logs/modules-build.log for details"
+        exit 1
+    fi
     
     # Install kernel artifacts
     make INSTALL_MOD_PATH="$BUILD_DIR/kernel/modules" modules_install
