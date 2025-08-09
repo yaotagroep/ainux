@@ -1,1 +1,4 @@
+<closed>[a7b3f41]
+2025-08-09T09:46:34.518Z|patches/6.6-npu-support.patch|113|[RESOLVED][CFG]-Added missing endif and completed TPU help text|(SUMMARY: Fixed incomplete NPU Kconfig structure)|endif # NPU_FRAMEWORK|1m55s|{"fix_applied":"added_missing_endif_and_tpu_help","verification":"kernel_config_success","components_verified":["NPU","TPU","GPU","CPU"]}
+</closed>
 
