@@ -792,6 +792,202 @@ index 123456789abc..abcdef123456 100644
  	net_timestamp_check(!netdev_tstamp_prequeue, skb);
 NET_EOF
     }
+
+# Log a build issue to the issue logger
+log_build_issue() {
+    local severity="$1"
+    local category="$2"
+    local description="$3"
+    local filename="$4"
+    local line_range="$5"
+    local code_snippet="$6"
+    local context="$7"
+    
+    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
+    local issue_signature="${filename}:${line_range}:${description}:${timestamp}"
+    local hash=$(echo -n "$issue_signature" | sha1sum | cut -c1-7)
+    
+    # Create issue entry
+    local issue_entry="<open>\n${timestamp}|${filename}|${line_range}|[${severity}][${category}]-${description}|(SUMMARY: Build system issue)|${code_snippet}|[${hash}]|${context}\n</open>"
+    
+    # Append to open issues file if issue logger exists
+    if [[ -f "$REPO_ROOT/issue_logger/open.issue" ]]; then
+        echo -e "$issue_entry" >> "$REPO_ROOT/issue_logger/open.issue"
+        log_info "Build issue logged with hash [$hash]"
+    fi
+}
+
+# Log resolution of a build issue
+log_build_resolution() {
+    local hash="$1"
+    local resolution_description="$2"
+    local resolution_time="$3"
+    local context="$4"
+    
+    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
+    
+    # Create resolution entry
+    local resolution_entry="<closed>[${hash}]\n${timestamp}|ainux-builder.sh|0|[RESOLVED][CFG]-${resolution_description}|(SUMMARY: Build patch fixed)|Automated resolution|${resolution_time}|${context}\n</closed>"
+    
+    # Append to closed issues file if issue logger exists
+    if [[ -f "$REPO_ROOT/issue_logger/closed.issue" ]]; then
+        echo -e "$resolution_entry" >> "$REPO_ROOT/issue_logger/closed.issue"
+        log_info "Build resolution logged for hash [$hash]"
+    fi
+}
+
+# Verify NPU patch integrity
+verify_npu_patch_integrity() {
+    log_info "Verifying NPU patch integrity..."
+    
+    # Check if essential NPU files exist
+    if [[ ! -s "drivers/npu/Kconfig" ]]; then
+        log_warning "drivers/npu/Kconfig missing or empty"
+        log_build_issue "HIGH" "CFG" "NPU Kconfig file missing or empty after patch application" "drivers/npu/Kconfig" "1" "File missing or zero size" "{\"patch_type\":\"npu-support\",\"build_phase\":\"patch_verification\"}"
+        return 1
+    fi
+    
+    if [[ ! -s "drivers/npu/Makefile" ]]; then
+        log_warning "drivers/npu/Makefile missing or empty"
+        log_build_issue "HIGH" "CFG" "NPU Makefile missing or empty after patch application" "drivers/npu/Makefile" "1" "File missing or zero size" "{\"patch_type\":\"npu-support\",\"build_phase\":\"patch_verification\"}"
+        return 1
+    fi
+    
+    # Check if Kconfig file is complete (should end with "endif # NPU_FRAMEWORK")
+    if ! grep -q "endif # NPU_FRAMEWORK" "drivers/npu/Kconfig"; then
+        log_warning "drivers/npu/Kconfig appears to be truncated"
+        local last_line=$(tail -1 "drivers/npu/Kconfig" | head -c 50)
+        log_build_issue "HIGH" "CFG" "NPU Kconfig file truncated - missing endif statement" "drivers/npu/Kconfig" "$(wc -l < drivers/npu/Kconfig)" "Last line: ${last_line}..." "{\"patch_type\":\"npu-support\",\"build_phase\":\"patch_verification\",\"truncation_detected\":true}"
+        return 1
+    fi
+    
+    # Check if main drivers/Kconfig includes NPU
+    if ! grep -q "source \"drivers/npu/Kconfig\"" "drivers/Kconfig"; then
+        log_warning "NPU not properly included in main drivers/Kconfig"
+        log_build_issue "MEDIUM" "CFG" "NPU Kconfig not included in main drivers configuration" "drivers/Kconfig" "246" "Missing source directive" "{\"patch_type\":\"npu-support\",\"build_phase\":\"patch_verification\"}"
+        return 1
+    fi
+    
+    # Check if main drivers/Makefile includes NPU
+    if ! grep -q "obj-\$(CONFIG_NPU_FRAMEWORK)" "drivers/Makefile"; then
+        log_warning "NPU not properly included in main drivers/Makefile"
+        log_build_issue "MEDIUM" "CFG" "NPU not included in main drivers Makefile" "drivers/Makefile" "$(wc -l < drivers/Makefile)" "Missing build directive" "{\"patch_type\":\"npu-support\",\"build_phase\":\"patch_verification\"}"
+        return 1
+    fi
+    
+    log_success "NPU patch integrity verification passed"
+    return 0
+}
+
+# Create NPU fallback files when patch fails or is incomplete
+create_npu_fallback_files() {
+    log_info "Creating NPU fallback configuration files..."
+    
+    # Create NPU directory if it doesn't exist
+    mkdir -p drivers/npu
+    
+    # Always recreate NPU Kconfig to ensure it's complete and not truncated
+    log_info "Creating fallback drivers/npu/Kconfig..."
+    cat > "drivers/npu/Kconfig" << 'KCONFIG_EOF'
+# SPDX-License-Identifier: GPL-2.0-only
+menuconfig NPU_FRAMEWORK
+	bool "Neural Processing Unit (NPU) Support"
+	default y
+	help
+	  Enable support for Neural Processing Units (NPUs) in Ainux OS.
+	  NPUs are specialized processors designed for AI/ML acceleration.
+	  This option cannot be disabled in Ainux AI cluster builds.
+
+if NPU_FRAMEWORK
+
+config ROCKCHIP_NPU
+	tristate "Rockchip NPU Support"
+	depends on ARM64 || X86_64
+	default y
+	help
+	  Enable support for Rockchip NPUs (Neural Processing Units).
+	  This includes support for RK3588 and other Rockchip SoCs.
+
+config ARM_ETHOS_NPU
+	tristate "ARM Ethos NPU Support"
+	depends on ARM64 || X86_64
+	default y
+	help
+	  Enable support for ARM Ethos NPUs for AI inference.
+
+config INTEL_VPU
+	tristate "Intel VPU (Vision Processing Unit) Support"
+	depends on X86_64 && PCI
+	default y
+	help
+	  Enable support for Intel VPU for AI acceleration.
+
+endif # NPU_FRAMEWORK
+KCONFIG_EOF
+    
+    # Always recreate NPU Makefile to ensure it's complete
+    log_info "Creating fallback drivers/npu/Makefile..."
+    cat > "drivers/npu/Makefile" << 'MAKEFILE_EOF'
+# SPDX-License-Identifier: GPL-2.0
+obj-$(CONFIG_NPU_FRAMEWORK)	+= npu-core.o
+obj-$(CONFIG_ROCKCHIP_NPU)	+= rockchip-npu.o
+obj-$(CONFIG_ARM_ETHOS_NPU)	+= arm-ethos-npu.o
+obj-$(CONFIG_INTEL_VPU)		+= intel-vpu.o
+MAKEFILE_EOF
+    
+    # Create minimal NPU core driver if it doesn't exist
+    if [[ ! -s "drivers/npu/npu-core.c" ]]; then
+        log_info "Creating fallback drivers/npu/npu-core.c..."
+        cat > "drivers/npu/npu-core.c" << 'CORE_EOF'
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Neural Processing Unit (NPU) Core Framework - Minimal Implementation
+ * Copyright (C) 2024 Ainux OS Project
+ */
+
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
+
+static int __init npu_core_init(void)
+{
+	pr_info("Ainux NPU Framework initialized (minimal)\n");
+	return 0;
+}
+
+static void __exit npu_core_exit(void)
+{
+	pr_info("Ainux NPU Framework unloaded\n");
+}
+
+module_init(npu_core_init);
+module_exit(npu_core_exit);
+
+MODULE_AUTHOR("Ainux OS Project");
+MODULE_DESCRIPTION("Neural Processing Unit (NPU) Framework - Core");
+MODULE_LICENSE("GPL v2");
+MODULE_ALIAS("npu-core");
+CORE_EOF
+    fi
+    
+    # Update main drivers/Kconfig to include NPU if not already included
+    if ! grep -q "source \"drivers/npu/Kconfig\"" "drivers/Kconfig"; then
+        log_info "Adding NPU to main drivers/Kconfig..."
+        sed -i '/source "drivers\/counter\/Kconfig"/a\\nsource "drivers/npu/Kconfig"' drivers/Kconfig
+    fi
+    
+    # Update main drivers/Makefile to include NPU if not already included
+    if ! grep -q "obj-\$(CONFIG_NPU_FRAMEWORK)" "drivers/Makefile"; then
+        log_info "Adding NPU to main drivers/Makefile..."
+        echo "obj-\$(CONFIG_NPU_FRAMEWORK)	+= npu/" >> drivers/Makefile
+    fi
+    
+    log_success "NPU fallback files created successfully"
+    
+    # Log resolution of NPU patch issues if any were logged
+    local resolution_time="immediate"
+    log_build_resolution "auto" "NPU fallback configuration files created successfully" "$resolution_time" "{\"fallback_method\":\"template_generation\",\"files_created\":[\"Kconfig\",\"Makefile\",\"npu-core.c\"]}"
+}
        
     # Use local patches from repository instead of downloading
     # Look for patches in the script directory (repository root)
@@ -836,16 +1032,20 @@ NET_EOF
         if [[ -f "$PATCH_DIR/6.6-npu-support.patch" ]]; then
             log_info "Applying NPU support patch..."
             if ! patch -p1 --fuzz=3 < "$PATCH_DIR/6.6-npu-support.patch" 2>&1 | tee "$BUILD_DIR/logs/patch-npu.log"; then
-                log_warning "NPU patch failed, continuing with build..."
+                log_warning "NPU patch failed, using fallback NPU configuration..."
+                # Create NPU files using fallback template when patch fails
+                create_npu_fallback_files
             else
-                # Fix NPU Kconfig if it was truncated during patch application
-                if [[ -f "drivers/npu/Kconfig" ]]; then
-                    log_info "Verifying NPU Kconfig completeness..."
-                    if [[ -x "$REPO_ROOT/fix-npu-kconfig.sh" ]]; then
-                        "$REPO_ROOT/fix-npu-kconfig.sh" "drivers/npu/Kconfig" || log_warning "NPU Kconfig fix failed"
-                    fi
+                log_info "NPU patch applied, verifying integrity..."
+                # Verify patch integrity - check that essential NPU files exist and are complete
+                if ! verify_npu_patch_integrity; then
+                    log_warning "NPU patch integrity check failed, restoring from fallback..."
+                    create_npu_fallback_files
                 fi
             fi
+        else
+            log_warning "NPU patch file not found, using fallback NPU configuration..."
+            create_npu_fallback_files
         fi
         
         # Try simplified ROCm patch first, fallback to original if needed
@@ -880,11 +1080,15 @@ NET_EOF
         log_info "Directory listing: $(ls -la "$(dirname "$PATCH_DIR")" 2>/dev/null || echo 'parent directory not found')"
         log_warning "Using fallback patches..."
         create_fallback_patches
-        patch -p1 --fuzz=3 < npu-support.patch 2>&1 | tee "$BUILD_DIR/logs/patch-npu.log" || log_warning "Fallback NPU patch failed"
-        # Fix NPU Kconfig if it was truncated during fallback patch application
-        if [[ -f "drivers/npu/Kconfig" && -x "$REPO_ROOT/fix-npu-kconfig.sh" ]]; then
-            log_info "Verifying fallback NPU Kconfig completeness..."
-            "$REPO_ROOT/fix-npu-kconfig.sh" "drivers/npu/Kconfig" || log_warning "NPU Kconfig fix failed"
+        if ! patch -p1 --fuzz=3 < npu-support.patch 2>&1 | tee "$BUILD_DIR/logs/patch-npu.log"; then
+            log_warning "Fallback NPU patch failed, creating NPU files directly..."
+            create_npu_fallback_files
+        else
+            # Verify fallback patch integrity
+            if ! verify_npu_patch_integrity; then
+                log_warning "Fallback NPU patch integrity check failed, restoring from template..."
+                create_npu_fallback_files
+            fi
         fi
         patch -p1 --fuzz=3 < rocm-optimizations.patch 2>&1 | tee "$BUILD_DIR/logs/patch-rocm.log" || log_warning "Fallback ROCm patch failed"
         patch -p1 --fuzz=3 < cluster-networking.patch 2>&1 | tee "$BUILD_DIR/logs/patch-cluster.log" || log_warning "Fallback cluster networking patch failed"
