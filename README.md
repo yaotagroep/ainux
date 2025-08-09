@@ -121,19 +121,19 @@ sudo validate-hardware
 
 ### Supported Hardware
 
-| Component | Supported Hardware | Driver Version |
-|-----------|-------------------|----------------|
-| **CPUs** | Intel x86_64, AMD x86_64, ARM64 (planned) | Native kernel support |
-| **NVIDIA GPUs** | RTX 20/30/40 Series, Tesla, A100, H100 | Driver 560+ |
-| **AMD GPUs** | RDNA, RDNA2, RDNA3, Vega, MI Series | ROCm 6.2+ |
-| **Intel GPUs** | Arc A-Series, Xe-LP, Xe-HPG | Intel GPU drivers |
-| **NPUs** | Rockchip RK3588, ARM Ethos-N, Intel VPU | Native unified framework |
-| **TPUs** | Google Coral USB/PCIe, Edge TPU | Enhanced TPU driver |
-| **DPUs** | SmartNIC, DPDK-enabled cards | DPDK integration |
-| **Flash Storage** | NVMe, SATA SSD, eMMC, UFS | bcache, dm-cache |
-| **Memory** | DDR4/DDR5, ZRAM, Huge Pages | Optimized pools |
-| **Networking** | 10GbE, InfiniBand, Thunderbolt 3/4 | Kernel native |
-| **Storage** | NVMe, SATA, USB 3.0+ | Advanced caching |
+| Component | Supported Hardware | Driver Version | Status |
+|-----------|-------------------|----------------|--------|
+| **CPUs** | Intel x86_64, AMD x86_64, ARM64 | Native kernel support | ✅ Complete |
+| **NVIDIA GPUs** | RTX 20/30/40 Series, Tesla, A100, H100 | Driver 560+ | ✅ Complete |
+| **AMD GPUs** | RDNA, RDNA2, RDNA3, Vega, MI Series | ROCm 6.2+ | ✅ Complete |
+| **Intel GPUs** | Arc A-Series, Xe-LP, Xe-HPG | Intel GPU drivers | ✅ Complete |
+| **NPUs** | Rockchip RK3588, ARM Ethos-N, Intel VPU | Native unified framework | ✅ Complete |
+| **TPUs** | Google Coral USB/PCIe, Edge TPU | Enhanced TPU driver | ✅ Complete |
+| **DPUs** | SmartNIC, DPDK-enabled cards | DPDK integration | 🔧 In Progress |
+| **Flash Storage** | NVMe, SATA SSD, eMMC, UFS | bcache, dm-cache | ✅ Complete |
+| **Memory** | DDR4/DDR5, ZRAM, Huge Pages | Optimized pools | ✅ Complete |
+| **Networking** | 10GbE, InfiniBand, Thunderbolt 3/4 | Kernel native | ✅ Complete |
+| **Storage** | NVMe, SATA, USB 3.0+ | Advanced caching | ✅ Complete |
 
 ### System Requirements
 
@@ -155,8 +155,16 @@ sudo validate-hardware
 
 ### Build Options
 
+Ainux OS supports multiple build variants optimized for different use cases:
+
 ```bash
-# Available build flags
+# Build variants
+BUILD_VARIANT=ai      ./ainux-builder.sh  # AI/Cluster edition (default)
+BUILD_VARIANT=desktop ./ainux-builder.sh  # Desktop edition with full GUI
+BUILD_VARIANT=server  ./ainux-builder.sh  # Server edition (enterprise)
+BUILD_VARIANT=arm     ./ainux-builder.sh  # ARM edition (Raspberry Pi)
+
+# Additional options
 ./ainux-builder.sh [OPTIONS]
 
 Options:
@@ -169,9 +177,15 @@ Options:
   --build-dir PATH        Custom build directory
 ```
 
+📚 **For detailed build variant information, see [BUILD_VARIANTS.md](./BUILD_VARIANTS.md)**
+
 ### Environment Variables
 
 ```bash
+# Build variant selection
+export BUILD_VARIANT=desktop       # ai|desktop|server|arm
+export ARCH=x86_64                 # x86_64|arm64
+
 # Customize build behavior
 export CLUSTER_MODE=main           # main|sub
 export BUILD_THREADS=8             # Parallel build jobs

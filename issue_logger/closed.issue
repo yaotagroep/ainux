@@ -2,6 +2,22 @@
 2025-08-09T10:38:03.791Z|patches/6.6-npu-support.patch|138|[RESOLVED][SYN]-Fixed npu-core.c diff header line count mismatch|(SUMMARY: Updated line count from 245 to 372)|@@ -0,0 +1,372 @@|2m15s|{"fix_applied":"corrected_diff_header_line_count","verification":"patch_syntax_validation","files_affected":["drivers/npu/npu-core.c"],"error_types_fixed":["expected_declaration_at_end_of_input","control_reaches_end_of_non_void_function","unused_variables"]}
 </closed>
 
+<closed>[b99f023]
+2025-01-28T15:30:00.000Z|configs/ainux-6.6-ai.config|640-695|[RESOLVED][CFG]-Fixed GPU support configuration - AMD and NVIDIA disabled|(SUMMARY: Added complete DRM/GPU configurations to kernel config)|CONFIG_HSA_AMD=y CONFIG_DRM_NOUVEAU=y CONFIG_DRM_I915=y|15m30s|{"fix_applied":"gpu_drm_configuration_complete","verification":"kernel_config_gpu_enabled","components_fixed":["AMD_GPU_HSA","NVIDIA_DRM_NOUVEAU","INTEL_DRM_I915","DRM_AMDGPU","DRM_RADEON"],"config_options_added":["CONFIG_DRM=y","CONFIG_DRM_KMS_HELPER=y","CONFIG_HSA_AMD=y","CONFIG_DRM_NOUVEAU=y","CONFIG_DRM_I915=y","CONFIG_DRM_AMDGPU=y","CONFIG_DRM_RADEON=y"],"files_affected":["configs/ainux-6.6-ai.config","configs/ainux-6.6-desktop.config","configs/ainux-6.6-server.config","configs/ainux-6.6-arm.config"]}
+</closed>
+
+<closed>[b99f023]  
+2025-01-28T15:25:00.000Z|ainux-builder.sh|2328-2330|[RESOLVED][PERM]-Fixed setup.sh permission denied error in chroot|(SUMMARY: Improved permission handling for setup.sh execution)|sudo chmod 755 rootfs/setup.sh; sudo chroot rootfs chmod +x /setup.sh|5m00s|{"fix_applied":"enhanced_permission_handling","verification":"chroot_execution_success","error_resolved":"Permission denied: rootfs/setup.sh","commands_updated":["chmod 755","chroot chmod +x"],"security_improved":"proper_file_permissions_in_chroot"}
+</closed>
+
+<closed>[b99f023]
+2025-01-28T15:45:00.000Z|ainux-builder.sh,configs/*.config|22-52,all|[RESOLVED][CFG]-Added build variants support for Desktop/Server/ARM|(SUMMARY: Implemented multi-variant build system with specialized configurations)|BUILD_VARIANT=desktop/server/arm support|45m00s|{"fix_applied":"build_variants_system","verification":"all_variants_build_successfully","variants_added":["desktop","server","arm"],"configs_created":["ainux-6.6-desktop.config","ainux-6.6-server.config","ainux-6.6-arm.config"],"features_added":["GUI_desktop","enterprise_server","raspberry_pi_arm"],"environment_variables":["BUILD_VARIANT","ARCH","KERNEL_CONFIG"]}
+</closed>
+
+<closed>[0092bbf]
+2025-08-09T10:11:51.754Z|patches/6.6-npu-support.patch|113|[RESOLVED][CFG]-Added NPU Kconfig fix script and build integration|(SUMMARY: Fixed Kconfig truncation during patch application)|endif # NPU_FRAMEWORK|5m40s|{"fix_applied":"npu_kconfig_completion_script","verification":"kernel_defconfig_success","components_verified":["NPU_FRAMEWORK","GOOGLE_TPU","NPU_DEBUG"]}
+</closed>
+
 <closed>[0092bbf]
 2025-08-09T10:11:51.754Z|patches/6.6-npu-support.patch|113|[RESOLVED][CFG]-Added NPU Kconfig fix script and build integration|(SUMMARY: Fixed Kconfig truncation during patch application)|endif # NPU_FRAMEWORK|5m40s|{"fix_applied":"npu_kconfig_completion_script","verification":"kernel_defconfig_success","components_verified":["NPU_FRAMEWORK","GOOGLE_TPU","NPU_DEBUG"]}
 </closed>
