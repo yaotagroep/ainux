@@ -1,0 +1,398 @@
+﻿2025-08-09T01:37:43.6149753Z ##[group]Run chmod +x ainux-builder.sh
+2025-08-09T01:37:43.6150071Z [36;1mchmod +x ainux-builder.sh[0m
+2025-08-09T01:37:43.6150290Z [36;1m[0m
+2025-08-09T01:37:43.6150456Z [36;1m# Add debug output[0m
+2025-08-09T01:37:43.6150651Z [36;1mset -x[0m
+2025-08-09T01:37:43.6150814Z [36;1m[0m
+2025-08-09T01:37:43.6150996Z [36;1m# Run build with timeout (2 hours max)[0m
+2025-08-09T01:37:43.6151285Z [36;1mtimeout 7200 ./ainux-builder.sh || {[0m
+2025-08-09T01:37:43.6151550Z [36;1m  echo "Build timed out or failed"[0m
+2025-08-09T01:37:43.6151831Z [36;1m  echo "=== Last 100 lines of any available logs ==="[0m
+2025-08-09T01:37:43.6152288Z [36;1m  find ~/ainux-build/logs -name "*.log" -exec tail -50 {} \; 2>/dev/null || echo "No log files found"[0m
+2025-08-09T01:37:43.6152669Z [36;1m  [0m
+2025-08-09T01:37:43.6152855Z [36;1m  echo "=== Environment Variables ==="[0m
+2025-08-09T01:37:43.6153176Z [36;1m  env | grep -E "(CLUSTER_MODE|ENABLE_GUI|SKIP_|BUILD_)" || true[0m
+2025-08-09T01:37:43.6153471Z [36;1m  [0m
+2025-08-09T01:37:43.6153662Z [36;1m  echo "=== Disk Usage ==="[0m
+2025-08-09T01:37:43.6153889Z [36;1m  df -h || true[0m
+2025-08-09T01:37:43.6154065Z [36;1m  [0m
+2025-08-09T01:37:43.6154234Z [36;1m  echo "=== Memory Usage ==="[0m
+2025-08-09T01:37:43.6154457Z [36;1m  free -h || true[0m
+2025-08-09T01:37:43.6154645Z [36;1m  [0m
+2025-08-09T01:37:43.6154795Z [36;1m  exit 1[0m
+2025-08-09T01:37:43.6154953Z [36;1m}[0m
+2025-08-09T01:37:43.6178799Z shell: /usr/bin/bash -e {0}
+2025-08-09T01:37:43.6179016Z env:
+2025-08-09T01:37:43.6179176Z   CLUSTER_MODE: main
+2025-08-09T01:37:43.6179360Z   ENABLE_GUI: true
+2025-08-09T01:37:43.6179536Z   SKIP_QEMU_TEST: true
+2025-08-09T01:37:43.6179716Z   BUILD_THREADS: 2
+2025-08-09T01:37:43.6179890Z   SKIP_CONNECTIVITY_CHECK: true
+2025-08-09T01:37:43.6180107Z ##[endgroup]
+2025-08-09T01:37:43.6231616Z + timeout 7200 ./ainux-builder.sh
+2025-08-09T01:37:43.6307255Z 
+2025-08-09T01:37:43.6307957Z [0;35m[PHASE][0m Starting Ainux OS AI Cluster Builder Process
+2025-08-09T01:37:43.6308378Z 
+2025-08-09T01:37:43.6308388Z 
+2025-08-09T01:37:43.6308616Z [0;35m[PHASE][0m Checking Prerequisites
+2025-08-09T01:37:43.6308905Z 
+2025-08-09T01:37:43.6354811Z [0;34m[INFO][0m Detected Ubuntu 22.04 LTS - supported
+2025-08-09T01:37:43.6383088Z [0;34m[INFO][0m Disk space check passed: 36GB available
+2025-08-09T01:37:43.6383754Z [0;34m[INFO][0m Checking internet connectivity...
+2025-08-09T01:37:43.6384514Z [1;33m[WARNING][0m Skipping connectivity check (SKIP_CONNECTIVITY_CHECK=true)
+2025-08-09T01:37:43.6385243Z [0;32m[SUCCESS][0m Prerequisites check passed
+2025-08-09T01:37:43.6386005Z 
+2025-08-09T01:37:43.6386380Z [0;35m[PHASE][0m Initializing Ainux OS AI Cluster Build Environment
+2025-08-09T01:37:43.6386807Z 
+2025-08-09T01:37:43.6387021Z [0;34m[INFO][0m Build Configuration:
+2025-08-09T01:37:43.6387498Z [0;34m[INFO][0m   Kernel Version: 6.6.58
+2025-08-09T01:37:43.6387986Z [0;34m[INFO][0m   Cluster Mode: main
+2025-08-09T01:37:43.6388448Z [0;34m[INFO][0m   Build Threads: 2
+2025-08-09T01:37:43.6389033Z [0;34m[INFO][0m   GUI Enabled: true
+2025-08-09T01:37:43.6389352Z [0;34m[INFO][0m   Build Directory: /home/runner/ainux-build
+2025-08-09T01:37:43.6389704Z [0;34m[INFO][0m Installing build dependencies...
+2025-08-09T01:37:43.6390098Z [0;34m[INFO][0m Detected CI environment - applying optimizations...
+2025-08-09T01:37:45.1898785Z 
+2025-08-09T01:37:45.1899469Z WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+2025-08-09T01:37:45.1899816Z 
+2025-08-09T01:37:45.2285901Z Reading package lists...
+2025-08-09T01:37:45.3958044Z Building dependency tree...
+2025-08-09T01:37:45.3969777Z Reading state information...
+2025-08-09T01:37:45.5329847Z bc is already the newest version (1.07.1-3build1).
+2025-08-09T01:37:45.5330511Z bison is already the newest version (2:3.8.2+dfsg-1build1).
+2025-08-09T01:37:45.5331107Z build-essential is already the newest version (12.9ubuntu3).
+2025-08-09T01:37:45.5331671Z dosfstools is already the newest version (4.2-1build3).
+2025-08-09T01:37:45.5332750Z flex is already the newest version (2.6.4-8build2).
+2025-08-09T01:37:45.5333124Z gcc is already the newest version (4:11.2.0-1ubuntu1).
+2025-08-09T01:37:45.5333480Z genisoimage is already the newest version (9:1.1.11-3.2ubuntu1).
+2025-08-09T01:37:45.5333828Z make is already the newest version (4.3-4.1build1).
+2025-08-09T01:37:45.5334182Z mtools is already the newest version (4.0.33-1+really4.0.32-1build1).
+2025-08-09T01:37:45.5334538Z pv is already the newest version (1.6.6-1build2).
+2025-08-09T01:37:45.5334883Z squashfs-tools is already the newest version (1:4.5-3build1).
+2025-08-09T01:37:45.5335336Z isolinux is already the newest version (3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1).
+2025-08-09T01:37:45.5336168Z syslinux-utils is already the newest version (3:6.04~git20190206.bf6db5b4+dfsg1-3ubuntu1).
+2025-08-09T01:37:45.5336605Z xorriso is already the newest version (1.5.4-2).
+2025-08-09T01:37:45.5336919Z curl is already the newest version (7.81.0-1ubuntu1.20).
+2025-08-09T01:37:45.5337306Z debootstrap is already the newest version (1.0.126+nmu1ubuntu0.8).
+2025-08-09T01:37:45.5337722Z grub-efi-amd64-bin is already the newest version (2.06-2ubuntu14.8).
+2025-08-09T01:37:45.5338111Z grub-pc-bin is already the newest version (2.06-2ubuntu7.2).
+2025-08-09T01:37:45.5338472Z libelf-dev is already the newest version (0.186-1ubuntu0.1).
+2025-08-09T01:37:45.5338841Z libncurses-dev is already the newest version (6.3-2ubuntu0.1).
+2025-08-09T01:37:45.5339216Z libssl-dev is already the newest version (3.0.2-0ubuntu1.19).
+2025-08-09T01:37:45.5339599Z live-build is already the newest version (3.0~a57-1ubuntu41.22.04.1).
+2025-08-09T01:37:45.5340022Z qemu-system-x86 is already the newest version (1:6.2+dfsg-2ubuntu6.26).
+2025-08-09T01:37:45.5340417Z rsync is already the newest version (3.2.7-0ubuntu0.22.04.4).
+2025-08-09T01:37:45.5340749Z wget is already the newest version (1.21.2-2ubuntu1.1).
+2025-08-09T01:37:45.5341137Z nmap is already the newest version (7.91+dfsg1+really7.80+dfsg1-2ubuntu0.1).
+2025-08-09T01:37:45.5341579Z python3-pip is already the newest version (22.0.2+dfsg-1ubuntu0.6).
+2025-08-09T01:37:45.5341976Z git is already the newest version (1:2.50.1-0ppa1~ubuntu22.04.1).
+2025-08-09T01:37:45.5732768Z The following NEW packages will be installed:
+2025-08-09T01:37:45.5740177Z   dialog
+2025-08-09T01:37:45.6027403Z 0 upgraded, 1 newly installed, 0 to remove and 16 not upgraded.
+2025-08-09T01:37:45.6361328Z Need to get 303 kB of archives.
+2025-08-09T01:37:45.6361971Z After this operation, 1258 kB of additional disk space will be used.
+2025-08-09T01:37:45.6362594Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T01:37:45.7334781Z Get:2 http://azure.archive.ubuntu.com/ubuntu jammy/universe amd64 dialog amd64 1.3-20211214-1 [303 kB]
+2025-08-09T01:37:46.0271554Z Fetched 303 kB in 0s (2650 kB/s)
+2025-08-09T01:37:46.0476588Z Selecting previously unselected package dialog.
+2025-08-09T01:37:46.0546591Z (Reading database ... 
+2025-08-09T01:37:46.0546984Z (Reading database ... 5%
+2025-08-09T01:37:46.0547682Z (Reading database ... 10%
+2025-08-09T01:37:46.0548032Z (Reading database ... 15%
+2025-08-09T01:37:46.0548356Z (Reading database ... 20%
+2025-08-09T01:37:46.0548692Z (Reading database ... 25%
+2025-08-09T01:37:46.0549024Z (Reading database ... 30%
+2025-08-09T01:37:46.0549343Z (Reading database ... 35%
+2025-08-09T01:37:46.0549667Z (Reading database ... 40%
+2025-08-09T01:37:46.0549982Z (Reading database ... 45%
+2025-08-09T01:37:46.0550306Z (Reading database ... 50%
+2025-08-09T01:37:46.0602255Z (Reading database ... 55%
+2025-08-09T01:37:46.0634311Z (Reading database ... 60%
+2025-08-09T01:37:46.0655709Z (Reading database ... 65%
+2025-08-09T01:37:46.0737138Z (Reading database ... 70%
+2025-08-09T01:37:46.0901222Z (Reading database ... 75%
+2025-08-09T01:37:46.0926743Z (Reading database ... 80%
+2025-08-09T01:37:46.1191537Z (Reading database ... 85%
+2025-08-09T01:37:46.1267716Z (Reading database ... 90%
+2025-08-09T01:37:46.1413222Z (Reading database ... 95%
+2025-08-09T01:37:46.1413535Z (Reading database ... 100%
+2025-08-09T01:37:46.1414648Z (Reading database ... 270634 files and directories currently installed.)
+2025-08-09T01:37:46.1465829Z Preparing to unpack .../dialog_1.3-20211214-1_amd64.deb ...
+2025-08-09T01:37:46.1482485Z Unpacking dialog (1.3-20211214-1) ...
+2025-08-09T01:37:46.3012512Z Setting up dialog (1.3-20211214-1) ...
+2025-08-09T01:37:46.3066044Z Processing triggers for man-db (2.10.2-1) ...
+2025-08-09T01:37:46.8575346Z NEEDRESTART-VER: 3.5
+2025-08-09T01:37:47.0880814Z NEEDRESTART-KCUR: 6.8.0-1031-azure
+2025-08-09T01:37:47.0881313Z NEEDRESTART-KEXP: 6.8.0-1031-azure
+2025-08-09T01:37:47.0881574Z NEEDRESTART-KSTA: 1
+2025-08-09T01:37:47.0881838Z NEEDRESTART-SVC: hosted-compute-agent.service
+2025-08-09T01:37:48.4144955Z [0;34m[INFO][0m Applying CI space optimizations...
+2025-08-09T01:37:49.3418100Z Reading package lists...
+2025-08-09T01:37:49.5178825Z Building dependency tree...
+2025-08-09T01:37:49.5191145Z Reading state information...
+2025-08-09T01:37:49.6568932Z The following packages will be REMOVED:
+2025-08-09T01:37:49.6569864Z   apport-symptoms landscape-common libintl-perl libintl-xs-perl libisns0
+2025-08-09T01:37:49.6570955Z   liblldb-13 liblldb-15 libmodule-find-perl libmodule-scandeps-perl libmspack0
+2025-08-09T01:37:49.6588996Z   libopeniscsiusr libproc-processtable-perl libsort-naturally-perl
+2025-08-09T01:37:49.6589752Z   libterm-readkey-perl libxmlsec1 libxmlsec1-openssl lxd-agent-loader
+2025-08-09T01:37:49.6590485Z   needrestart open-iscsi open-vm-tools python3-apport python3-automat
+2025-08-09T01:37:49.6591022Z   python3-bcrypt python3-click python3-colorama python3-constantly
+2025-08-09T01:37:49.6591412Z   python3-hamcrest python3-hyperlink python3-incremental
+2025-08-09T01:37:49.6591789Z   python3-problem-report python3-pyasn1 python3-pyasn1-modules
+2025-08-09T01:37:49.6592174Z   python3-service-identity python3-systemd python3-twisted
+2025-08-09T01:37:49.6592481Z   python3-zope.interface zerofree
+2025-08-09T01:37:49.9858480Z 0 upgraded, 0 newly installed, 37 to remove and 14 not upgraded.
+2025-08-09T01:37:49.9858970Z After this operation, 62.7 MB disk space will be freed.
+2025-08-09T01:37:50.0079724Z (Reading database ... 
+2025-08-09T01:37:50.0080154Z (Reading database ... 5%
+2025-08-09T01:37:50.0080510Z (Reading database ... 10%
+2025-08-09T01:37:50.0080840Z (Reading database ... 15%
+2025-08-09T01:37:50.0081170Z (Reading database ... 20%
+2025-08-09T01:37:50.0081487Z (Reading database ... 25%
+2025-08-09T01:37:50.0081819Z (Reading database ... 30%
+2025-08-09T01:37:50.0082141Z (Reading database ... 35%
+2025-08-09T01:37:50.0082468Z (Reading database ... 40%
+2025-08-09T01:37:50.0082783Z (Reading database ... 45%
+2025-08-09T01:37:50.0083109Z (Reading database ... 50%
+2025-08-09T01:37:50.0135851Z (Reading database ... 55%
+2025-08-09T01:37:50.0166448Z (Reading database ... 60%
+2025-08-09T01:37:50.0186832Z (Reading database ... 65%
+2025-08-09T01:37:50.0265336Z (Reading database ... 70%
+2025-08-09T01:37:50.0428741Z (Reading database ... 75%
+2025-08-09T01:37:50.0453638Z (Reading database ... 80%
+2025-08-09T01:37:50.0729495Z (Reading database ... 85%
+2025-08-09T01:37:50.0810738Z (Reading database ... 90%
+2025-08-09T01:37:50.0962719Z (Reading database ... 95%
+2025-08-09T01:37:50.0963077Z (Reading database ... 100%
+2025-08-09T01:37:50.0963530Z (Reading database ... 270787 files and directories currently installed.)
+2025-08-09T01:37:50.1015748Z Removing apport-symptoms (0.24) ...
+2025-08-09T01:37:50.1256109Z Removing landscape-common (23.02-0ubuntu1~22.04.4) ...
+2025-08-09T01:37:50.2486419Z Removing libintl-xs-perl (1.26-3build2) ...
+2025-08-09T01:37:50.2728701Z Removing needrestart (3.5-5ubuntu2.4) ...
+2025-08-09T01:37:50.3296316Z Removing libintl-perl (1.26-3build2) ...
+2025-08-09T01:37:50.3625076Z Removing open-iscsi (2.1.5-1ubuntu1.1) ...
+2025-08-09T01:37:50.5393103Z Warning: Stopping iscsid.service, but it can still be activated by:
+2025-08-09T01:37:50.5393738Z   iscsid.socket
+2025-08-09T01:37:51.9300618Z Removing libisns0:amd64 (0.101-0ubuntu2) ...
+2025-08-09T01:37:51.9532333Z Removing liblldb-13 (1:13.0.1-2ubuntu2.2) ...
+2025-08-09T01:37:51.9795045Z Removing liblldb-15 (1:15.0.7-0ubuntu0.22.04.3) ...
+2025-08-09T01:37:52.0074280Z Removing libmodule-find-perl (0.15-1) ...
+2025-08-09T01:37:52.0332222Z Removing libmodule-scandeps-perl (1.31-1ubuntu0.1) ...
+2025-08-09T01:37:52.0568408Z Removing open-vm-tools (2:12.3.5-3~ubuntu0.22.04.2) ...
+2025-08-09T01:37:53.0278049Z Removing libmspack0:amd64 (0.10.1-2build2) ...
+2025-08-09T01:37:53.0475197Z Removing libopeniscsiusr (2.1.5-1ubuntu1.1) ...
+2025-08-09T01:37:53.0676183Z Removing libproc-processtable-perl:amd64 (0.634-1build1) ...
+2025-08-09T01:37:53.0931406Z Removing libsort-naturally-perl (1.03-2) ...
+2025-08-09T01:37:53.1133185Z Removing libterm-readkey-perl (2.38-1build4) ...
+2025-08-09T01:37:53.1341888Z Removing libxmlsec1-openssl:amd64 (1.2.33-1build2) ...
+2025-08-09T01:37:53.1542059Z Removing libxmlsec1:amd64 (1.2.33-1build2) ...
+2025-08-09T01:37:53.1748017Z Removing lxd-agent-loader (0.5) ...
+2025-08-09T01:37:53.6598776Z Removing python3-apport (2.20.11-0ubuntu82.9) ...
+2025-08-09T01:37:53.7613493Z Removing python3-twisted (22.1.0-2ubuntu2.6) ...
+2025-08-09T01:37:54.0904733Z Removing python3-automat (20.2.0-1) ...
+2025-08-09T01:37:54.1863576Z Removing python3-bcrypt (3.2.0-1build1) ...
+2025-08-09T01:37:54.2796918Z Removing python3-click (8.0.3-1) ...
+2025-08-09T01:37:54.3771379Z Removing python3-colorama (0.4.4-1) ...
+2025-08-09T01:37:54.4686649Z Removing python3-constantly (15.1.0-2) ...
+2025-08-09T01:37:54.5561084Z Removing python3-hamcrest (2.0.2-2) ...
+2025-08-09T01:37:54.6608792Z Removing python3-hyperlink (21.0.0-3) ...
+2025-08-09T01:37:54.7554528Z Removing python3-incremental (21.3.0-1) ...
+2025-08-09T01:37:54.8488073Z Removing python3-problem-report (2.20.11-0ubuntu82.9) ...
+2025-08-09T01:37:54.9456626Z Removing python3-service-identity (18.1.0-6) ...
+2025-08-09T01:37:55.0380755Z Removing python3-pyasn1-modules (0.2.1-1) ...
+2025-08-09T01:37:55.1351430Z Removing python3-pyasn1 (0.4.8-1) ...
+2025-08-09T01:37:55.2360835Z Removing python3-systemd (234-3ubuntu2) ...
+2025-08-09T01:37:55.3382903Z Removing python3-zope.interface (5.4.0-1build1) ...
+2025-08-09T01:37:55.4415999Z Removing zerofree (1.1.1-1build3) ...
+2025-08-09T01:37:55.4950566Z Processing triggers for libc-bin (2.35-0ubuntu3.10) ...
+2025-08-09T01:37:55.5128121Z Processing triggers for man-db (2.10.2-1) ...
+2025-08-09T01:37:55.8474513Z Processing triggers for initramfs-tools (0.140ubuntu13.5) ...
+2025-08-09T01:37:55.9068192Z update-initramfs: Generating /boot/initrd.img-6.8.0-1031-azure
+2025-08-09T01:38:06.9821141Z [0;32m[SUCCESS][0m Build environment initialized
+2025-08-09T01:38:06.9822416Z 
+2025-08-09T01:38:06.9822817Z [0;35m[PHASE][0m Building Custom Kernel 6.6.58 with AI Optimizations
+2025-08-09T01:38:06.9823180Z 
+2025-08-09T01:38:06.9823363Z [0;34m[INFO][0m Downloading Linux kernel 6.6.58...
+2025-08-09T01:38:06.9823887Z [0;34m[INFO][0m CI environment detected - using optimized download strategy
+2025-08-09T01:38:06.9824337Z [0;34m[INFO][0m Downloading kernel tarball (faster than git clone)...
+2025-08-09T01:38:07.0020180Z --2025-08-09 01:38:07--  https://www.kernel.org/pub/linux/kernel/v6.x/linux-6.6.58.tar.xz
+2025-08-09T01:38:07.0093901Z Resolving www.kernel.org (www.kernel.org)... 151.101.41.55, 2a04:4e42:2f::311
+2025-08-09T01:38:07.0104934Z Connecting to www.kernel.org (www.kernel.org)|151.101.41.55|:443... connected.
+2025-08-09T01:38:07.0188656Z HTTP request sent, awaiting response... 200 OK
+2025-08-09T01:38:07.0189130Z Length: 140387240 (134M) [application/x-xz]
+2025-08-09T01:38:07.0189693Z Saving to: ‘linux-6.6.58.tar.xz’
+2025-08-09T01:38:07.0245153Z 
+2025-08-09T01:38:07.0366741Z      0K ........ ........ ........ ........ ........ ........  2%  171M 1s
+2025-08-09T01:38:07.0502951Z   3072K ........ ........ ........ ........ ........ ........  4%  225M 1s
+2025-08-09T01:38:07.0670377Z   6144K ........ ........ ........ ........ ........ ........  6%  178M 1s
+2025-08-09T01:38:07.0857385Z   9216K ........ ........ ........ ........ ........ ........  8%  170M 1s
+2025-08-09T01:38:07.1069845Z  12288K ........ ........ ........ ........ ........ ........ 11%  133M 1s
+2025-08-09T01:38:07.1221999Z  15360K ........ ........ ........ ........ ........ ........ 13%  200M 1s
+2025-08-09T01:38:07.1407874Z  18432K ........ ........ ........ ........ ........ ........ 15%  160M 1s
+2025-08-09T01:38:07.1797678Z  21504K ........ ........ ........ ........ ........ ........ 17% 77.9M 1s
+2025-08-09T01:38:07.2042023Z  24576K ........ ........ ........ ........ ........ ........ 20%  120M 1s
+2025-08-09T01:38:07.2183926Z  27648K ........ ........ ........ ........ ........ ........ 22%  215M 1s
+2025-08-09T01:38:07.2311608Z  30720K ........ ........ ........ ........ ........ ........ 24%  236M 1s
+2025-08-09T01:38:07.2475917Z  33792K ........ ........ ........ ........ ........ ........ 26%  180M 1s
+2025-08-09T01:38:07.2584452Z  36864K ........ ........ ........ ........ ........ ........ 29%  287M 1s
+2025-08-09T01:38:07.2733449Z  39936K ........ ........ ........ ........ ........ ........ 31%  198M 1s
+2025-08-09T01:38:07.2847389Z  43008K ........ ........ ........ ........ ........ ........ 33%  263M 1s
+2025-08-09T01:38:07.3037912Z  46080K ........ ........ ........ ........ ........ ........ 35%  158M 1s
+2025-08-09T01:38:07.3209617Z  49152K ........ ........ ........ ........ ........ ........ 38%  174M 0s
+2025-08-09T01:38:07.3336582Z  52224K ........ ........ ........ ........ ........ ........ 40%  236M 0s
+2025-08-09T01:38:07.3530471Z  55296K ........ ........ ........ ........ ........ ........ 42%  155M 0s
+2025-08-09T01:38:07.3658381Z  58368K ........ ........ ........ ........ ........ ........ 44%  235M 0s
+2025-08-09T01:38:07.3835861Z  61440K ........ ........ ........ ........ ........ ........ 47%  169M 0s
+2025-08-09T01:38:07.3966958Z  64512K ........ ........ ........ ........ ........ ........ 49%  234M 0s
+2025-08-09T01:38:07.4088322Z  67584K ........ ........ ........ ........ ........ ........ 51%  238M 0s
+2025-08-09T01:38:07.4259412Z  70656K ........ ........ ........ ........ ........ ........ 53%  176M 0s
+2025-08-09T01:38:07.4455716Z  73728K ........ ........ ........ ........ ........ ........ 56%  155M 0s
+2025-08-09T01:38:07.4797231Z  76800K ........ ........ ........ ........ ........ ........ 58% 87.9M 0s
+2025-08-09T01:38:07.5065065Z  79872K ........ ........ ........ ........ ........ ........ 60%  115M 0s
+2025-08-09T01:38:07.5244611Z  82944K ........ ........ ........ ........ ........ ........ 62%  160M 0s
+2025-08-09T01:38:07.5419949Z  86016K ........ ........ ........ ........ ........ ........ 64%  171M 0s
+2025-08-09T01:38:07.6648655Z  89088K ........ ........ ........ ........ ........ ........ 67% 24.4M 0s
+2025-08-09T01:38:07.6767457Z  92160K ........ ........ ........ ........ ........ ........ 69%  265M 0s
+2025-08-09T01:38:07.6929115Z  95232K ........ ........ ........ ........ ........ ........ 71%  178M 0s
+2025-08-09T01:38:07.7042856Z  98304K ........ ........ ........ ........ ........ ........ 73%  265M 0s
+2025-08-09T01:38:07.7118688Z 101376K ........ ........ ........ ........ ........ ........ 76%  390M 0s
+2025-08-09T01:38:07.7289376Z 104448K ........ ........ ........ ........ ........ ........ 78%  177M 0s
+2025-08-09T01:38:07.7519354Z 107520K ........ ........ ........ ........ ........ ........ 80%  130M 0s
+2025-08-09T01:38:07.7733038Z 110592K ........ ........ ........ ........ ........ ........ 82%  145M 0s
+2025-08-09T01:38:07.7959420Z 113664K ........ ........ ........ ........ ........ ........ 85%  130M 0s
+2025-08-09T01:38:07.8109726Z 116736K ........ ........ ........ ........ ........ ........ 87%  207M 0s
+2025-08-09T01:38:07.8207405Z 119808K ........ ........ ........ ........ ........ ........ 89%  288M 0s
+2025-08-09T01:38:07.8467865Z 122880K ........ ........ ........ ........ ........ ........ 91%  115M 0s
+2025-08-09T01:38:07.8748602Z 125952K ........ ........ ........ ........ ........ ........ 94%  109M 0s
+2025-08-09T01:38:07.9081351Z 129024K ........ ........ ........ ........ ........ ........ 96% 90.0M 0s
+2025-08-09T01:38:07.9377496Z 132096K ........ ........ ........ ........ ........ ........ 98%  111M 0s
+2025-08-09T01:38:07.9729698Z 135168K ........ ........ ........ ......                    100% 48.8M=1.0s
+2025-08-09T01:38:07.9730065Z 
+2025-08-09T01:38:07.9730727Z 2025-08-09 01:38:07 (140 MB/s) - ‘linux-6.6.58.tar.xz’ saved [140387240/140387240]
+2025-08-09T01:38:07.9731297Z 
+2025-08-09T01:38:07.9744231Z [0;34m[INFO][0m ✓ Kernel tarball downloaded successfully from kernel.org
+2025-08-09T01:38:07.9744909Z [0;34m[INFO][0m Extracting kernel source...
+2025-08-09T01:38:17.2665646Z [0;32m[SUCCESS][0m Kernel source extracted successfully
+2025-08-09T01:38:17.2666434Z [0;34m[INFO][0m Applying AI/NPU optimization patches...
+2025-08-09T01:38:17.2711938Z [0;34m[INFO][0m Script directory: /home/runner/ainux-build/kernel/linux
+2025-08-09T01:38:17.2712828Z [0;34m[INFO][0m Patch directory: /home/runner/ainux-build/kernel/linux/patches
+2025-08-09T01:38:17.2732208Z [1;33m[WARNING][0m Local patches not found at: /home/runner/ainux-build/kernel/linux/patches
+2025-08-09T01:38:17.2772054Z [0;34m[INFO][0m Directory listing: total 1092
+2025-08-09T01:38:17.2772626Z drwxr-xr-x  26 runner docker   4096 Aug  9 01:38 .
+2025-08-09T01:38:17.2773138Z drwxr-xr-x   4 runner docker   4096 Aug  9 01:38 ..
+2025-08-09T01:38:17.2773696Z -rw-r--r--   1 runner docker  20561 Oct 22  2024 .clang-format
+2025-08-09T01:38:17.2774265Z -rw-r--r--   1 runner docker     59 Oct 22  2024 .cocciconfig
+2025-08-09T01:38:17.2774641Z -rw-r--r--   1 runner docker    151 Oct 22  2024 .get_maintainer.ignore
+2025-08-09T01:38:17.2775005Z -rw-r--r--   1 runner docker    105 Oct 22  2024 .gitattributes
+2025-08-09T01:38:17.2775319Z -rw-r--r--   1 runner docker   2080 Oct 22  2024 .gitignore
+2025-08-09T01:38:17.2775862Z -rw-r--r--   1 runner docker  36608 Oct 22  2024 .mailmap
+2025-08-09T01:38:17.2776169Z -rw-r--r--   1 runner docker    369 Oct 22  2024 .rustfmt.toml
+2025-08-09T01:38:17.2776464Z -rw-r--r--   1 runner docker    496 Oct 22  2024 COPYING
+2025-08-09T01:38:17.2776733Z -rw-r--r--   1 runner docker 102435 Oct 22  2024 CREDITS
+2025-08-09T01:38:17.2777052Z drwxr-xr-x  76 runner docker   4096 Oct 22  2024 Documentation
+2025-08-09T01:38:17.2777353Z -rw-r--r--   1 runner docker   2573 Oct 22  2024 Kbuild
+2025-08-09T01:38:17.2777625Z -rw-r--r--   1 runner docker    555 Oct 22  2024 Kconfig
+2025-08-09T01:38:17.2777900Z drwxr-xr-x   6 runner docker   4096 Oct 22  2024 LICENSES
+2025-08-09T01:38:17.2778196Z -rw-r--r--   1 runner docker 726918 Oct 22  2024 MAINTAINERS
+2025-08-09T01:38:17.2778481Z -rw-r--r--   1 runner docker  67637 Oct 22  2024 Makefile
+2025-08-09T01:38:17.2778746Z -rw-r--r--   1 runner docker    727 Oct 22  2024 README
+2025-08-09T01:38:17.2779025Z drwxr-xr-x  24 runner docker   4096 Oct 22  2024 arch
+2025-08-09T01:38:17.2779305Z drwxr-xr-x   3 runner docker   4096 Oct 22  2024 block
+2025-08-09T01:38:17.2779584Z drwxr-xr-x   2 runner docker   4096 Oct 22  2024 certs
+2025-08-09T01:38:17.2779860Z drwxr-xr-x   4 runner docker   4096 Oct 22  2024 crypto
+2025-08-09T01:38:17.2780147Z drwxr-xr-x 143 runner docker   4096 Oct 22  2024 drivers
+2025-08-09T01:38:17.2780692Z drwxr-xr-x  81 runner docker   4096 Oct 22  2024 fs
+2025-08-09T01:38:17.2780983Z drwxr-xr-x  31 runner docker   4096 Oct 22  2024 include
+2025-08-09T01:38:17.2781273Z drwxr-xr-x   2 runner docker   4096 Oct 22  2024 init
+2025-08-09T01:38:17.2781555Z drwxr-xr-x   2 runner docker   4096 Oct 22  2024 io_uring
+2025-08-09T01:38:17.2781844Z drwxr-xr-x   2 runner docker   4096 Oct 22  2024 ipc
+2025-08-09T01:38:17.2782119Z drwxr-xr-x  22 runner docker   4096 Oct 22  2024 kernel
+2025-08-09T01:38:17.2782396Z drwxr-xr-x  21 runner docker  12288 Oct 22  2024 lib
+2025-08-09T01:38:17.2782658Z drwxr-xr-x   6 runner docker   4096 Oct 22  2024 mm
+2025-08-09T01:38:17.2782926Z drwxr-xr-x  73 runner docker   4096 Oct 22  2024 net
+2025-08-09T01:38:17.2783196Z drwxr-xr-x   7 runner docker   4096 Oct 22  2024 rust
+2025-08-09T01:38:17.2783471Z drwxr-xr-x  41 runner docker   4096 Oct 22  2024 samples
+2025-08-09T01:38:17.2783756Z drwxr-xr-x  17 runner docker   4096 Oct 22  2024 scripts
+2025-08-09T01:38:17.2784193Z drwxr-xr-x  14 runner docker   4096 Oct 22  2024 security
+2025-08-09T01:38:17.2784658Z drwxr-xr-x  27 runner docker   4096 Oct 22  2024 sound
+2025-08-09T01:38:17.2785172Z drwxr-xr-x  43 runner docker   4096 Oct 22  2024 tools
+2025-08-09T01:38:17.2785829Z drwxr-xr-x   4 runner docker   4096 Oct 22  2024 usr
+2025-08-09T01:38:17.2786328Z drwxr-xr-x   4 runner docker   4096 Oct 22  2024 virt
+2025-08-09T01:38:17.2786923Z [1;33m[WARNING][0m Using fallback patches...
+2025-08-09T01:38:17.2787280Z [1;33m[WARNING][0m Using fallback patch configuration...
+2025-08-09T01:38:17.3006175Z patching file drivers/Kconfig
+2025-08-09T01:38:17.3006793Z Hunk #1 succeeded at 243 with fuzz 2 (offset 3 lines).
+2025-08-09T01:38:17.3007277Z patching file drivers/npu/Kconfig
+2025-08-09T01:38:17.3007594Z patch: **** malformed patch at line 36:  
+2025-08-09T01:38:17.3007806Z 
+2025-08-09T01:38:17.3012628Z [1;33m[WARNING][0m Fallback NPU patch failed
+2025-08-09T01:38:17.3027101Z patching file drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
+2025-08-09T01:38:17.3028032Z Hunk #1 FAILED at 190.
+2025-08-09T01:38:17.3030370Z 1 out of 1 hunk FAILED -- saving rejects to file drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c.rej
+2025-08-09T01:38:17.3037614Z [1;33m[WARNING][0m Fallback ROCm patch failed
+2025-08-09T01:38:17.3054168Z patching file net/core/dev.c
+2025-08-09T01:38:17.3060609Z Hunk #1 succeeded at 5354 with fuzz 2 (offset -166 lines).
+2025-08-09T01:38:17.3067922Z [0;34m[INFO][0m Configuring kernel for AI workloads...
+2025-08-09T01:38:17.4339816Z [0;34m[INFO][0m Applying AI hardware optimizations to kernel config...
+2025-08-09T01:38:17.8468544Z   HOSTCC  scripts/basic/fixdep
+2025-08-09T01:38:18.0207605Z   HOSTCC  scripts/kconfig/conf.o
+2025-08-09T01:38:18.1949636Z   HOSTCC  scripts/kconfig/confdata.o
+2025-08-09T01:38:18.4176754Z   HOSTCC  scripts/kconfig/expr.o
+2025-08-09T01:38:18.6024397Z   LEX     scripts/kconfig/lexer.lex.c
+2025-08-09T01:38:18.6630735Z   YACC    scripts/kconfig/parser.tab.[ch]
+2025-08-09T01:38:19.3137596Z   HOSTCC  scripts/kconfig/lexer.lex.o
+2025-08-09T01:38:19.6417724Z   HOSTCC  scripts/kconfig/menu.o
+2025-08-09T01:38:19.7982502Z   HOSTCC  scripts/kconfig/parser.tab.o
+2025-08-09T01:38:20.0491742Z   HOSTCC  scripts/kconfig/preprocess.o
+2025-08-09T01:38:20.1869937Z   HOSTCC  scripts/kconfig/symbol.o
+2025-08-09T01:38:20.5478659Z   HOSTCC  scripts/kconfig/util.o
+2025-08-09T01:38:20.5978911Z   HOSTLD  scripts/kconfig/conf
+2025-08-09T01:38:26.9211008Z drivers/Kconfig:246: can't open file "drivers/npu/Kconfig"
+2025-08-09T01:38:26.9220941Z make[2]: *** [scripts/kconfig/Makefile:77: oldconfig] Error 1
+2025-08-09T01:38:26.9223466Z make[1]: *** [/home/runner/ainux-build/kernel/linux/Makefile:697: oldconfig] Error 2
+2025-08-09T01:38:26.9225856Z make: *** [Makefile:234: __sub-make] Error 2
+2025-08-09T01:38:26.9233365Z + echo 'Build timed out or failed'
+2025-08-09T01:38:26.9233800Z Build timed out or failed
+2025-08-09T01:38:26.9234189Z + echo '=== Last 100 lines of any available logs ==='
+2025-08-09T01:38:26.9234880Z === Last 100 lines of any available logs ===
+2025-08-09T01:38:26.9238919Z + find /home/runner/ainux-build/logs -name '*.log' -exec tail -50 '{}' ';'
+2025-08-09T01:38:26.9260267Z patching file net/core/dev.c
+2025-08-09T01:38:26.9260785Z Hunk #1 succeeded at 5354 with fuzz 2 (offset -166 lines).
+2025-08-09T01:38:26.9270175Z patching file drivers/Kconfig
+2025-08-09T01:38:26.9270656Z Hunk #1 succeeded at 243 with fuzz 2 (offset 3 lines).
+2025-08-09T01:38:26.9271078Z patching file drivers/npu/Kconfig
+2025-08-09T01:38:26.9271331Z patch: **** malformed patch at line 36:  
+2025-08-09T01:38:26.9271500Z 
+2025-08-09T01:38:26.9280221Z patching file drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
+2025-08-09T01:38:26.9280698Z Hunk #1 FAILED at 190.
+2025-08-09T01:38:26.9281159Z 1 out of 1 hunk FAILED -- saving rejects to file drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c.rej
+2025-08-09T01:38:26.9283718Z + echo '=== Environment Variables ==='
+2025-08-09T01:38:26.9284154Z === Environment Variables ===
+2025-08-09T01:38:26.9286260Z + env
+2025-08-09T01:38:26.9288224Z + grep -E '(CLUSTER_MODE|ENABLE_GUI|SKIP_|BUILD_)'
+2025-08-09T01:38:26.9300037Z BUILD_THREADS=2
+2025-08-09T01:38:26.9300387Z DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+2025-08-09T01:38:26.9300779Z SKIP_QEMU_TEST=true
+2025-08-09T01:38:26.9301077Z CLUSTER_MODE=main
+2025-08-09T01:38:26.9301320Z SKIP_CONNECTIVITY_CHECK=true
+2025-08-09T01:38:26.9301527Z ENABLE_GUI=true
+2025-08-09T01:38:26.9301820Z + echo '=== Disk Usage ==='
+2025-08-09T01:38:26.9302308Z + df -h
+2025-08-09T01:38:26.9302478Z === Disk Usage ===
+2025-08-09T01:38:26.9313919Z Filesystem      Size  Used Avail Use% Mounted on
+2025-08-09T01:38:26.9314289Z /dev/root        73G   38G   36G  52% /
+2025-08-09T01:38:26.9314549Z tmpfs           7.9G  172K  7.9G   1% /dev/shm
+2025-08-09T01:38:26.9314913Z tmpfs           3.2G  1.1M  3.2G   1% /run
+2025-08-09T01:38:26.9315546Z tmpfs           5.0M     0  5.0M   0% /run/lock
+2025-08-09T01:38:26.9316123Z /dev/sda15      105M  6.1M   99M   6% /boot/efi
+2025-08-09T01:38:26.9316581Z /dev/sdb1        74G  4.1G   66G   6% /mnt
+2025-08-09T01:38:26.9317013Z tmpfs           1.6G   12K  1.6G   1% /run/user/1001
+2025-08-09T01:38:26.9317482Z tmpfs           7.9G     0  7.9G   0% /run/qemu
+2025-08-09T01:38:26.9317889Z + echo '=== Memory Usage ==='
+2025-08-09T01:38:26.9318095Z + free -h
+2025-08-09T01:38:26.9318252Z === Memory Usage ===
+2025-08-09T01:38:26.9332103Z                total        used        free      shared  buff/cache   available
+2025-08-09T01:38:26.9332542Z Mem:            15Gi       598Mi        10Gi        44Mi       4.7Gi        14Gi
+2025-08-09T01:38:26.9332840Z Swap:          4.0Gi          0B       4.0Gi
+2025-08-09T01:38:26.9334560Z + exit 1
+2025-08-09T01:38:26.9350359Z ##[error]Process completed with exit code 1.
