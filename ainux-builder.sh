@@ -886,10 +886,9 @@ create_npu_fallback_files() {
     # Create NPU directory if it doesn't exist
     mkdir -p drivers/npu
     
-    # Create complete NPU Kconfig
-    if [[ ! -s "drivers/npu/Kconfig" ]]; then
-        log_info "Creating fallback drivers/npu/Kconfig..."
-        cat > "drivers/npu/Kconfig" << 'KCONFIG_EOF'
+    # Always recreate NPU Kconfig to ensure it's complete and not truncated
+    log_info "Creating fallback drivers/npu/Kconfig..."
+    cat > "drivers/npu/Kconfig" << 'KCONFIG_EOF'
 # SPDX-License-Identifier: GPL-2.0-only
 menuconfig NPU_FRAMEWORK
 	bool "Neural Processing Unit (NPU) Support"
@@ -925,21 +924,18 @@ config INTEL_VPU
 
 endif # NPU_FRAMEWORK
 KCONFIG_EOF
-    fi
     
-    # Create NPU Makefile
-    if [[ ! -s "drivers/npu/Makefile" ]]; then
-        log_info "Creating fallback drivers/npu/Makefile..."
-        cat > "drivers/npu/Makefile" << 'MAKEFILE_EOF'
+    # Always recreate NPU Makefile to ensure it's complete
+    log_info "Creating fallback drivers/npu/Makefile..."
+    cat > "drivers/npu/Makefile" << 'MAKEFILE_EOF'
 # SPDX-License-Identifier: GPL-2.0
 obj-$(CONFIG_NPU_FRAMEWORK)	+= npu-core.o
 obj-$(CONFIG_ROCKCHIP_NPU)	+= rockchip-npu.o
 obj-$(CONFIG_ARM_ETHOS_NPU)	+= arm-ethos-npu.o
 obj-$(CONFIG_INTEL_VPU)		+= intel-vpu.o
 MAKEFILE_EOF
-    fi
     
-    # Create minimal NPU core driver
+    # Create minimal NPU core driver if it doesn't exist
     if [[ ! -s "drivers/npu/npu-core.c" ]]; then
         log_info "Creating fallback drivers/npu/npu-core.c..."
         cat > "drivers/npu/npu-core.c" << 'CORE_EOF'
