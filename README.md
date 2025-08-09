@@ -25,7 +25,7 @@
 
 - **🧠 AI-First Architecture**: Native support for PyTorch, TensorFlow, ONNX Runtime
 - **🚀 Multi-GPU Support**: NVIDIA CUDA, AMD ROCm, Intel Arc out-of-the-box
-- **🔌 NPU Integration**: Rockchip, ARM Ethos, Intel VPU support
+- **🔌 NPU Integration**: Rockchip, ARM Ethos, Intel VPU support with enhanced driver framework
 - **💾 Flash Memory Optimization**: NVMe caching, bcache, dm-cache support
 - **🧠 Advanced Memory Management**: ZRAM compression, huge pages, shared memory pools
 - **🌐 Cluster Management**: Automatic node discovery and load balancing
@@ -119,7 +119,7 @@ sudo validate-hardware
 |-----------|-------------------|----------------|
 | **NVIDIA GPUs** | RTX 20/30/40 Series, Tesla, A100, H100 | Driver 560+ |
 | **AMD GPUs** | RDNA, RDNA2, RDNA3, Vega, MI Series | ROCm 6.2+ |
-| **NPUs** | Rockchip RK3588, ARM Ethos-N, Intel VPU | Native drivers |
+| **NPUs** | Rockchip RK3588, ARM Ethos-N, Intel VPU | Native unified framework |
 | **Flash Storage** | NVMe, SATA SSD, eMMC, UFS | bcache, dm-cache |
 | **Memory** | DDR4/DDR5, ZRAM, Huge Pages | Optimized pools |
 | **Networking** | 10GbE, InfiniBand, Thunderbolt 3/4 | Kernel native |
@@ -351,13 +351,25 @@ For questions and discussions, visit our [Community Discussions](https://github.
 
 ### Areas for Contribution
 
-- **Hardware Support**: New GPU/NPU driver integration
+- **Hardware Support**: New GPU/NPU driver integration using the unified NPU framework
 - **AI Frameworks**: Additional ML library support
 - **Flash Storage**: Advanced caching algorithms and storage optimization
 - **Memory Management**: NUMA optimization, memory pool enhancements
 - **Networking**: Advanced cluster networking features
 - **Security**: Enhanced cluster authentication
 - **Documentation**: User guides, tutorials, examples
+
+### NPU Driver Framework
+
+Ainux OS includes a unified NPU (Neural Processing Unit) driver framework that provides:
+
+- **Unified API**: Common interface for all NPU types (Rockchip, ARM Ethos, Intel VPU, etc.)
+- **Device Management**: Automatic NPU detection and initialization
+- **Memory Management**: Efficient buffer allocation and DMA support
+- **Job Scheduling**: Queue-based job submission and completion tracking
+- **IOCTL Interface**: User-space API for NPU control and monitoring
+
+The framework is located in `drivers/npu/` and provides both core functionality and vendor-specific implementations.
 
 ## 📋 Roadmap
 
@@ -385,6 +397,13 @@ For questions and discussions, visit our [Community Discussions](https://github.
 ## 🐛 Troubleshooting
 
 ### Common Issues
+
+**NPU driver compilation errors (Fixed in v2.1)**
+```bash
+# Previously: "expected declaration or statement at end of input"
+# Fixed: NPU driver framework now compiles correctly with proper function declarations
+# The unified NPU framework supports multiple NPU types with consistent API
+```
 
 **Build fails with "insufficient disk space"**
 ```bash
