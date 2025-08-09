@@ -1,3 +1,7 @@
+<closed>[0092bbf]
+2025-08-09T10:11:51.754Z|patches/6.6-npu-support.patch|113|[RESOLVED][CFG]-Added NPU Kconfig fix script and build integration|(SUMMARY: Fixed Kconfig truncation during patch application)|endif # NPU_FRAMEWORK|5m40s|{"fix_applied":"npu_kconfig_completion_script","verification":"kernel_defconfig_success","components_verified":["NPU_FRAMEWORK","GOOGLE_TPU","NPU_DEBUG"]}
+</closed>
+
 <closed>[a7b3f41]
 2025-08-09T09:46:34.518Z|patches/6.6-npu-support.patch|113|[RESOLVED][CFG]-Added missing endif and completed TPU help text|(SUMMARY: Fixed incomplete NPU Kconfig structure)|endif # NPU_FRAMEWORK|1m55s|{"fix_applied":"added_missing_endif_and_tpu_help","verification":"kernel_config_success","components_verified":["NPU","TPU","GPU","CPU"]}
 </closed>
