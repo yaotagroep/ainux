@@ -1,0 +1,37 @@
+﻿2025-08-09T00:28:29.2478748Z ##[group]Run sudo apt-get update
+2025-08-09T00:28:29.2479463Z [36;1msudo apt-get update[0m
+2025-08-09T00:28:29.2480028Z [36;1msudo apt-get install -y shellcheck[0m
+2025-08-09T00:28:29.2480582Z [36;1m[0m
+2025-08-09T00:28:29.2481146Z [36;1m# Check all shell scripts (warnings allowed, only errors fail)[0m
+2025-08-09T00:28:29.2482333Z [36;1mfind . -name "*.sh" -type f | xargs shellcheck -e SC2155,SC2002,SC2046,SC2116,SC2024 || true[0m
+2025-08-09T00:28:29.2483152Z [36;1m[0m
+2025-08-09T00:28:29.2483575Z [36;1m# Check for critical errors only[0m
+2025-08-09T00:28:29.2484225Z [36;1mecho "Checking for critical shellcheck errors..."[0m
+2025-08-09T00:28:29.2485009Z [36;1mif find . -name "*.sh" -type f | xargs shellcheck -S error; then[0m
+2025-08-09T00:28:29.2485780Z [36;1m    echo "✅ No critical shellcheck errors found"[0m
+2025-08-09T00:28:29.2486370Z [36;1melse[0m
+2025-08-09T00:28:29.2486856Z [36;1m    echo "❌ Critical shellcheck errors detected"[0m
+2025-08-09T00:28:29.2487436Z [36;1m    exit 1[0m
+2025-08-09T00:28:29.2488176Z [36;1mfi[0m
+2025-08-09T00:28:29.2519915Z shell: /usr/bin/bash -e {0}
+2025-08-09T00:28:29.2520490Z ##[endgroup]
+2025-08-09T00:28:29.3404831Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2025-08-09T00:28:29.3706411Z Hit:2 http://azure.archive.ubuntu.com/ubuntu jammy InRelease
+2025-08-09T00:28:29.3721299Z Get:3 http://azure.archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+2025-08-09T00:28:29.3779347Z Get:4 http://azure.archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+2025-08-09T00:28:29.3794035Z Get:5 http://azure.archive.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+2025-08-09T00:28:29.4107057Z Get:6 https://packages.microsoft.com/repos/azure-cli jammy InRelease [3596 B]
+2025-08-09T00:28:29.4871518Z Get:7 https://packages.microsoft.com/ubuntu/22.04/prod jammy InRelease [3632 B]
+2025-08-09T00:28:29.7144052Z Get:8 http://azure.archive.ubuntu.com/ubuntu jammy-security/main Translation-en [379 kB]
+2025-08-09T00:28:29.7766694Z Get:9 https://packages.microsoft.com/repos/azure-cli jammy/main amd64 Packages [2575 B]
+2025-08-09T00:28:29.8271682Z Get:10 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main amd64 Packages [239 kB]
+2025-08-09T00:28:29.8801668Z Get:11 https://packages.microsoft.com/ubuntu/22.04/prod jammy/main arm64 Packages [75.0 kB]
+2025-08-09T00:28:32.5783676Z Fetched 1087 kB in 1s (1936 kB/s)
+2025-08-09T00:28:33.5085720Z Reading package lists...
+2025-08-09T00:28:33.5678857Z Reading package lists...
+2025-08-09T00:28:33.7791008Z Building dependency tree...
+2025-08-09T00:28:33.7802690Z Reading state information...
+2025-08-09T00:28:33.9652843Z shellcheck is already the newest version (0.8.0-2).
+2025-08-09T00:28:33.9653681Z 0 upgraded, 0 newly installed, 0 to remove and 16 not upgraded.
+2025-08-09T00:28:34.9845299Z Checking for critical shellcheck errors...
+2025-08-09T00:28:35.3268325Z ✅ No critical shellcheck errors found
