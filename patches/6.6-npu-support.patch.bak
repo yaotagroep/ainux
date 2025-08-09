@@ -24,7 +24,7 @@ new file mode 100644
 index 000000000000..f8e7d2a7b5c1
 --- /dev/null
 +++ b/drivers/npu/Kconfig
-@@ -0,0 +1,75 @@
+@@ -0,0 +1,74 @@
 +# SPDX-License-Identifier: GPL-2.0-only
 +#
 +# Neural Processing Unit (NPU) support for Ainux OS
