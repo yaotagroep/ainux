@@ -101,6 +101,25 @@ const issueSignature = `${filename}:${line_range}:${issue_description}:${timesta
 const hash = sha1(issueSignature).substring(0, 7);
 ```
 
+### Truncation Prevention
+
+**BELANGRIJK**: Om truncation te voorkomen:
+
+1. **File Size Monitoring**: Automatische backup wanneer files te groot worden
+2. **Buffer Management**: Gebruik sufficient buffer size (64KB minimum)
+3. **Batch Writing**: Schrijf issues in batches om I/O overhead te minimaliseren
+4. **Compression**: Automatische gzip compressie voor archived issues
+5. **Rotation Strategy**: Automatische file rotation bij size limits
+
+```bash
+# Controle op truncation
+tail -n 1 issue_logger/open.issue | grep -q "</open>" || echo "WAARSCHUWING: Mogelijke truncation gedetecteerd"
+
+# File integrity check
+wc -l issue_logger/*.issue
+stat -c%s issue_logger/*.issue
+```
+
 ### Auto-Resolution Triggers
 
 Een issue wordt automatisch gesloten wanneer:
