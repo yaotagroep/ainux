@@ -32,16 +32,19 @@ index 000000000000..f8e7d2a7b5c1
 +
 +menuconfig NPU_FRAMEWORK
 +	bool "Neural Processing Unit (NPU) Support"
++	default y
 +	help
 +	  Enable support for Neural Processing Units (NPUs) in Ainux OS.
 +	  NPUs are specialized processors designed for AI/ML acceleration,
 +	  providing high-performance inference and training capabilities.
++	  This option cannot be disabled in Ainux AI cluster builds.
 +
 +if NPU_FRAMEWORK
 +
 +config ROCKCHIP_NPU
 +	tristate "Rockchip NPU Support"
 +	depends on ARM64 || X86_64
++	default y
 +	help
 +	  Enable support for Rockchip NPUs (Neural Processing Units).
 +	  This includes support for RK3588 and other Rockchip SoCs
@@ -51,6 +54,7 @@ index 000000000000..f8e7d2a7b5c1
 +config ARM_ETHOS_NPU  
 +	tristate "ARM Ethos NPU Support"
 +	depends on ARM64 || X86_64
++	default y
 +	help
 +	  Enable support for ARM Ethos NPUs. ARM Ethos-N series
 +	  neural processing units provide efficient AI inference
@@ -60,6 +64,7 @@ index 000000000000..f8e7d2a7b5c1
 +config INTEL_VPU
 +	tristate "Intel VPU (Vision Processing Unit) Support"
 +	depends on X86_64 && PCI
++	default y
 +	help
 +	  Enable support for Intel VPU (Vision Processing Unit).
 +	  Intel VPU provides hardware acceleration for computer
@@ -69,6 +74,7 @@ index 000000000000..f8e7d2a7b5c1
 +config QUALCOMM_NPU
 +	tristate "Qualcomm Hexagon NPU Support"
 +	depends on ARM64
++	default y
 +	help
 +	  Enable support for Qualcomm Hexagon DSP/NPU units.
 +	  Qualcomm Snapdragon processors include dedicated
@@ -78,6 +84,7 @@ index 000000000000..f8e7d2a7b5c1
 +config MEDIATEK_APU
 +	tristate "MediaTek APU Support"
 +	depends on ARM64
++	default y
 +	help
 +	  Enable support for MediaTek APU (AI Processing Unit).
 +	  MediaTek Dimensity processors include dedicated APU
@@ -86,6 +93,7 @@ index 000000000000..f8e7d2a7b5c1
 +config NPU_DEBUG
 +	bool "NPU Framework Debug Support"
 +	depends on NPU_FRAMEWORK
++	default n
 +	help
 +	  Enable debug support for NPU framework. This includes
 +	  additional logging, debugging interfaces, and validation
