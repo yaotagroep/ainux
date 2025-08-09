@@ -2361,6 +2361,7 @@ EOF
 
     # Ensure setup.sh is executable after final append
     sudo chmod +x rootfs/setup.sh
+    chmod +x rootfs/setup.sh 2>/dev/null || true
 
     # Execute chroot setup with progress monitoring - OPTIMIZED for CI
     log_info "Executing system setup in chroot environment..."
@@ -2381,6 +2382,9 @@ EOF
     else
         timeout_duration=3600  # 60 minutes for normal builds
     fi
+    
+    # Final permission fix to ensure setup.sh is always executable
+    chmod +x rootfs/setup.sh 2>/dev/null || true
     
     # Run setup with timeout and progress indication
     log_info "Running chroot setup (timeout: ${timeout_duration}s)..."
