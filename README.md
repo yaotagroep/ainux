@@ -65,7 +65,7 @@
 
 ### Prerequisites
 
-- **Host System**: Ubuntu 22.04 LTS
+- **Host System**: Ubuntu 22.04 or 24.04 LTS
 - **Storage**: 30GB+ free disk space
 - **Memory**: 8GB+ RAM recommended
 - **Network**: Internet connection for downloads
