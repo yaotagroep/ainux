@@ -53,6 +53,18 @@ export RKNN_SUPPORT="true"       # Rockchip NPU support
 export BUILD_THREADS="${BUILD_THREADS:-4}"  # Limited for ARM cross-compilation
 export SKIP_QEMU_TEST="${SKIP_QEMU_TEST:-true}"  # Skip QEMU for ARM
 
+# ARM-specific kernel config
+export KERNEL_CONFIG="configs/ainux-6.6-arm.config"
+
+# ARM ISO naming
+export OUTPUT_ISO_NAME="ainux-arm-${ARCH}"
+
+# Cross-compilation settings
+if [[ "$(uname -m)" != "aarch64" ]]; then
+    export CROSS_COMPILE="aarch64-linux-gnu-"
+    export CROSS_COMPILE_ARM64="aarch64-linux-gnu-"
+fi
+
 # Detect if GUI is requested
 if [[ "${ENABLE_GUI:-false}" == "true" ]]; then
     CUSTOM_PACKAGES="${CUSTOM_PACKAGES} lightdm xfce4-session xfce4-panel xfce4-desktop"
@@ -64,6 +76,7 @@ echo -e "  📦 Build Variant: ${BUILD_VARIANT}"
 echo -e "  🖥️  GUI Enabled: ${ENABLE_GUI}"
 echo -e "  🏗️  Architecture: ${ARCH}"
 echo -e "  🧵 Build Threads: ${BUILD_THREADS}"
+echo -e "  ⚙️  Kernel Config: ${KERNEL_CONFIG}"
 echo -e "  ⚡ Low Power Mode: ${LOW_POWER_MODE}"
 echo -e "  🔧 GPIO Support: ${GPIO_SUPPORT}"
 echo -e "  🤖 Edge AI: ${EDGE_AI_SUPPORT}"

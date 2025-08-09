@@ -15,22 +15,49 @@ Ainux OS offers three specialized variants optimized for different use cases and
 
 ## 🎯 Build Variants Overview
 
-Ainux OS offers three specialized variants optimized for different use cases and hardware platforms. Each variant includes comprehensive TPU, NPU, GPU, CPU, and DPU acceleration support.
+Ainux OS offers three specialized variants optimized for different use cases and hardware platforms. Each variant includes comprehensive TPU, NPU, GPU, CPU, and DPU acceleration support with enhanced v4.0 fixes.
 
 ### 🖥️ Desktop Edition
 **Target**: Workstations, gaming PCs, development machines  
 **GUI**: XFCE4 desktop environment included  
 **Use Cases**: Development, gaming, multimedia, AI research  
+**Build Script**: `./build-desktop.sh`  
+**Docker**: `ghcr.io/yaotagroep/ainux-desktop`  
+
+**Key Features**:
+- 🎮 Gaming optimizations (Steam, Lutris, Discord)
+- 🎨 Creative tools (GIMP, OBS Studio, multimedia codecs) 
+- 🔊 Audio/video support (PulseAudio, Bluetooth, WiFi)
+- 🧠 Full AI acceleration stack
+- 🎯 Hardware-specific builds (NVIDIA, AMD, Intel, integrated)
 
 ### 🏢 Server Edition  
 **Target**: Enterprise servers, data centers, cloud infrastructure  
 **GUI**: Headless (no GUI) for maximum performance  
 **Use Cases**: Enterprise computing, virtualization, containers, AI inference  
+**Build Script**: `./build-server.sh`  
+**Docker**: `ghcr.io/yaotagroep/ainux-server`  
+
+**Key Features**:
+- 🛡️ Enhanced security (SELinux, AppArmor hardening)
+- 🐳 Container orchestration (Docker, Kubernetes)
+- 🌐 Enterprise networking (InfiniBand, RDMA)
+- 💾 Advanced storage (RAID, LVM, ZFS)
+- 🏗️ Multiple profiles (datacenter, cloud, edge, hpc)
 
 ### 🍓 ARM Edition
 **Target**: Raspberry Pi, edge devices, IoT systems  
-**GUI**: Optional (configurable)  
+**GUI**: Optional (configurable with ENABLE_GUI=true)  
 **Use Cases**: Edge computing, IoT, industrial automation, embedded AI  
+**Build Script**: `./build-arm.sh`  
+**Docker**: `ghcr.io/yaotagroep/ainux-arm`  
+
+**Key Features**:
+- 🔧 GPIO/I2C/SPI hardware interfaces
+- ⚡ Low-power optimizations
+- 🤖 Edge AI acceleration (Coral TPU, ARM Ethos NPU)
+- 🍓 Raspberry Pi optimizations (4/5/400 support)
+- 🏭 Industrial IoT protocols (MQTT, CoAP, Modbus)  
 
 ---
 

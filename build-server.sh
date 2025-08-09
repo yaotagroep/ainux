@@ -54,11 +54,18 @@ export TRITON_SUPPORT="true"  # NVIDIA Triton Inference Server
 export BUILD_THREADS="${BUILD_THREADS:-$(nproc)}"
 export SKIP_QEMU_TEST="${SKIP_QEMU_TEST:-false}"
 
+# Server-specific kernel config
+export KERNEL_CONFIG="configs/ainux-6.6-server.config"
+
+# Server ISO naming
+export OUTPUT_ISO_NAME="ainux-server-${ARCH}"
+
 echo -e "${YELLOW}🔧 Configuration:${NC}"
 echo -e "  📦 Build Variant: ${BUILD_VARIANT}"
 echo -e "  🖥️  GUI Enabled: ${ENABLE_GUI}"
 echo -e "  🏗️  Architecture: ${ARCH}"
 echo -e "  🧵 Build Threads: ${BUILD_THREADS}"
+echo -e "  ⚙️  Kernel Config: ${KERNEL_CONFIG}"
 echo -e "  🛡️  Security Hardening: ${SECURITY_HARDENING}"
 echo -e "  🐳 Container Runtime: ${CONTAINER_RUNTIME}"
 echo -e "  💾 Enterprise Storage: ${ENTERPRISE_STORAGE}"
